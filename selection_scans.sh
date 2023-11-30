@@ -15,19 +15,18 @@ if [ $# -lt 1 ]
     echo "Analyzes a vcf containing sequences from two populations using fst, bayescan, nucleotide diversity, Tajima's D, and SweeD.
 
     [-i] Path to vcf file directory
-    [-v] Vcf file name (don't include extension)
+    [-n] Output project name (don't include extension)
     [-o] Output directory for files
-    [-p] Path to pop1 file (population of interest)
-    [-q] Path to pop2 file (reference population)"
+    [-p] Pop1 file name (reference population)
+    [-q] Pop2 file name (population of interest)"
 
 
   else
-    while getopts i:o:c:r: option
+    while getopts n:o:p:q: option
     do
     case "${option}"
     in
-    i) inDir=${OPTARG};;
-    v) vcf=${OPTARG};;
+    n) name=${OPTARG};;
     o) outDir=${OPTARG};;
     p) pop1=${OPTARG};;
     q) pop2=${OPTARG};;
@@ -39,18 +38,20 @@ if [ $# -lt 1 ]
 module load vcftools
 module load R
 
+mkdir ${outDir}/referencepop ${outDir}/interestpop
 
-vcftools --vcf ${inDir}/${vcf}.vcf --window-pi 10000 --out ${outDir}/${vcf}
+# reference population analysis
+vcftools --vcf ${pop1} --window-pi 10000 --out ${outDir}/referencepop/${name}
 
-head -1 ${outDir}/${vcf}.windowed.pi > ${outDir}/${vcf}.chroms.windowed.pi
-grep 'NC' ${outDir}/${vcf}.windowed.pi >> ${outDir}/${vcf}.chroms.windowed.pi
+head -1 ${outDir}/referencepop/${name}.windowed.pi > ${outDir}/referencepop/${name}.chroms.windowed.pi
+grep 'NC' ${outDir}/referencepop/${name}.windowed.pi >> ${outDir}/referencepop/${name}.chroms.windowed.pi
 
-sed -i 's/NC_//g' ${outDir}/${vcf}.chroms.windowed.pi
+sed -i 's/NC_//g' ${outDir}/referencepop/${name}.chroms.windowed.pi
 
-awk '{sub(/\./,"",$1)}1' ${outDir}/${vcf}.chroms.windowed.pi | column -t > ${outDir}/${vcf}.chroms.windowed.pi.formanhattan
+awk '{sub(/\./,"",$1)}1' ${outDir}/referencepop/${name}.chroms.windowed.pi | column -t > ${outDir}/referencepop/${name}.chroms.windowed.pi.formanhattan
 
 
 
-Rscript nucleotidediversity.R ${outDir} ${vcf}
+Rscript nucleotidediversity.R ${outDir}/referencepop/${name}
 
 fi
