@@ -52,6 +52,7 @@ awk '{sub(/\./,"",$1)}1' ${outDir}/referencepop/${name}.chroms.windowed.pi | col
 
 
 
-Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/referencepop/${name}
+Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/referencepop ${name}
 
-fi 
+
+fi
