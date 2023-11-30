@@ -1,0 +1,57 @@
+# Revised full sample list 
+
+PAR = Camarhynchus parvulus	Small tree finch
+CRA = Platyspiza crassirostris	Vegetarian finch
+FOR = Geospiza fortis	Medium ground finch
+
+JP4481  CRA post
+JP5410  CRA post
+JP9655  CRA post
+lamich_PARV1  PAR pre
+lamich_PARV2  PAR pre
+lamich_PL15 CRA pre
+lamich_PL16 CRA pre
+lamich_PL4  CRA pre
+lamich_PL7  CRA pre
+lamich_PL9  CRA pre
+RHC097  PAR post
+RHC507  PAR post
+SM031 PAR post
+SM032 PAR post
+SM040 PAR post
+SM059 PAR post
+SM079 PAR post
+SM1067  CRA post
+SM1083  FOR post
+SM1156  FOR post
+SM1157  CRA post
+SM1200  CRA post
+SM1204  FOR post
+SM1231  CRA post
+SM1237  FOR post
+SM1240  CRA post
+SM1266  CRA post
+SM1270  FOR post
+SM1271  FOR post
+SM1272  FOR post
+SM1273  FOR post
+SRR289  FOR pre
+SRR290  FOR pre
+SRR291  FOR pre
+SRR292  FOR pre
+SRR293  FOR pre
+SRR294  FOR pre
+SRR295  FOR pre
+SRR296  FOR pre
+SRR297  FOR pre
+SRR298  FOR pre
+SRR329  PAR pre
+SRR330  PAR pre
+SRR331  PAR pre
+SRR332  PAR pre
+SRR333  PAR pre
+SRR334  PAR pre
+SRR335  PAR pre
+SRR336  PAR pre
+SRR337  PAR pre
+SRR338  PAR pre
