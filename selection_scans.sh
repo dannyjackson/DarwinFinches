@@ -54,5 +54,18 @@ awk '{sub(/\./,"",$1)}1' ${outDir}/referencepop/${name}.chroms.windowed.pi | col
 
 Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/referencepop ${name}
 
+# population of interest analysis
+vcftools --vcf ${pop2} --window-pi 10000 --out ${outDir}/interestpop/${name}
+
+head -1 ${outDir}/interestpop/${name}.windowed.pi > ${outDir}/interestpop/${name}.chroms.windowed.pi
+grep 'NC' ${outDir}/interestpop/${name}.windowed.pi >> ${outDir}/interestpop/${name}.chroms.windowed.pi
+
+sed -i 's/NC_//g' ${outDir}/interestpop/${name}.chroms.windowed.pi
+
+awk '{sub(/\./,"",$1)}1' ${outDir}/interestpop/${name}.chroms.windowed.pi | column -t > ${outDir}/interestpop/${name}.chroms.windowed.pi.formanhattan
+
+
+
+Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/interestpop ${name}
 
 fi

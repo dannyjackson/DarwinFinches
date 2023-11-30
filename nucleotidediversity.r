@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript 
-#Genome wide ABBA BABA test with block jackknife procedure
+# Plotting and identifying significant regions of genome wide nucleotide diversity scan output from vcftools
 
 args = commandArgs()
 
@@ -24,11 +24,11 @@ myBg <- !LessThanCutoff
 
 mydf<-data.frame(SNP,myBg,pi.subset)
 
-pdf(file = paste0(outDir,"/",name,".pre_pi_hist.pdf"), width = 10, height = 5, useDingbats=FALSE)
+pdf(file = paste0(outDir,"/",name,".pi_hist.pdf"), width = 10, height = 5, useDingbats=FALSE)
 hist(pi.subset$PI,br=50)
 dev.off()
 
-pdf(file = paste0(outDir,"/",name,".pre_pi.pdf"), width = 20, height = 7, useDingbats=FALSE)
+pdf(file = paste0(outDir,"/",name,".pi.pdf"), width = 20, height = 7, useDingbats=FALSE)
 
 plot(PI ~ SNP, col= "white", pch = 21, bg=ifelse(myBg  == "TRUE", 'red', 'gray'),
      data = mydf,
@@ -43,5 +43,5 @@ dev.off()
 # this gives regions of significance 
 
 
-write.csv(mydf[ which(mydf$myBg=='TRUE'),], paste0(outDir,"/",name,".pre_pi_sig.csv"), row.names=FALSE)
+write.csv(mydf[ which(mydf$myBg=='TRUE'),], paste0(outDir,"/",name,".pi_sig.csv"), row.names=FALSE)
 
