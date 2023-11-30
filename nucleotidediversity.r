@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript
+#!/usr/bin/env Rscript 
 #Genome wide ABBA BABA test with block jackknife procedure
 
 args = commandArgs()
