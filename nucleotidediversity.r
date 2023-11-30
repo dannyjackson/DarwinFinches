@@ -7,8 +7,6 @@ outDir <- args[6]
 name <- args[7]
 
 
-R
-
 pi.all <- read.table(paste0(outDir,"/",name,".chroms.windowed.pi"),header=T)
 pi.subset<-pi.all[complete.cases(pi.all),]
 

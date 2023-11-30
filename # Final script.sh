@@ -736,6 +736,7 @@ dev.off()
 
 mydf[ which(mydf$myBg=='TRUE'),]
 
+write.csv(mydf[ which(mydf$myBg=='TRUE'),], "cra_pre_td_sig.csv", row.names=FALSE)
 
 SNP myBg   CHROM BIN_START BIN_END N_VARIANTS        PI
 94646 94646 TRUE 44601.1   4400001 4410000        307 0.0161473
@@ -811,3 +812,13 @@ NC_044583.1     Gnomon  gene    2203974 2217325 .       -       .       ID=gene-
 protocadherin gamma-A12-like
 
 grep '44601.1' /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff | grep 'ID=gene'
+
+
+
+./selection_scans.sh -n cra -o /xdisk/mcnew/dannyjackson/finches/nucleotidediversity/cra/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf
+
+    n) name=${OPTARG};;
+    o) outDir=${OPTARG};;
+    p) pop1=${OPTARG};;
+    q) pop2=${OPTARG};;
+ 
