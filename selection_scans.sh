@@ -18,7 +18,7 @@ if [ $# -lt 1 ]
     [-v] Vcf file name (don't include extension)
     [-o] Output directory for files
     [-p] Path to pop1 file (population of interest)
-    [-q] Path to pop2 file (reference population)
+    [-q] Path to pop2 file (reference population)"
 
 
   else
