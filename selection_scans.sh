@@ -53,3 +53,4 @@ awk '{sub(/\./,"",$1)}1' ${outDir}/${vcf}.chroms.windowed.pi | column -t > ${out
 
 Rscript nucleotidediversity.R ${outDir} ${vcf}
 
+fi
