@@ -822,3 +822,76 @@ grep '44601.1' /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/dat
     p) pop1=${OPTARG};;
     q) pop2=${OPTARG};;
  
+
+
+# i need to search GFF for genes in the chromosome of column "CHROM" of the CSV (col3)
+
+# testing
+
+# this finds shared values between file1$1 and file2$2
+
+awk -F"[,\t]" 'NR==FNR{a[$1]=$1","$2; next} ($2 in a){print a[$2]","$1}' file1.txt file2.txt
+
+
+# i need to find shared values between file1$3 and file2$1
+
+# remake test files
+1,Brian,1000
+4,Jason,1010
+8,Nick,400
+13,Sean,410
+
+1000 3044	
+400  4466
+1010 1206
+
+awk -F"[,\t]" 'NR==FNR{a[$3]=$3","$1; next} ($1 in a){print a[$1]","$3}' file1.txt file2.txt
+
+# so that works, but it's printing a combination of file2$1 and file1$3
+# what I need is the entire line of file 2 if it matches file1$3
+
+awk -F"[,\t]" 'NR==FNR{a[$3]=$3","$1; next} ($1 in a){print $0}' test2.test.csv file2.txt
+
+awk -F"[,\t]" 'NR==FNR{a[$3]=$3","$1; next} ($1 in a){print $0}' file1.txt file2.txt
+
+
+# generate test csv 
+awk NR\>1 cra.pi_sig.csv > test.csv
+awk 'BEGIN {FS = ",";OFS = ","} $3="NC_0"$3' test.csv > test2.csv
+
+
+# generate test giff
+
+awk '$0 !~ /\#/' /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff | head > test.gff
+grep '44583.1' /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff | grep 'ID=gene' | grep 'LOC115908533' >> test.gff
+
+# modify awk script to apply to my test files
+awk -F"[,\t]" 'NR==FNR{a[$3]=$3","$1; next} ($1 in a){print $0}' test2.csv test.gff
+
+# okay this works now! try it with the non-test files
+
+awk -F"[,\t]" 'NR==FNR{a[$3]=$3","$1; next} ($1 in a){print $0}' test2.csv /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff
+
+# that worked! now I have to get it to identify not just where file1$3 is a match but also where file1$4 < file2$5 and file1$5 > file2$4
+
+
+awk '$5>= 2217320 && $4>= 2203970' test.gff
+
+# the above works! I need to incorporate it into the other awk script now ugh
+
+
+/xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff
+
+# confusing notes
+
+
+awk '{$2 > 140268 && $2 < 142418}1' /scratch/dnjacks4/cardinalis/to_b10k/b10k_filtered.geno25.maf1.vcf | awk '$0 !~ /\##/' | awk '$0 ~ /VYXE01020886/' >> Col6a1.vcf
+
+
+
+awk '{$5 > 4400001 && $4 < 4410000}1' /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff | awk '$0 !~ /\##/' | awk '$0 ~ /VYXE01006626/' >> rho.vcf
+
+
+
+
+sbatch ~/programs/slurmscripts/selection_scans.slurm
