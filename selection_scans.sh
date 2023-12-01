@@ -95,6 +95,32 @@ Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/nucleotidediver
 awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/nucleotidediversity/interestpop/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/nucleotidediversity/interestpop/${name}.pi_sig_genes.csv
 
 ## Tajima's D
+
+# population of interest
+
+mkdir ${outDir}/tajimasd 
+mkdir ${outDir}/tajimasd/referencepop ${outDir}/tajimasd/interestpop
+
+vcftools --vcf ${pop2} --TajimaD 20000 --out ${outDir}/tajimasd/interestpop/${name} 
+
+
+out.Tajima.D
+
+
+head -1 ${outDir}/tajimasd/interestpop/${name}.Tajima.D > ${outDir}/tajimasd/interestpop/${name}.chroms..Tajima.D
+grep 'NC' ${outDir}/tajimasd/interestpop/${name}..Tajima.D >> ${outDir}/tajimasd/interestpop/${name}.chroms..Tajima.D
+
+sed -i 's/NC_//g' ${outDir}/tajimasd/interestpop/${name}.chroms..Tajima.D
+
+awk '{sub(/\./,"",$1)}1' ${outDir}/tajimasd/interestpop/${name}.chroms..Tajima.D | column -t > ${outDir}/tajimasd/interestpop/${name}.chroms.Tajima.D.formanhattan
+
+Rscript ~/programs/DarwinFinches/tajimasD.r ${outDir}/tajimasD/interestpop ${name}
+
+awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/interestpop/${name}.tD_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/interestpop/${name}.tD_sig_genes.csv
+
+
+
+
 ## SweeD
 
 fi

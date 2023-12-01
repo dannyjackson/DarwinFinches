@@ -1577,3 +1577,242 @@ awk 'BEGIN {FS = ",";OFS = ","} $3="NC_0"$3' test.csv > test2.csv
 
 
 # tomorrow, continue to build out the script incorporating pre and post pops into the nucleotide diversity scans, then do fst, tajima's d, sweed, and bayescan. The last one is gonna be the most annoying i think. The final step should be to incorporate all of these output into one single file that has rows of genes with columns that attribute which programs identified them.
+
+
+
+
+awk -F"[,\t]" 'NR==FNR{a[NC_0$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}'  /xdisk/mcnew/dannyjackson/finches/nucleotidediversity/cra/interestpop/cra.pi_sig.csv /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff | grep 'ID=gene' > ${outDir}/interestpop/${name}.pi_sig_genes.csv
+
+
+# Friday December 1st
+/xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf
+
+
+
+
+## previous fst scripts
+# PAR
+
+module load vcftools
+module load R
+
+vcftools --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf --weir-fst-pop pre.txt --weir-fst-pop post.txt --fst-window-size 1000 --fst-window-step 1000 
+
+head -1 out.windowed.weir.fst > chroms.windowed.weir.fst
+grep 'NC' out.windowed.weir.fst >> chroms.windowed.weir.fst
+
+sed -i 's/NC_//g' chroms.windowed.weir.fst
+
+
+
+library(qqman)
+fst<-read.table("chroms.windowed.weir.fst", header=TRUE)
+fstsubset<-fst[complete.cases(fst),]
+
+xu <- mean(fstsubset$WEIGHTED_FST)
+s <- sd(fstsubset$WEIGHTED_FST)
+fstsubset$ZFST = (fstsubset$WEIGHTED_FST - xu)/s
+
+SNP<-c(1: (nrow(fstsubset)))
+mydf<-data.frame(SNP,fstsubset)
+
+pdf(file = "par_1000window.pdf", width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="WEIGHTED_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
+dev.off()
+
+pdf(file = "par_1000window_zfst.pdf", width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="ZFST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
+dev.off()
+
+# CRA
+
+module load vcftools
+module load R
+
+
+vcftools --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf --weir-fst-pop pre.txt --weir-fst-pop post.txt --fst-window-size 1000 --fst-window-step 1000 
+
+head -1 out.windowed.weir.fst > chroms.windowed.weir.fst
+grep 'NC' out.windowed.weir.fst >> chroms.windowed.weir.fst
+
+sed -i 's/NC_//g' chroms.windowed.weir.fst
+
+
+library(qqman)
+fst<-read.table("chroms.windowed.weir.fst", header=TRUE)
+fstsubset<-fst[complete.cases(fst),]
+
+xu <- mean(fstsubset$WEIGHTED_FST)
+s <- sd(fstsubset$WEIGHTED_FST)
+fstsubset$ZFST = (fstsubset$WEIGHTED_FST - xu)/s
+
+SNP<-c(1: (nrow(fstsubset)))
+mydf<-data.frame(SNP,fstsubset)
+
+pdf(file = "cra_1000window.pdf", width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="WEIGHTED_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
+dev.off()
+
+pdf(file = "cra_1000window_zfst.pdf", width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="ZFST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
+dev.off()
+
+
+# FOR
+module load vcftools
+module load R
+
+
+vcftools --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf --weir-fst-pop pre.txt --weir-fst-pop post.txt --fst-window-size 1000 --fst-window-step 1000 
+
+head -1 out.windowed.weir.fst > chroms.windowed.weir.fst
+grep 'NC' out.windowed.weir.fst >> chroms.windowed.weir.fst
+
+sed -i 's/NC_//g' chroms.windowed.weir.fst
+
+library(qqman)
+fst<-read.table("chroms.windowed.weir.fst", header=TRUE)
+fstsubset<-fst[complete.cases(fst),]
+
+xu <- mean(fstsubset$WEIGHTED_FST)
+s <- sd(fstsubset$WEIGHTED_FST)
+fstsubset$ZFST = (fstsubset$WEIGHTED_FST - xu)/s
+
+SNP<-c(1: (nrow(fstsubset)))
+mydf<-data.frame(SNP,fstsubset)
+
+pdf(file = "for_1000window.pdf", width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="WEIGHTED_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
+dev.off()
+
+pdf(file = "for_1000window_zfst.pdf", width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="ZFST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
+dev.off()
+
+
+
+vcftools --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.recode.vcf --weir-fst-pop pre.txt --weir-fst-pop post.txt 
+
+head -1 out.weir.fst > chroms.weir.fst
+grep 'NC' out.weir.fst >> chroms.weir.fst
+
+sed -i 's/NC_//g' chroms.weir.fst
+
+
+library(qqman)
+fst<-read.table("chroms.weir.fst", header=TRUE)
+fstsubset<-fst[complete.cases(fst),]
+SNP<-c(1: (nrow(fstsubset)))
+mydf<-data.frame(SNP,fstsubset)
+
+pdf(file = "for.chroms.fst.snps.pdf", width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="CHROM",bp="POS",p="WEIR_AND_COCKERHAM_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst"))
+dev.off()
+
+
+
+
+#!/bin/bash
+
+#SBATCH --job-name=selectionscans
+#SBATCH --ntasks=12
+#SBATCH --nodes=1             
+#SBATCH --time=240:00:00   
+#SBATCH --partition=standard
+#SBATCH --account=mcnew
+#SBATCH --mem-per-cpu=15gb
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=dannyjackson@arizona.edu
+#SBATCH --output=output.selectionscans.%j
+
+module load vcftools
+module load R
+
+chmod +x ~/programs/DarwinFinches/selection_scans.sh
+
+~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf -n cra -o /xdisk/mcnew/dannyjackson/finches/cra/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pre_pops.txt -s /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_post_pops.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff
+
+chmod -x ~/programs/DarwinFinches/selection_scans.sh
+
+
+
+
+# Tajima's D
+
+vcftools --vcf /scratch/dnjacks4/cardinalis/to_b10k/sweed/urban_pyrr.filtered.geno25.maf1.vcf --TajimaD 20000 
+
+
+sed -i 's/VYXE//g' out.Tajima.D
+
+awk '{sub(/\./,"",$1)}1' out.Tajima.D | column -t > out.Tajima.D.formanhattan
+
+
+R
+
+taj.all <- read.table("out.Tajima.D",header=T)
+taj.subset<-taj.all[complete.cases(taj.all),]
+
+SNP<-c(1: (nrow(taj.subset)))
+
+lower = min(taj.subset$TajimaD)
+upper = max(taj.subset$TajimaD)
+lower_cutoff = lower + ((upper-lower)*0.025)
+upper_cutoff = upper - ((upper-lower)*0.025)
+
+MoreThanLower <- taj.subset$TajimaD > lower_cutoff
+LessThanUpper <- taj.subset$TajimaD < upper_cutoff
+significant <- MoreThanLower & LessThanUpper 
+
+myBg <- !significant
+
+
+mydf<-data.frame(SNP,myBg,taj.subset)
+
+sigdf <-  mydf[which(mydf$myBg),]
+
+write.table(sigdf, file = "sigtd.tsv")
+
+pdf(file = "pyrr_urban_td_hist.pdf", width = 10, height = 5, useDingbats=FALSE)
+hist(taj.subset$TajimaD,br=20)
+dev.off()
+
+pdf(file = "pyrr_urban_td.pdf", width = 20, height = 7, useDingbats=FALSE)
+
+plot(TajimaD ~ SNP, col= "white", pch = 21, bg=ifelse(myBg  == "TRUE", 'red', 'gray'),
+     data = mydf,
+     xaxt = "n", bty = "l", xlab = "chr", cex = 1)
+# add custom axis labels
+axis(1, at = mydf$SNP,
+     labels = mydf$CHROM,
+     las = 2)
+
+dev.off()
+
+
+
+
+# Next steps:
+Consider https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-020-07095-8#Sec8
+which used zfst, zHp, pi-ratio, and also:
+XP-EHH: Cross-population extended haplotype homozygosity
+
+Rubin et al. defined and applied a Z-score test for heterozygosity depression (ZHp) on chicken genome sequence, which basically expresses how much the expected heterozygosity in chromosome windows deviate from the average genome heterozygosity [11].
+
+https://www.nature.com/articles/nature08832
+
+Run ARGwaver (Ancestral Recombination Graph)
+
+
+# ideal header for output of gene table
+genename,chromosome,startpos,endpos,cra,par,for,fst,pi,etc
+
+python --version
+# If you have trouble installing pixy in an environment using python 3.9, try rolling back to python 3.8.
+
+
+
+conda config --add channels conda-forge
+conda install -c conda-forge pixy
+conda install -c bioconda htslib
+# test installation
+pixy --help

@@ -8,7 +8,9 @@ name <- args[7]
 
 
 
-taj.all <- read.table("out.Tajima.D",header=T)
+taj.all <- read.table(paste0(outDir,"/",name,"Tajima.D.formanhattan"),header=T)
+
+
 taj.subset<-taj.all[complete.cases(taj.all),]
 
 SNP<-c(1: (nrow(taj.subset)))
@@ -29,13 +31,13 @@ mydf<-data.frame(SNP,myBg,taj.subset)
 
 sigdf <-  mydf[which(mydf$myBg),]
 
-write.table(sigdf, file = "sigtd.tsv")
+write.table(sigdf, file = paste0(outDir,"/",name,"_sigtd.tsv"))
 
-pdf(file = "pyrr_urban_td_hist.pdf", width = 10, height = 5, useDingbats=FALSE)
+pdf(file = paste0(outDir,"/",name,"_td_hist.pdf"), width = 10, height = 5, useDingbats=FALSE)
 hist(taj.subset$TajimaD,br=20)
 dev.off()
 
-pdf(file = "pyrr_urban_td.pdf", width = 20, height = 7, useDingbats=FALSE)
+pdf(file = paste0(outDir,"/",name,"_td.pdf"), width = 20, height = 7, useDingbats=FALSE)
 
 plot(TajimaD ~ SNP, col= "white", pch = 21, bg=ifelse(myBg  == "TRUE", 'red', 'gray'),
      data = mydf,
