@@ -58,7 +58,7 @@ sed -i 's/NC_//g' ${outDir}/fst/${name}.chroms.windowed.weir.fst
 
 Rscript ~/programs/DarwinFinches/fstscans.r ${outDir}/fst ${name}
 
-awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/fst/${name}.fst_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/fst/${name}.zfst_sig.csv
+awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/fst/${name}.zfst_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/fst/${name}.zfst_sig_genes.csv
 
 ## bayescan
 
