@@ -69,7 +69,7 @@ awk '{sub(/\./,"",$1)}1' ${outDir}/interestpop/${name}.chroms.windowed.pi | colu
 
 Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/interestpop ${name}
 
-awk -F"[,\t]" 'NR==FNR{a[NC_0$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outdir}/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outdir}/${name}.pi_sig_genes.csv
+awk -F"[,\t]" 'NR==FNR{a[NC_0$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outdir}/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/${name}.pi_sig_genes.csv
 
 
 fi

@@ -683,3 +683,4 @@ dev.off()
 
 
 sbatch ~/programs/slurmscripts/selection_scans.slurm
+squeue --job 1693015
