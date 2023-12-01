@@ -51,8 +51,6 @@ sed -i 's/NC_//g' ${outDir}/referencepop/${name}.chroms.windowed.pi
 
 awk '{sub(/\./,"",$1)}1' ${outDir}/referencepop/${name}.chroms.windowed.pi | column -t > ${outDir}/referencepop/${name}.chroms.windowed.pi.formanhattan
 
-
-
 Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/referencepop ${name}
 
 # population of interest analysis
@@ -65,11 +63,9 @@ sed -i 's/NC_//g' ${outDir}/interestpop/${name}.chroms.windowed.pi
 
 awk '{sub(/\./,"",$1)}1' ${outDir}/interestpop/${name}.chroms.windowed.pi | column -t > ${outDir}/interestpop/${name}.chroms.windowed.pi.formanhattan
 
-
-
 Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/interestpop ${name}
 
-awk -F"[,\t]" 'NR==FNR{a[NC_0$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/interestpop/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/interestpop/${name}.pi_sig_genes.csv
+awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/interestpop/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/interestpop/${name}.pi_sig_genes.csv
 
 
 fi

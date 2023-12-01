@@ -681,6 +681,8 @@ dev.off()
 
 # Nucleotide Diversity 
 
-
 sbatch ~/programs/slurmscripts/selection_scans.slurm
-squeue --job 1693015
+squeue --job 1693043
+
+
+awk -F"[,\t]" 'NR==FNR{a[NC_0$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}'  /xdisk/mcnew/dannyjackson/finches/nucleotidediversity/cra/interestpop/cra.pi_sig.csv /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff | grep 'ID=gene' > ${outDir}/interestpop/${name}.pi_sig_genes.csv
