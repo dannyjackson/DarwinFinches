@@ -7,8 +7,11 @@ outDir <- args[6]
 name <- args[7]
 
 
+# for troubleshooting in interactive:
+# outDir <- "/xdisk/mcnew/dannyjackson/finches/cra/tajimasd/interestpop"
+# name <- "cra"
 
-taj.all <- read.table(paste0(outDir,"/",name,"Tajima.D.formanhattan"),header=T)
+taj.all <- read.table(paste0(outDir,"/",name,".chroms.Tajima.D.formanhattan"),header=T)
 
 
 taj.subset<-taj.all[complete.cases(taj.all),]

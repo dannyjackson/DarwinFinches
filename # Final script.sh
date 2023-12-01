@@ -564,5 +564,5 @@ echo -e "SRR298" >> for_pre_pops.txt
 # Selection Scans
 
 sbatch ~/programs/slurmscripts/selection_scans.slurm
-squeue --job 1693186
+squeue --job 1693223
 

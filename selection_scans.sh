@@ -62,6 +62,10 @@ awk -F"[,\t]" 'NR==FNR{a["NC_0"$2]=$0; b=$3; c=$4; next} ($1 in a && $5 >= b && 
 
 ## bayescan
 
+Rscript ~/programs/DarwinFinches/bayescan.r ${outDir}/fst ${name}
+
+# grep -v "#" /scratch/dnjacks4/cardinalis/to_b10k/bayescan/pyrr.filtered.geno25.maf1.vcf | awk '{ print $1, $2 }' | tr ' ' '_' > /scratch/dnjacks4/cardinalis/to_b10k/bayescan/pyrr.filtered.geno25.maf1.loci.txt
+
 ## nucleotide diversity
 mkdir ${outDir}/nucleotidediversity 
 mkdir ${outDir}/nucleotidediversity/referencepop ${outDir}/nucleotidediversity/interestpop
@@ -104,15 +108,13 @@ mkdir ${outDir}/tajimasd/referencepop ${outDir}/tajimasd/interestpop
 vcftools --vcf ${pop2} --TajimaD 20000 --out ${outDir}/tajimasd/interestpop/${name} 
 
 
-out.Tajima.D
+head -1 ${outDir}/tajimasd/interestpop/${name}.Tajima.D > ${outDir}/tajimasd/interestpop/${name}.chroms.Tajima.D
+grep 'NC' ${outDir}/tajimasd/interestpop/${name}.Tajima.D >> ${outDir}/tajimasd/interestpop/${name}.chroms.Tajima.D
 
 
-head -1 ${outDir}/tajimasd/interestpop/${name}.Tajima.D > ${outDir}/tajimasd/interestpop/${name}.chroms..Tajima.D
-grep 'NC' ${outDir}/tajimasd/interestpop/${name}..Tajima.D >> ${outDir}/tajimasd/interestpop/${name}.chroms..Tajima.D
+sed -i 's/NC_//g' ${outDir}/tajimasd/interestpop/${name}.chroms.Tajima.D
 
-sed -i 's/NC_//g' ${outDir}/tajimasd/interestpop/${name}.chroms..Tajima.D
-
-awk '{sub(/\./,"",$1)}1' ${outDir}/tajimasd/interestpop/${name}.chroms..Tajima.D | column -t > ${outDir}/tajimasd/interestpop/${name}.chroms.Tajima.D.formanhattan
+awk '{sub(/\./,"",$1)}1' ${outDir}/tajimasd/interestpop/${name}.chroms.Tajima.D | column -t > ${outDir}/tajimasd/interestpop/${name}.chroms.Tajima.D.formanhattan
 
 Rscript ~/programs/DarwinFinches/tajimasD.r ${outDir}/tajimasD/interestpop ${name}
 
