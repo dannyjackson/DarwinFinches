@@ -7,7 +7,7 @@ outDir <- args[6]
 name <- args[7]
 
 
-pi.all <- read.table(paste0(outDir,"/nucleotidediversity/",name,".chroms.windowed.pi"),header=T)
+pi.all <- read.table(paste0(outDir,"/fst/",name,".chroms.windowed.pi"),header=T)
 pi.subset<-pi.all[complete.cases(pi.all),]
 
 SNP<-c(1: (nrow(pi.subset)))
