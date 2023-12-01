@@ -8,7 +8,7 @@ name <- args[7]
 
 library(qqman)
 
-fst<-read.table(paste0(outDir,"/",name,"chroms.weir.formanhattan.fst"), header=TRUE)
+fst<-read.table(paste0(outDir,"/",name,".chroms.windowed.weir.fst"), header=TRUE)
 
 fstsubset<-fst[complete.cases(fst),]
 

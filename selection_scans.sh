@@ -48,16 +48,17 @@ mkdir ${outDir}/fst
 
 ##  fst
 
-# reference population analysis
-vcftools --vcf ${vcf} --weir-fst-pop ${p1file} --weir-fst-pop ${p2file} --out ${outDir}/fst/${name}
+vcftools --vcf ${vcf} --weir-fst-pop ${p1file} --weir-fst-pop ${p2file} --out ${outDir}/fst/${name} --fst-window-size 10000 
 
 
-head -1 ${outDir}/fst/${name}.weir.fst > ${outDir}/fst/${name}.chroms.weir.fst
-grep 'NC' ${outDir}/fst/${name}.weir.fst >> ${outDir}/fst/${name}.chroms.weir.fst
+head -1 ${outDir}/fst/${name}.windowed.weir.fst > ${outDir}/fst/${name}.windowed.chroms.weir.fst
+grep 'NC' ${outDir}/fst/${name}.weir.fst >> ${outDir}/fst/${name}.chroms.windowed.weir.fst
 
-sed -i 's/NC_//g' ${outDir}/fst/${name}.chroms.weir.fst
+sed -i 's/NC_//g' ${outDir}/fst/${name}.chroms.windowed.weir.fst
 
 Rscript ~/programs/DarwinFinches/fstscans.r ${outDir}/fst ${name}
+
+awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/fst/${name}.fst_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/fst/${name}.fst_sig_genes.csv
 
 ## bayescan
 
