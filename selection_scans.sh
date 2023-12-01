@@ -18,7 +18,8 @@ if [ $# -lt 1 ]
     [-n] Output project name (don't include extension)
     [-o] Output directory for files
     [-p] Pop1 file name (reference population)
-    [-q] Pop2 file name (population of interest)"
+    [-q] Pop2 file name (population of interest)
+    [-g] Path to gff file"
 
 
   else
@@ -30,7 +31,7 @@ if [ $# -lt 1 ]
     o) outDir=${OPTARG};;
     p) pop1=${OPTARG};;
     q) pop2=${OPTARG};;
-
+    g) gff=${OPTARG};;
     esac
     done
 
@@ -68,8 +69,8 @@ awk '{sub(/\./,"",$1)}1' ${outDir}/interestpop/${name}.chroms.windowed.pi | colu
 
 Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/interestpop ${name}
 
-fi
-
-
 awk -F"[,\t]" 'NR==FNR{a[NC_0$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outdir}/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outdir}/${name}.pi_sig_genes.csv
+
+
+fi
 
