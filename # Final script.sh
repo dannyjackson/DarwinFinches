@@ -86,6 +86,7 @@ sed -i 's/\SRR2917/SRR/g' darwinfinches_filtered.recode.vcf
 plink --vcf darwinfinches_filtered.recode.vcf --allow-extra-chr --snps-only 'just-acgt' --geno 0.02 --mind 0.2 --maf 0.01 --recode vcf-iid --out darwinfinches_filtered_mind2
 
 
+## I used this one in future analyses
 plink --vcf darwinfinches_filtered.recode.vcf --allow-extra-chr --snps-only 'just-acgt' --geno 0.25 --maf 0.1 --recode vcf-iid --indep-pairwise 50 5 0.5 --out darwinfinches_filtered.geno25.maf1
 
 plink --vcf darwinfinches_filtered.recode.vcf --allow-extra-chr --snps-only 'just-acgt' --geno 0.02 --mind 0.1 --maf 0.01 --recode vcf-iid --out darwinfinches_filtered_cleaned
@@ -563,4 +564,5 @@ echo -e "SRR298" >> for_pre_pops.txt
 # Selection Scans
 
 sbatch ~/programs/slurmscripts/selection_scans.slurm
-squeue --job 1693172
+squeue --job 1693185
+
