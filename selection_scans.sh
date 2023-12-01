@@ -52,7 +52,7 @@ vcftools --vcf ${vcf} --weir-fst-pop ${p1file} --weir-fst-pop ${p2file} --out ${
 
 
 head -1 ${outDir}/fst/${name}.windowed.weir.fst > ${outDir}/fst/${name}.chroms.windowed.weir.fst
-grep 'NC' ${outDir}/fst/${name}.weir.fst >> ${outDir}/fst/${name}.chroms.windowed.weir.fst
+grep 'NC' ${outDir}/fst/${name}.windowed.weir.fst >> ${outDir}/fst/${name}.chroms.windowed.weir.fst
 
 sed -i 's/NC_//g' ${outDir}/fst/${name}.chroms.windowed.weir.fst
 
