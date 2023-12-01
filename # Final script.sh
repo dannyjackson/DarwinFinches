@@ -167,7 +167,7 @@ sbatch ~/programs/slurmscripts/raxml.slurm
 # PCA
 # all
 # PCA All
-echo -e "CRA" >> pops.txt
+echo -e "CRA" > pops.txt
 echo -e "CRA" >> pops.txt
 echo -e "CRA" >> pops.txt
 echo -e "PAR" >> pops.txt
@@ -563,4 +563,4 @@ echo -e "SRR298" >> for_pre_pops.txt
 # Selection Scans
 
 sbatch ~/programs/slurmscripts/selection_scans.slurm
-squeue --job 8666454
+squeue --job 8666598
