@@ -5,7 +5,12 @@ args = commandArgs()
 
 outDir <- args[6]
 name <- args[7]
+pop1 <- args[8]
+bayesmap <- args[9]
 
+# for troubleshooting in interactive:
+# outDir <- "/xdisk/mcnew/dannyjackson/finches/cra/bayescan"
+# name <- "cra"
 
 library(vcfR)
 library(hierfstat)
@@ -13,21 +18,13 @@ library(adegenet)
 library(ggplot2)
 library(radiator)
 
-vcf <- read.vcfR("/scratch/dnjacks4/cardinalis/to_b10k/bayescan/pyrr.filtered.geno25.maf1.vcf")
+vcf <- read.vcfR(paste0(pop1))
 
-pop_map <- read.table("/scratch/dnjacks4/cardinalis/to_parus/reference_lists/pyrr_bayescan_popfile.txt", header=TRUE, stringsAsFactors = TRUE)
+pop_map <- read.table(paste0(bayesmap), header=TRUE, stringsAsFactors = TRUE)
 
 genind <- vcfR2genind(vcf)
 genind@pop <- pop_map$STRATA
 hierfstat <- genind2hierfstat(genind)
 
 
-write.bayescan(hierfstat,fn="pyrr.filtered.bsc")
-
-mkdir filtered 
-
-bayescan -n 5000 -burn 50000 -pr_odds 10 /scratch/dnjacks4/cardinalis/to_b10k/bayescan/pyrr/pyrr.filtered.bsc -od /scratch/dnjacks4/cardinalis/to_b10k/bayescan/pyrr/filtered/
-
-
-
-
+write.bayescan(hierfstat,fn=paste0(outDir,"/",name,".bsc"))

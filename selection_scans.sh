@@ -21,11 +21,12 @@ if [ $# -lt 1 ]
     [-q] Path to pop2 vcf (population of interest)
     [-r] Path to pop1 sample list file (reference population)
     [-s] Path to pop2 sample list file (population of interest)
+    [-t] Path to bayescan pop file
     [-g] Path to gff file"
 
 
   else
-    while getopts v:n:o:p:q:r:s:g: option
+    while getopts v:n:o:p:q:r:s:t:g: option
     do
     case "${option}"
     in
@@ -36,6 +37,7 @@ if [ $# -lt 1 ]
     q) pop2=${OPTARG};;
     r) p1file=${OPTARG};;
     s) p2file=${OPTARG};;
+    t) bayesmap=${OPTARG};;
     g) gff=${OPTARG};;
     esac
     done
@@ -61,8 +63,12 @@ Rscript ~/programs/DarwinFinches/fstscans.r ${outDir}/fst ${name}
 awk -F"[,\t]" 'NR==FNR{a["NC_0"$2]=$0; b=$3; c=$4; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/fst/${name}.zfst_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/fst/${name}.zfst_sig_genes.csv
 
 ## bayescan
+mkdir ${outDir}/bayescan/ 
+mkdir ${outDir}/bayescan/filtered 
 
-Rscript ~/programs/DarwinFinches/bayescan.r ${outDir}/fst ${name}
+Rscript ~/programs/DarwinFinches/bayescan.r ${outDir}/bayescan ${name} ${pop2} ${bayesmap}
+
+/home/u15/dannyjackson/programs/BayeScan2.1/binaries/BayeScan2.1_linux64bits -n 5000 -burn 50000 -pr_odds 10 ${outDir}/bayescan/${name}.filtered.bsc -od ${outDir}/${name}/bayescan/filtered
 
 # grep -v "#" /scratch/dnjacks4/cardinalis/to_b10k/bayescan/pyrr.filtered.geno25.maf1.vcf | awk '{ print $1, $2 }' | tr ' ' '_' > /scratch/dnjacks4/cardinalis/to_b10k/bayescan/pyrr.filtered.geno25.maf1.loci.txt
 

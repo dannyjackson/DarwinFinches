@@ -34,7 +34,7 @@ mydf<-data.frame(SNP,myBg,taj.subset)
 
 sigdf <-  mydf[which(mydf$myBg),]
 
-write.table(sigdf, file = paste0(outDir,"/",name,"_sigtd.tsv"))
+write.table(sigdf, file = paste0(outDir,"/",name,".tD_sig.tsv"))
 
 pdf(file = paste0(outDir,"/",name,"_td_hist.pdf"), width = 10, height = 5, useDingbats=FALSE)
 hist(taj.subset$TajimaD,br=20)
