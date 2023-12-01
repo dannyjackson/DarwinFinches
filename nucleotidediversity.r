@@ -7,7 +7,7 @@ outDir <- args[6]
 name <- args[7]
 
 
-pi.all <- read.table(paste0(outDir,"/",name,".chroms.windowed.pi"),header=T)
+pi.all <- read.table(paste0(outDir,"/nucleotidediversity/",name,".chroms.windowed.pi"),header=T)
 pi.subset<-pi.all[complete.cases(pi.all),]
 
 SNP<-c(1: (nrow(pi.subset)))
@@ -24,11 +24,11 @@ myBg <- !LessThanCutoff
 
 mydf<-data.frame(SNP,myBg,pi.subset)
 
-pdf(file = paste0(outDir,"/",name,".pi_hist.pdf"), width = 10, height = 5, useDingbats=FALSE)
+pdf(file = paste0(outDir,"/nucleotidediversity/",name,".pi_hist.pdf"), width = 10, height = 5, useDingbats=FALSE)
 hist(pi.subset$PI,br=50)
 dev.off()
 
-pdf(file = paste0(outDir,"/",name,".pi.pdf"), width = 20, height = 7, useDingbats=FALSE)
+pdf(file = paste0(outDir,"/nucleotidediversity/",name,".pi.pdf"), width = 20, height = 7, useDingbats=FALSE)
 
 plot(PI ~ SNP, col= "white", pch = 21, bg=ifelse(myBg  == "TRUE", 'red', 'gray'),
      data = mydf,

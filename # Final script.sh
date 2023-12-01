@@ -495,194 +495,72 @@ grep -e 'NW_' /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno
 
 # PAR
 
-cd /xdisk/mcnew/dannyjackson/finches/fst/par
-rm *
-echo -e "PARV1" > pre.txt 
-echo -e "PARV2" >> pre.txt 
-echo -e "RHC097" >> post.txt 
-echo -e "RHC507" >> post.txt 
-echo -e "SM031" >> post.txt 
-echo -e "SM032" >> post.txt 
-echo -e "SM040" >> post.txt 
-echo -e "SM059" >> post.txt 
-echo -e "SM079" >> post.txt 
-echo -e "SRR329" >> pre.txt 
-echo -e "SRR330" >> pre.txt 
-echo -e "SRR331" >> pre.txt 
-echo -e "SRR332" >> pre.txt 
-echo -e "SRR333" >> pre.txt 
-echo -e "SRR334" >> pre.txt 
-echo -e "SRR335" >> pre.txt 
-echo -e "SRR336" >> pre.txt 
-echo -e "SRR337" >> pre.txt 
-echo -e "SRR338" >> pre.txt 
-
-
-module load vcftools
-module load R
-
-vcftools --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf --weir-fst-pop pre.txt --weir-fst-pop post.txt --fst-window-size 1000 --fst-window-step 1000 
-
-head -1 out.windowed.weir.fst > chroms.windowed.weir.fst
-grep 'NC' out.windowed.weir.fst >> chroms.windowed.weir.fst
-
-sed -i 's/NC_//g' chroms.windowed.weir.fst
-
-
-
-library(qqman)
-fst<-read.table("chroms.windowed.weir.fst", header=TRUE)
-fstsubset<-fst[complete.cases(fst),]
-
-xu <- mean(fstsubset$WEIGHTED_FST)
-s <- sd(fstsubset$WEIGHTED_FST)
-fstsubset$ZFST = (fstsubset$WEIGHTED_FST - xu)/s
-
-SNP<-c(1: (nrow(fstsubset)))
-mydf<-data.frame(SNP,fstsubset)
-
-pdf(file = "par_1000window.pdf", width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="WEIGHTED_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
-dev.off()
-
-pdf(file = "par_1000window_zfst.pdf", width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="ZFST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
-dev.off()
+cd /xdisk/mcnew/dannyjackson/finches/reference_lists
+echo -e "PARV1" > par_pre_pops.txt 
+echo -e "PARV2" >> par_pre_pops.txt 
+echo -e "RHC097" >> par_post_pops.txt 
+echo -e "RHC507" >> par_post_pops.txt 
+echo -e "SM031" >> par_post_pops.txt 
+echo -e "SM032" >> par_post_pops.txt 
+echo -e "SM040" >> par_post_pops.txt 
+echo -e "SM059" >> par_post_pops.txt 
+echo -e "SM079" >> par_post_pops.txt 
+echo -e "SRR329" >> par_pre_pops.txt 
+echo -e "SRR330" >> par_pre_pops.txt 
+echo -e "SRR331" >> par_pre_pops.txt 
+echo -e "SRR332" >> par_pre_pops.txt 
+echo -e "SRR333" >> par_pre_pops.txt 
+echo -e "SRR334" >> par_pre_pops.txt 
+echo -e "SRR335" >> par_pre_pops.txt 
+echo -e "SRR336" >> par_pre_pops.txt 
+echo -e "SRR337" >> par_pre_pops.txt 
+echo -e "SRR338" >> par_pre_pops.txt 
 
 
 
 # CRA
-cd /xdisk/mcnew/dannyjackson/finches/fst/cra
-
-echo -e "JP4481" > post.txt 
-echo -e "JP5410" >> post.txt 
-echo -e "JP9655" >> post.txt 
-echo -e "PL15" > pre.txt 
-echo -e "PL16" >> pre.txt 
-echo -e "PL4" >> pre.txt 
-echo -e "PL7" >> pre.txt 
-echo -e "PL9" >> pre.txt 
-echo -e "SM1067" >> post.txt 
-echo -e "SM1157" >> post.txt 
-echo -e "SM1200" >> post.txt 
-echo -e "SM1231" >> post.txt 
-echo -e "SM1240" >> post.txt 
-echo -e "SM1266" >> post.txt 
-
-
-module load vcftools
-module load R
-
-
-vcftools --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf --weir-fst-pop pre.txt --weir-fst-pop post.txt --fst-window-size 1000 --fst-window-step 1000 
-
-head -1 out.windowed.weir.fst > chroms.windowed.weir.fst
-grep 'NC' out.windowed.weir.fst >> chroms.windowed.weir.fst
-
-sed -i 's/NC_//g' chroms.windowed.weir.fst
-
-
-library(qqman)
-fst<-read.table("chroms.windowed.weir.fst", header=TRUE)
-fstsubset<-fst[complete.cases(fst),]
-
-xu <- mean(fstsubset$WEIGHTED_FST)
-s <- sd(fstsubset$WEIGHTED_FST)
-fstsubset$ZFST = (fstsubset$WEIGHTED_FST - xu)/s
-
-SNP<-c(1: (nrow(fstsubset)))
-mydf<-data.frame(SNP,fstsubset)
-
-pdf(file = "cra_1000window.pdf", width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="WEIGHTED_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
-dev.off()
-
-pdf(file = "cra_1000window_zfst.pdf", width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="ZFST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
-dev.off()
-
+echo -e "JP4481" > cra_post_pops.txt 
+echo -e "JP5410" >> cra_post_pops.txt 
+echo -e "JP9655" >> cra_post_pops.txt 
+echo -e "PL15" > cra_pre_pops.txt 
+echo -e "PL16" >> cra_pre_pops.txt 
+echo -e "PL4" >> cra_pre_pops.txt 
+echo -e "PL7" >> cra_pre_pops.txt 
+echo -e "PL9" >> cra_pre_pops.txt 
+echo -e "SM1067" >> cra_post_pops.txt 
+echo -e "SM1157" >> cra_post_pops.txt 
+echo -e "SM1200" >> cra_post_pops.txt 
+echo -e "SM1231" >> cra_post_pops.txt 
+echo -e "SM1240" >> cra_post_pops.txt 
+echo -e "SM1266" >> cra_post_pops.txt 
 
 
 # FOR
-cd /xdisk/mcnew/dannyjackson/finches/fst/for
-
-echo -e "SM1083" > post.txt 
-echo -e "SM1156" >> post.txt 
-echo -e "SM1204" >> post.txt 
-echo -e "SM1237" >> post.txt 
-echo -e "SM1270" >> post.txt 
-echo -e "SM1271" >> post.txt 
-echo -e "SM1272" >> post.txt 
-echo -e "SM1273" >> post.txt 
-echo -e "SRR289" > pre.txt 
-echo -e "SRR290" >> pre.txt 
-echo -e "SRR291" >> pre.txt 
-echo -e "SRR292" >> pre.txt 
-echo -e "SRR293" >> pre.txt 
-echo -e "SRR294" >> pre.txt 
-echo -e "SRR295" >> pre.txt 
-echo -e "SRR296" >> pre.txt 
-echo -e "SRR297" >> pre.txt 
-echo -e "SRR298" >> pre.txt 
+echo -e "SM1083" > for_post_pops.txt 
+echo -e "SM1156" >> for_post_pops.txt 
+echo -e "SM1204" >> for_post_pops.txt 
+echo -e "SM1237" >> for_post_pops.txt 
+echo -e "SM1270" >> for_post_pops.txt 
+echo -e "SM1271" >> for_post_pops.txt 
+echo -e "SM1272" >> for_post_pops.txt 
+echo -e "SM1273" >> for_post_pops.txt 
+echo -e "SRR289" > for_pre_pops.txt 
+echo -e "SRR290" >> for_pre_pops.txt 
+echo -e "SRR291" >> for_pre_pops.txt 
+echo -e "SRR292" >> for_pre_pops.txt 
+echo -e "SRR293" >> for_pre_pops.txt 
+echo -e "SRR294" >> for_pre_pops.txt 
+echo -e "SRR295" >> for_pre_pops.txt 
+echo -e "SRR296" >> for_pre_pops.txt 
+echo -e "SRR297" >> for_pre_pops.txt 
+echo -e "SRR298" >> for_pre_pops.txt 
 
 
 
 
-module load vcftools
-module load R
 
 
-vcftools --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf --weir-fst-pop pre.txt --weir-fst-pop post.txt --fst-window-size 1000 --fst-window-step 1000 
-
-head -1 out.windowed.weir.fst > chroms.windowed.weir.fst
-grep 'NC' out.windowed.weir.fst >> chroms.windowed.weir.fst
-
-sed -i 's/NC_//g' chroms.windowed.weir.fst
-
-library(qqman)
-fst<-read.table("chroms.windowed.weir.fst", header=TRUE)
-fstsubset<-fst[complete.cases(fst),]
-
-xu <- mean(fstsubset$WEIGHTED_FST)
-s <- sd(fstsubset$WEIGHTED_FST)
-fstsubset$ZFST = (fstsubset$WEIGHTED_FST - xu)/s
-
-SNP<-c(1: (nrow(fstsubset)))
-mydf<-data.frame(SNP,fstsubset)
-
-pdf(file = "for_1000window.pdf", width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="WEIGHTED_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
-dev.off()
-
-pdf(file = "for_1000window_zfst.pdf", width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="ZFST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
-dev.off()
-
-
-
-vcftools --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.recode.vcf --weir-fst-pop pre.txt --weir-fst-pop post.txt 
-
-head -1 out.weir.fst > chroms.weir.fst
-grep 'NC' out.weir.fst >> chroms.weir.fst
-
-sed -i 's/NC_//g' chroms.weir.fst
-
-
-library(qqman)
-fst<-read.table("chroms.weir.fst", header=TRUE)
-fstsubset<-fst[complete.cases(fst),]
-SNP<-c(1: (nrow(fstsubset)))
-mydf<-data.frame(SNP,fstsubset)
-
-pdf(file = "for.chroms.fst.snps.pdf", width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="POS",p="WEIR_AND_COCKERHAM_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst"))
-dev.off()
-
-
-# Nucleotide Diversity 
+# Selection Scans
 
 sbatch ~/programs/slurmscripts/selection_scans.slurm
-squeue --job 1693043
-
-
-awk -F"[,\t]" 'NR==FNR{a[NC_0$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}'  /xdisk/mcnew/dannyjackson/finches/nucleotidediversity/cra/interestpop/cra.pi_sig.csv /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff | grep 'ID=gene' > ${outDir}/interestpop/${name}.pi_sig_genes.csv
+squeue --job 1693049
