@@ -6,6 +6,10 @@ args = commandArgs()
 outDir <- args[6]
 name <- args[7]
 
+# for troubleshooting in interactive:
+# outDir <- "/xdisk/mcnew/dannyjackson/finches/cra/fst"
+# name <- "cra"
+
 library(qqman)
 
 fst<-read.table(paste0(outDir,"/",name,".chroms.windowed.weir.fst"), header=TRUE)
