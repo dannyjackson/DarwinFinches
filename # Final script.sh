@@ -536,6 +536,25 @@ echo -e "SM1240" >> cra_post_pops.txt
 echo -e "SM1266" >> cra_post_pops.txt 
 
 
+
+echo "INDIVIDUALS,STRATA" > cra_bayescan_popfile.txt
+echo -e "JP4481,post" > cra_bayescan_popfile.txt 
+echo -e "JP5410,post" >> cra_bayescan_popfile.txt 
+echo -e "JP9655,post" >> cra_bayescan_popfile.txt 
+echo -e "PL15,pre" >> cra_bayescan_popfile.txt 
+echo -e "PL16,pre" >> cra_bayescan_popfile.txt 
+echo -e "PL4,pre" >> cra_bayescan_popfile.txt 
+echo -e "PL7,pre" >> cra_bayescan_popfile.txt 
+echo -e "PL9,pre" >> cra_bayescan_popfile.txt 
+echo -e "SM1067,post" >> cra_bayescan_popfile.txt 
+echo -e "SM1157,post" >> cra_bayescan_popfile.txt 
+echo -e "SM1200,post" >> cra_bayescan_popfile.txt 
+echo -e "SM1231,post" >> cra_bayescan_popfile.txt 
+echo -e "SM1240,post" >> cra_bayescan_popfile.txt 
+echo -e "SM1266,post" >> cra_bayescan_popfile.txt 
+
+sed -i 's/,/\t/g' /scratch/dnjacks4/cardinalis/to_parus/reference_lists/pyrr_bayescan_popfile.txt
+
 # FOR
 echo -e "SM1083" > for_post_pops.txt 
 echo -e "SM1156" >> for_post_pops.txt 
@@ -564,5 +583,5 @@ echo -e "SRR298" >> for_pre_pops.txt
 # Selection Scans
 
 sbatch ~/programs/slurmscripts/selection_scans.slurm
-squeue --job 1693232
+squeue --job 1693257
 

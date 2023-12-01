@@ -1730,7 +1730,7 @@ module load R
 
 chmod +x ~/programs/DarwinFinches/selection_scans.sh
 
-~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf -n cra -o /xdisk/mcnew/dannyjackson/finches/cra/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pre_pops.txt -s /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_post_pops.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff
+~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf -n cra -o /xdisk/mcnew/dannyjackson/finches/cra/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pre_pops.txt -s /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_post_pops.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff - /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_bayescan_popfile.txt 
 
 chmod -x ~/programs/DarwinFinches/selection_scans.sh
 
@@ -1812,7 +1812,11 @@ python --version
 
 
 conda config --add channels conda-forge
+conda create --name pixy2 -c conda-forge scipy numpy cython=0.26.1 python=3.8
+conda activate pixy2
 conda install -c conda-forge pixy
 conda install -c bioconda htslib
 # test installation
 pixy --help
+
+
