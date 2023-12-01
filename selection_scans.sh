@@ -23,7 +23,7 @@ if [ $# -lt 1 ]
 
 
   else
-    while getopts n:o:p:q: option
+    while getopts n:o:p:q:g: option
     do
     case "${option}"
     in
