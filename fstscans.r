@@ -30,7 +30,7 @@ write.csv(mydf[ which(mydf$ZFST>='5'),], paste0(outDir,"/",name,".zfst_sig.csv")
 
 
 pdf(file = paste0(outDir,"/",name,".chroms.fst.pdf"), width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="SNP",p="WEIR_AND_COCKERHAM_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst"))
+print(manhattan(mydf,chr="CHROM",bp="SNP",p="WEIGHTED_FST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst"))
 dev.off()
 
 
