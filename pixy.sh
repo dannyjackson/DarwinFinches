@@ -35,7 +35,7 @@ if [ $# -lt 1 ]
     esac
     done
 
-conda activate pixy
+source activate pixy
 
 module load samtools
 
