@@ -11,6 +11,10 @@ bayesmap <- args[9]
 # for troubleshooting in interactive:
 # outDir <- "/xdisk/mcnew/dannyjackson/finches/cra/bayescan"
 # name <- "cra"
+install.packages("hierfstat")
+install.packages("adegenet")
+install.packages("ggplot2")
+install.packages("radiator")
 
 library(vcfR)
 library(hierfstat)

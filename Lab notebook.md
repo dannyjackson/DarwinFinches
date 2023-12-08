@@ -1810,13 +1810,108 @@ python --version
 # If you have trouble installing pixy in an environment using python 3.9, try rolling back to python 3.8.
 
 
-
-conda config --add channels conda-forge
-conda create --name pixy2 -c conda-forge scipy numpy cython=0.26.1 python=3.8
-conda activate pixy2
-conda install -c conda-forge pixy
-conda install -c bioconda htslib
+conda create --name pixy
+conda activate pixy
+conda install --yes -c conda-forge pixy
+conda install --yes -c bioconda htslib
+pip install numpy==1.22.1
 # test installation
 pixy --help
 
 
+Consider paring back the script so that it doesn't have to do everything / have a dozen options passed to it. Idk just a thought.
+
+## December 6th
+Goals:
+1. Confirm that I used the trimmed sequences in my pipeline. If not, start it from the beginning with the proper ones.
+2. Then work on the script to run various sliding window summary stats 
+
+Retrimming, starting all analyses from scratch. Good thing I am making my scripts repeatable instead of doing all this shit by hand <3 
+
+awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' cra.tD_sig.tsv /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff  | grep 'ID=gene' 
+
+
+awk -F"[,\t]" '{print "NC_0"substr($3, 1, length($2)-1)".1" }' 
+
+awk -F"[ \t]" '{print $4}' cra.tD_sig.tsv 
+
+substr($3, 1, length($2)-1)
+
+
+> ${outDir}/tajimasd/interestpop/${name}.tD_sig_genes.csv
+
+echo 'IND,POP' > /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_popgenome_popfile.txt
+cat /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_bayescan_popfile.txt >> /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_popgenome_popfile.txt
+# sorting out dxy
+# https://markravinet.github.io/Chapter8.html
+library(tidyverse)
+# library(devtools)
+# install_github("pievos101/PopGenome")
+library(PopGenome)
+
+cra <- readData("/xdisk/mcnew/dannyjackson/finches/cra/dxy", format = "VCF", include.unknown = TRUE, FAST = TRUE)
+
+get.sum.data(cra)
+cra@n.biallelic.sites 
+# 3050107
+cra@populations
+
+cra_info <- read_delim("/xdisk/mcnew/dannyjackson/finches/reference_lists/cra_popgenome_popfile.txt", delim = ",")
+
+populations <- split(cra_info$IND, cra_info$POP)
+
+cra <- set.populations(cra, populations, diploid = T)
+
+cra@populations
+
+
+cra_sw <- sliding.window.transform(cra, width = 100000, jump = 25000)
+
+cra_sw <- diversity.stats(cra_sw, pi = TRUE)
+cra_sw <- F_ST.stats(cra_sw, mode = "nucleotide")
+
+nd <- cra_sw@nuc.diversity.within/100000
+pops <- c("post", "pre")
+# set population names
+colnames(nd) <- paste0(pops, "_pi")
+
+fst <- t(cra_sw@nuc.F_ST.pairwise)
+dxy <- get.diversity(cra_sw, between = T)[[2]]/100000
+
+# get column names 
+x <- colnames(fst)
+# replace all occurrences of pop1 with house
+# x <- sub("pop1", "post", x)
+# does the same thing as above but by indexing the pops vector
+x <- sub("pop1", pops[1], x)
+x <- sub("pop2", pops[2], x)
+
+colnames(fst) <- paste0(x, "_fst")
+colnames(dxy) <- paste0(x, "_dxy")
+
+cra_data <- as.tibble(data.frame(nd, fst, dxy))
+
+
+~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf -n cra -o /xdisk/mcnew/dannyjackson/finches/cra/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pre_pops.txt -s /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_post_pops.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff - /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_bayescan_popfile.txt 
+
+
+
+# Got pixy installed!
+
+sed 's/\,/\t/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_bayescan_popfile.txt > /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt
+
+module load samtools
+bgzip /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf
+tabix /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf.gz
+
+
+
+conda activate pixy
+
+module load samtools
+
+pixy --stats dxy --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf.gz --populations /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt --window_size 10000 --output_folder /xdisk/mcnew/dannyjackson/finches/cra/dxy --bypass_invariant_check yes
+
+
+sbatch ~/programs/slurmsxy_cra.slurm 
+Submitted batch job 1706029

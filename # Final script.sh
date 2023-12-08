@@ -57,6 +57,14 @@ SRR336  PAR pre
 SRR337  PAR pre
 SRR338  PAR pre
 
+# trim sequences 
+cp /xdisk/mcnew/finch_wgs/scripts/2_trimming_adaptor_removal.sh ~/programs/slurmscripts
+sbatch ~/programs/slurmscripts/2_trimming_adaptor_removal.sh
+
+squeue --job 8713104
+
+cp /xdisk/mcnew/dannyjackson/finches/fastas/*.truncated /xdisk/mcnew/dannyjackson/finches/trimmedfastas
+
 # align and sort 
 
 

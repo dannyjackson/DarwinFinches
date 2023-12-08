@@ -5,14 +5,14 @@
 
 # for example, when looking for genes under selection in an urban population, pop1 would be the urban samples and pop2 would be the rural samples
 
-# uses  
+# analyzes sliding windows of FST, nucleotide diversity (pi) and Tajima's D.
 
 #
 #
 
 if [ $# -lt 1 ]
   then
-    echo "Analyzes a vcf containing sequences from two populations using fst, bayescan, nucleotide diversity, Tajima's D, and SweeD.
+    echo "Analyzes a vcf containing sequences from two populations using fst, nucleotide diversity, and Tajima's D,.
 
     [-v] Path to full vcf file 
     [-n] Output project name (don't include extension)
@@ -35,9 +35,7 @@ if [ $# -lt 1 ]
     o) outDir=${OPTARG};;
     p) pop1=${OPTARG};;
     q) pop2=${OPTARG};;
-    r) p1file=${OPTARG};;
-    s) p2file=${OPTARG};;
-    t) bayesmap=${OPTARG};;
+    r) pixypop=${OPTARG};;
     g) gff=${OPTARG};;
     esac
     done
@@ -46,63 +44,19 @@ if [ $# -lt 1 ]
 module load vcftools
 module load R
 
-mkdir ${outDir}/fst 
-
-##  fst
-
-vcftools --vcf ${vcf} --weir-fst-pop ${p1file} --weir-fst-pop ${p2file} --out ${outDir}/fst/${name} --fst-window-size 10000 
 
 
-head -1 ${outDir}/fst/${name}.windowed.weir.fst > ${outDir}/fst/${name}.chroms.windowed.weir.fst
-grep 'NC' ${outDir}/fst/${name}.windowed.weir.fst >> ${outDir}/fst/${name}.chroms.windowed.weir.fst
+##  fst, pi, and dxy
+mkdir ${outDir}/pixy
 
-sed -i 's/NC_//g' ${outDir}/fst/${name}.chroms.windowed.weir.fst
+conda activate pixy
 
-Rscript ~/programs/DarwinFinches/fstscans.r ${outDir}/fst ${name}
+module load samtools
 
-awk -F"[,\t]" 'NR==FNR{a["NC_0"$2]=$0; b=$3; c=$4; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/fst/${name}.zfst_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/fst/${name}.zfst_sig_genes.csv
+bgzip ${vcf}
+tabix ${vcf}.gz
 
-## bayescan
-mkdir ${outDir}/bayescan/ 
-mkdir ${outDir}/bayescan/filtered 
-
-Rscript ~/programs/DarwinFinches/bayescan.r ${outDir}/bayescan ${name} ${pop2} ${bayesmap}
-
-/home/u15/dannyjackson/programs/BayeScan2.1/binaries/BayeScan2.1_linux64bits -n 5000 -burn 50000 -pr_odds 10 ${outDir}/bayescan/${name}.filtered.bsc -od ${outDir}/${name}/bayescan/filtered
-
-# grep -v "#" /scratch/dnjacks4/cardinalis/to_b10k/bayescan/pyrr.filtered.geno25.maf1.vcf | awk '{ print $1, $2 }' | tr ' ' '_' > /scratch/dnjacks4/cardinalis/to_b10k/bayescan/pyrr.filtered.geno25.maf1.loci.txt
-
-## nucleotide diversity
-mkdir ${outDir}/nucleotidediversity 
-mkdir ${outDir}/nucleotidediversity/referencepop ${outDir}/nucleotidediversity/interestpop
-
-# reference population analysis
-vcftools --vcf ${pop1} --window-pi 10000 --out ${outDir}/nucleotidediversity/referencepop/${name}
-
-head -1 ${outDir}/nucleotidediversity/referencepop/${name}.windowed.pi > ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi
-grep 'NC' ${outDir}/nucleotidediversity/referencepop/${name}.windowed.pi >> ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi
-
-sed -i 's/NC_//g' ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi
-
-awk '{sub(/\./,"",$1)}1' ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi | column -t > ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi.formanhattan
-
-Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/nucleotidediversity/referencepop ${name}
-
-awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/nucleotidediversity/referencepop/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/nucleotidediversity/referencepop/${name}.pi_sig_genes.csv
-
-# population of interest analysis
-vcftools --vcf ${pop2} --window-pi 10000 --out ${outDir}/nucleotidediversity/interestpop/${name}
-
-head -1 ${outDir}/nucleotidediversity/interestpop/${name}.windowed.pi > ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi
-grep 'NC' ${outDir}/nucleotidediversity/interestpop/${name}.windowed.pi >> ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi
-
-sed -i 's/NC_//g' ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi
-
-awk '{sub(/\./,"",$1)}1' ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi | column -t > ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi.formanhattan
-
-Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/nucleotidediversity/interestpop ${name}
-
-awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/nucleotidediversity/interestpop/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/nucleotidediversity/interestpop/${name}.pi_sig_genes.csv
+pixy --stats fst pi dxy --vcf ${vcf} --populations ${pixypop} --window_size 1000 --output_folder ${outDir}/pixy --bypass_invariant_check yes
 
 ## Tajima's D
 
@@ -124,12 +78,25 @@ awk '{sub(/\./,"",$1)}1' ${outDir}/tajimasd/interestpop/${name}.chroms.Tajima.D 
 
 Rscript ~/programs/DarwinFinches/tajimasD.r ${outDir}/tajimasd/interestpop ${name}
 
-awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/interestpop/${name}.tD_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/interestpop/${name}.tD_sig_genes.csv
+awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/interestpop/${name}.tD_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/interestpop/${name}.tD_sig_genes.csv
+
+# reference population
+
+vcftools --vcf ${pop1} --TajimaD 20000 --out ${outDir}/tajimasd/referencepop/${name} 
 
 
+head -1 ${outDir}/tajimasd/referencepop/${name}.Tajima.D > ${outDir}/tajimasd/referencepop/${name}.chroms.Tajima.D
+grep 'NC' ${outDir}/tajimasd/referencepop/${name}.Tajima.D >> ${outDir}/tajimasd/referencepop/${name}.chroms.Tajima.D
 
 
-## SweeD
+sed -i 's/NC_//g' ${outDir}/tajimasd/referencepop/${name}.chroms.Tajima.D
+
+awk '{sub(/\./,"",$1)}1' ${outDir}/tajimasd/referencepop/${name}.chroms.Tajima.D | column -t > ${outDir}/tajimasd/referencepop/${name}.chroms.Tajima.D.formanhattan
+
+Rscript ~/programs/DarwinFinches/tajimasD.r ${outDir}/tajimasd/referencepop ${name}
+
+awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/referencepop/${name}.tD_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/referencepop/${name}.tD_sig_genes.csv
+
 
 fi
 
