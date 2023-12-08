@@ -19,14 +19,12 @@ if [ $# -lt 1 ]
     [-o] Output directory for files
     [-p] Path to pop1 vcf (reference population)
     [-q] Path to pop2 vcf (population of interest)
-    [-r] Path to pop1 sample list file (reference population)
-    [-s] Path to pop2 sample list file (population of interest)
-    [-t] Path to bayescan pop file
+    [-r] Path to pixy population list file
     [-g] Path to gff file"
 
 
   else
-    while getopts v:n:o:p:q:r:s:t:g: option
+    while getopts v:n:o:p:q:r:g: option
     do
     case "${option}"
     in
@@ -49,7 +47,7 @@ module load R
 ##  fst, pi, and dxy
 mkdir ${outDir}/pixy
 
-conda activate pixy
+source activate pixy
 
 module load samtools
 
@@ -57,6 +55,18 @@ bgzip ${vcf}
 tabix ${vcf}.gz
 
 pixy --stats fst pi dxy --vcf ${vcf} --populations ${pixypop} --window_size 1000 --output_folder ${outDir}/pixy --bypass_invariant_check yes
+
+head -1 ${outDir}/pixy/pixy_dxy.txt > ${outDir}/pixy/${name}.chroms.pixy_dxy.txt
+grep 'NC' ${outDir}/pixy/pixy_dxy.txt >> ${outDir}/pixy/${name}.chroms.pixy_dxy.txt
+
+
+sed -i 's/NC_//g' ${outDir}/pixy/${name}.chroms.pixy_dxy.txt
+
+awk '{sub(/\./,"",$1)}1' ${outDir}/pixy/${name}.chroms.pixy_dxy.txt | column -t > ${outDir}/pixy/${name}.chroms.pixy_dxy.formanhattan.txt
+
+Rscript ~/programs/DarwinFinches/pixy.r ${outDir}/pixy/ ${name}
+
+awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/referencepop/${name}.tD_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/referencepop/${name}.tD_sig_genes.csv
 
 ## Tajima's D
 

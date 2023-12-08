@@ -585,11 +585,29 @@ echo -e "SRR298" >> for_pre_pops.txt
 
 
 
-
-
-
 # Selection Scans
 
-sbatch ~/programs/slurmscripts/selection_scans.slurm
-squeue --job 1693257
+module load samtools
+bgzip /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf
+tabix /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf.gz
 
+bgzip /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf
+tabix /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf.gz
+
+bgzip /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf
+tabix /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf.gz
+
+sed 's/\,/\t/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_bayescan_popfile.txt > /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt
+
+sed 's/\,/\t/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/for_bayescan_popfile.txt > /xdisk/mcnew/dannyjackson/finches/reference_lists/for_pixy_popfile.txt
+
+sed 's/\,/\t/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/par_bayescan_popfile.txt > /xdisk/mcnew/dannyjackson/finches/reference_lists/par_pixy_popfile.txt
+
+
+sbatch ~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf.gz -n cra -o /xdisk/mcnew/dannyjackson/finches/cra/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff 
+
+sbatch  ~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf.gz -n for -o /xdisk/mcnew/dannyjackson/finches/for/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/for_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/for_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/for_pixy_popfile.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff 
+
+# Submitted batch job 1707597
+
+sbatch ~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf.gz -n par -o /xdisk/mcnew/dannyjackson/finches/par/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/par_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/par_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/par_pixy_popfile.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff 
