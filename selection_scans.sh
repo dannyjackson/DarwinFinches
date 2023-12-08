@@ -1,5 +1,16 @@
 #!/bin/bash
 
+#SBATCH --job-name=selection_scans
+#SBATCH --ntasks=12
+#SBATCH --nodes=1             
+#SBATCH --time=240:00:00   
+#SBATCH --partition=standard
+#SBATCH --account=mcnew
+#SBATCH --mem-per-cpu=5gb
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=dannyjackson@arizona.edu
+#SBATCH --output=output.alignsort.%j
+
 
 # shell script to pull significant genes from an analysis of a vcf containing two populations: pop1 is of interest and pop2 is the reference
 

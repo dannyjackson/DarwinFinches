@@ -63,12 +63,18 @@ sbatch ~/programs/slurmscripts/2_trimming_adaptor_removal.sh
 
 squeue --job 8713104
 
-cp /xdisk/mcnew/dannyjackson/finches/fastas/*.truncated /xdisk/mcnew/dannyjackson/finches/trimmedfastas
+mv /xdisk/mcnew/dannyjackson/finches/fastas/*pair*truncated /xdisk/mcnew/dannyjackson/finches/trimmedfastas
+
+# I ended up not using the trimmed sequences since Sabrina had already done the trimming and aligning. I'd like to revisit this step to confirm that I know what I'm doing here though.
 
 # align and sort 
+# Sabrina already aligned, I just did the sorting.
 
+ref="/xdisk/mcnew/finch_wgs/fastqs/GCF_901933205.fa"
+bamdir="/xdisk/mcnew/finch_wgs/fastqs/sorted_marked_bams/"
+ID="darwinfinches"
+bcftools mpileup -Ou -f "$ref" -a FORMAT/AD,DP,INFO/AD,SP "$bamdir"*.sorted.marked.bam | bcftools call -mv -V indels > "$ID"_snps_multiallelic.vcf
 
-sbatch ~/programs/slurmscripts/alignsort.slurm
 
 sbatch ~/programs/slurmscripts/vcfstats.slurm -i /xdisk/mcnew/dannyjackson/vcfs/darwinfinches_snps_multiallelic.vcf
 
