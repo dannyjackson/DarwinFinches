@@ -88,6 +88,34 @@ dev.off()
 
 write.csv(mydf[ which(mydf$myBg=='TRUE'),], paste0(outDir,"/fst/",name,".fst_sig.csv"), row.names=FALSE)
 
+## manhattan
+
+library(qqman)
+
+fst<-read.table(paste0(outDir,"/fst/",name,".chroms.pixy_fst.formanhattan.txt"), header=TRUE)
+
+fstsubset<-fst[complete.cases(fst),]
+
+
+xu <- mean(fstsubset$avg_wc_fst)
+s <- sd(fstsubset$avg_wc_fst)
+fstsubset$ZFST = (fstsubset$avg_wc_fst - xu)/s
+
+SNP<-c(1: (nrow(fstsubset)))
+
+mydf<-data.frame(SNP,fstsubset)
+
+
+write.csv(mydf[ which(mydf$ZFST>='5'),], paste0(outDir,"/",name,".zfst_sig.csv"), row.names=FALSE)
+
+
+pdf(file = paste0(outDir,"/fst/",name,".chroms.fst.manhattan.pdf"), width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="CHROM",bp="SNP",p="avg_wc_fst",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst"))
+dev.off()
+
+pdf(file = paste0(outDir,"/fst/",name,".chroms.zfst.manhattan.pdf"), width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="ZFST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
+dev.off()
 
 ## dxy 
 
