@@ -617,3 +617,5 @@ sbatch  ~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson
 # Submitted batch job 1707597
 
 sbatch ~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf.gz -n par -o /xdisk/mcnew/dannyjackson/finches/par/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/par_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/par_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/par_pixy_popfile.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff 
+
+# Submitted batch job 1707614
