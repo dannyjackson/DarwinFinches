@@ -56,11 +56,11 @@ fst.subset<-fst.all[complete.cases(fst.all),]
 
 SNP<-c(1: (nrow(fst.subset)))
 
-lower = min(fst.subset$avg_fst)
-upper = max(fst.subset$avg_fst)
+lower = min(fst.subset$avg_wc_fst)
+upper = max(fst.subset$avg_wc_fst)
 cutoff = upper - ((upper-lower)*0.05)
 
-LessThanCutoff <- fst.subset$avg_fst < cutoff
+LessThanCutoff <- fst.subset$avg_wc_fst < cutoff
 
 myBg <- !LessThanCutoff
 
@@ -69,12 +69,12 @@ myBg <- !LessThanCutoff
 mydf<-data.frame(SNP,myBg,fst.subset)
 
 pdf(file = paste0(outDir,"/fst/",name,".fst_hist.pdf"), width = 10, height = 5, useDingbats=FALSE)
-hist(fst.subset$avg_fst,br=50)
+hist(fst.subset$avg_wc_fst,br=50)
 dev.off()
 
 pdf(file = paste0(outDir,"fst/",name,".fst.pdf"), width = 20, height = 7, useDingbats=FALSE)
 
-plot(avg_fst ~ SNP, col= "white", pch = 21, bg=ifelse(myBg  == "TRUE", 'red', 'gray'),
+plot(avg_wc_fst ~ SNP, col= "white", pch = 21, bg=ifelse(myBg  == "TRUE", 'red', 'gray'),
      data = mydf,
      xaxt = "n", bty = "l", xlab = "chr", cex = 1)
 # add custom axis labels
