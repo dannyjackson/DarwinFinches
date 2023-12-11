@@ -158,4 +158,32 @@ write.csv(mydf[ which(mydf$myBg=='TRUE'),], paste0(outDir,"/dxy/",name,".dxy_sig
 
 
 
+## manhattan
+
+library(qqman)
+
+fst<-read.table(paste0(outDir,"/dxy/",name,".chroms.pixy_dxy.formanhattan.txt"), header=TRUE)
+
+fstsubset<-fst[complete.cases(fst),]
+
+
+xu <- mean(fstsubset$avg_dxy)
+s <- sd(fstsubset$avg_dxy)
+fstsubset$ZFST = (fstsubset$avg_dxy - xu)/s
+
+SNP<-c(1: (nrow(fstsubset)))
+
+mydf<-data.frame(SNP,fstsubset)
+
+
+write.csv(mydf[ which(mydf$Zdxy>='5'),], paste0(outDir,"/dxy/",name,".zdxy_sig.csv"), row.names=FALSE)
+
+
+pdf(file = paste0(outDir,"/dxy/",name,".chroms.dxy.manhattan.pdf"), width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="chromosome",bp="window_pos_1",p="avg_dxy",snp="window_pos_1",logp=FALSE,ylab="Dxy"))
+dev.off()
+
+pdf(file = paste0(outDir,"/dxy/",name,".chroms.zdxy.manhattan.pdf"), width = 20, height = 7, useDingbats=FALSE)
+print(manhattan(mydf,chr="chromosome",bp="window_pos_1",p="Zdxy",snp="window_pos_1",logp=FALSE,ylab="Z DXY", cex = 0.2))
+dev.off()
 
