@@ -162,18 +162,18 @@ write.csv(mydf[ which(mydf$myBg=='TRUE'),], paste0(outDir,"/dxy/",name,".dxy_sig
 
 library(qqman)
 
-fst<-read.table(paste0(outDir,"/dxy/",name,".chroms.pixy_dxy.formanhattan.txt"), header=TRUE)
+dxy<-read.table(paste0(outDir,"/dxy/",name,".chroms.pixy_dxy.formanhattan.txt"), header=TRUE)
 
-fstsubset<-fst[complete.cases(fst),]
+dxysubset<-dxy[complete.cases(dxy),]
 
 
-xu <- mean(fstsubset$avg_dxy)
-s <- sd(fstsubset$avg_dxy)
-fstsubset$ZFST = (fstsubset$avg_dxy - xu)/s
+xu <- mean(dxysubset$avg_dxy)
+s <- sd(dxysubset$avg_dxy)
+dxysubset$Zdxy = (fstsubset$avg_dxy - xu)/s
 
-SNP<-c(1: (nrow(fstsubset)))
+SNP<-c(1: (nrow(dxysubset)))
 
-mydf<-data.frame(SNP,fstsubset)
+mydf<-data.frame(SNP,dxysubset)
 
 
 write.csv(mydf[ which(mydf$Zdxy>='5'),], paste0(outDir,"/dxy/",name,".zdxy_sig.csv"), row.names=FALSE)
