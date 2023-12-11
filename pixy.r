@@ -106,7 +106,7 @@ SNP<-c(1: (nrow(fstsubset)))
 mydf<-data.frame(SNP,fstsubset)
 
 
-write.csv(mydf[ which(mydf$ZFST>='5'),], paste0(outDir,"/",name,".zfst_sig.csv"), row.names=FALSE)
+write.csv(mydf[ which(mydf$ZFST>='5'),], paste0(outDir,"/fst/",name,".zfst_sig.csv"), row.names=FALSE)
 
 
 pdf(file = paste0(outDir,"/fst/",name,".chroms.fst.manhattan.pdf"), width = 20, height = 7, useDingbats=FALSE)
