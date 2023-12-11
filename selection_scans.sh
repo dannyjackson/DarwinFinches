@@ -65,15 +65,22 @@ module load samtools
 bgzip ${vcf}
 tabix ${vcf}.gz
 
-pixy --stats fst pi dxy --vcf ${vcf} --populations ${pixypop} --window_size 1000 --output_folder ${outDir}/pixy --bypass_invariant_check yes
+pixy --stats pi fst dxy --vcf ${vcf} --populations ${pixypop} --window_size ${windowsize} --output_folder ${outDir}/pixy --bypass_invariant_check yes
 
-head -1 ${outDir}/pixy/pixy_dxy.txt > ${outDir}/pixy/${name}.chroms.pixy_dxy.txt
-grep 'NC' ${outDir}/pixy/pixy_dxy.txt >> ${outDir}/pixy/${name}.chroms.pixy_dxy.txt
+mkdir ${outDir}/pixy/pi ${outDir}/pixy/fst ${outDir}/pixy/dxy 
+
+mv ${outDir}/pixy/pixy_pi.txt ${outDir}/pixy/pi
+mv ${outDir}/pixy/pixy_fst.txt ${outDir}/pixy/fst
+mv ${outDir}/pixy/pixy_dxy.txt ${outDir}/pixy/dxy
 
 
-sed -i 's/NC_//g' ${outDir}/pixy/${name}.chroms.pixy_dxy.txt
+head -1 ${outDir}/pixy/dxy/pixy_dxy.txt > ${outDir}/pixy/dxy/${name}.chroms.pixy_dxy.txt
+grep 'NC' ${outDir}/pixy/dxy/pixy_dxy.txt >> ${outDir}/pixy/dxy/${name}.chroms.pixy_dxy.txt
 
-awk '{sub(/\./,"",$1)}1' ${outDir}/pixy/${name}.chroms.pixy_dxy.txt | column -t > ${outDir}/pixy/${name}.chroms.pixy_dxy.formanhattan.txt
+
+sed -i 's/NC_//g' ${outDir}/pixy/dxy/${name}.chroms.pixy_dxy.txt
+
+awk '{sub(/\./,"",$1)}1' ${outDir}/pixy/dxy/${name}.chroms.pixy_dxy.txt | column -t > ${outDir}/pixy/dxy/${name}.chroms.pixy_dxy.formanhattan.txt
 
 Rscript ~/programs/DarwinFinches/pixy.r ${outDir}/pixy/ ${name}
 
