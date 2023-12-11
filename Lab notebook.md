@@ -1910,8 +1910,94 @@ conda activate pixy
 
 module load samtools
 
-pixy --stats dxy --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf.gz --populations /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt --window_size 10000 --output_folder /xdisk/mcnew/dannyjackson/finches/cra/dxy --bypass_invariant_check yes
+pixy --stats fst,dxy --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf.gz --populations /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt --window_size 1000 --output_folder /xdisk/mcnew/dannyjackson/finches/cra/dxy --bypass_invariant_check yes
+
+sed -i 's/NC_//g' ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi
+
+sbatch ~/programs/slurmscripts/pixy_cra.slurm 
+Submitted batch job 1706575
 
 
-sbatch ~/programs/slurmsxy_cra.slurm 
-Submitted batch job 1706029
+awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/interestpop/${name}.tD_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/interestpop/${name}.tD_sig_genes.csv
+
+
+/xdisk/mcnew/dannyjackson/finches/cra/dxy
+
+
+
+## Friday December 8th
+1. Revise selection scan script to use pixy for pi, dxy, and fst
+
+Stuff from previous script that I'm removing:
+
+# reference population analysis
+vcftools --vcf ${pop1} --window-pi 10000 --out ${outDir}/nucleotidediversity/referencepop/${name}
+
+head -1 ${outDir}/nucleotidediversity/referencepop/${name}.windowed.pi > ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi
+grep 'NC' ${outDir}/nucleotidediversity/referencepop/${name}.windowed.pi >> ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi
+
+sed -i 's/NC_//g' ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi
+
+awk '{sub(/\./,"",$1)}1' ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi | column -t > ${outDir}/nucleotidediversity/referencepop/${name}.chroms.windowed.pi.formanhattan
+
+Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/nucleotidediversity/referencepop ${name}
+
+awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/nucleotidediversity/referencepop/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/nucleotidediversity/referencepop/${name}.pi_sig_genes.csv
+
+# population of interest analysis
+vcftools --vcf ${pop2} --window-pi 10000 --out ${outDir}/nucleotidediversity/interestpop/${name}
+
+head -1 ${outDir}/nucleotidediversity/interestpop/${name}.windowed.pi > ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi
+grep 'NC' ${outDir}/nucleotidediversity/interestpop/${name}.windowed.pi >> ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi
+
+sed -i 's/NC_//g' ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi
+
+awk '{sub(/\./,"",$1)}1' ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi | column -t > ${outDir}/nucleotidediversity/interestpop/${name}.chroms.windowed.pi.formanhattan
+
+Rscript ~/programs/DarwinFinches/nucleotidediversity.r ${outDir}/nucleotidediversity/interestpop ${name}
+
+awk -F"[,\t]" 'NR==FNR{a["NC_0"$3]=$0; b=$4; c=$5; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/nucleotidediversity/interestpop/${name}.pi_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/nucleotidediversity/interestpop/${name}.pi_sig_genes.csv
+
+
+
+# fst 
+vcftools --vcf ${vcf} --weir-fst-pop ${p1file} --weir-fst-pop ${p2file} --out ${outDir}/fst/${name} --fst-window-size 10000 
+
+
+head -1 ${outDir}/fst/${name}.windowed.weir.fst > ${outDir}/fst/${name}.chroms.windowed.weir.fst
+grep 'NC' ${outDir}/fst/${name}.windowed.weir.fst >> ${outDir}/fst/${name}.chroms.windowed.weir.fst
+
+sed -i 's/NC_//g' ${outDir}/fst/${name}.chroms.windowed.weir.fst
+
+Rscript ~/programs/DarwinFinches/fstscans.r ${outDir}/fst ${name}
+
+awk -F"[,\t]" 'NR==FNR{a["NC_0"$2]=$0; b=$3; c=$4; next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/fst/${name}.zfst_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/fst/${name}.zfst_sig_genes.csv
+
+
+
+
+
+
+## working notes for the revision
+~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf -n cra -o /xdisk/mcnew/dannyjackson/finches/cra/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pre_pops.txt -s /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_post_pops.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff 
+
+
+
+awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/interestpop/${name}.tD_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/interestpop/${name}.tD_sig_genes.csv
+
+
+head -1 pixy_dxy.txt > cra.chroms.pixy_dxy.txt
+grep 'NC' pixy_dxy.txt >> cra.chroms.pixy_dxy.txt
+
+
+awk '{sub(/\./,"",$1)}1' cra.chroms.pixy_dxy.txt | column -t > cra.chroms.pixy_dxy.formanhattan.txt
+
+sbatch ~/programs/DarwinFinches/pixy.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf.gz -o /xdisk/mcnew/dannyjackson/finches/cra/ -r /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt -w 10000
+
+
+sbatch ~/programs/DarwinFinches/pixy.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf.gz -o /xdisk/mcnew/dannyjackson/finches/par/ -r /xdisk/mcnew/dannyjackson/finches/reference_lists/par_pixy_popfile.txt -w 10000
+
+sbatch ~/programs/DarwinFinches/pixy.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf.gz -o /xdisk/mcnew/dannyjackson/finches/for/ -r /xdisk/mcnew/dannyjackson/finches/reference_lists/for_pixy_popfile.txt -w 10000
+
+
+squeue --job 1707595
