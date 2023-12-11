@@ -34,7 +34,7 @@ dev.off()
 
 pdf(file = paste0(outDir,"/pi/",name,".pi.pdf"), width = 20, height = 7, useDingbats=FALSE)
 
-plot(avg_dxy ~ SNP, col= "white", pch = 21, bg=ifelse(myBg  == "TRUE", 'red', 'gray'),
+plot(avg_pi ~ SNP, col= "white", pch = 21, bg=ifelse(myBg  == "TRUE", 'red', 'gray'),
      data = mydf,
      xaxt = "n", bty = "l", xlab = "chr", cex = 1)
 # add custom axis labels
