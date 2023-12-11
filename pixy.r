@@ -169,7 +169,7 @@ dxysubset<-dxy[complete.cases(dxy),]
 
 xu <- mean(dxysubset$avg_dxy)
 s <- sd(dxysubset$avg_dxy)
-dxysubset$Zdxy = (fstsubset$avg_dxy - xu)/s
+dxysubset$Zdxy = (dxysubset$avg_dxy - xu)/s
 
 SNP<-c(1: (nrow(dxysubset)))
 
