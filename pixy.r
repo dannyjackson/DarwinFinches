@@ -110,11 +110,11 @@ write.csv(mydf[ which(mydf$ZFST>='5'),], paste0(outDir,"/",name,".zfst_sig.csv")
 
 
 pdf(file = paste0(outDir,"/fst/",name,".chroms.fst.manhattan.pdf"), width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="SNP",p="avg_wc_fst",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst"))
+print(manhattan(mydf,chr="chromosome",bp="window_pos_1",p="avg_wc_fst",snp="window_pos_1",logp=FALSE,ylab="Weighted Weir and Cockerham Fst"))
 dev.off()
 
 pdf(file = paste0(outDir,"/fst/",name,".chroms.zfst.manhattan.pdf"), width = 20, height = 7, useDingbats=FALSE)
-print(manhattan(mydf,chr="CHROM",bp="BIN_START",p="ZFST",snp="SNP",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
+print(manhattan(mydf,chr="chromosome",bp="window_pos_1",p="ZFST",snp="window_pos_1",logp=FALSE,ylab="Weighted Weir and Cockerham Fst", cex = 0.2))
 dev.off()
 
 ## dxy 
