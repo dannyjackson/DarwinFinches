@@ -72,7 +72,7 @@ pdf(file = paste0(outDir,"/fst/",name,".fst_hist.pdf"), width = 10, height = 5, 
 hist(fst.subset$avg_wc_fst,br=50)
 dev.off()
 
-pdf(file = paste0(outDir,"fst/",name,".fst.pdf"), width = 20, height = 7, useDingbats=FALSE)
+pdf(file = paste0(outDir,"/fst/",name,".fst.pdf"), width = 20, height = 7, useDingbats=FALSE)
 
 plot(avg_wc_fst ~ SNP, col= "white", pch = 21, bg=ifelse(myBg  == "TRUE", 'red', 'gray'),
      data = mydf,
