@@ -111,7 +111,6 @@ Rscript ~/programs/DarwinFinches/pixy.r ${outDir}/pixy/ ${name}
 
 
 ## post R script 
-outDir="/xdisk/mcnew/dannyjackson/finches/cra/"
 ## fst 
 awk -F"[,\t]" 'NR==FNR{a["NC_0"$4]=$0; b=($5-10000); c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/pixy/fst/${name}.zfst_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/pixy/fst/${name}.zfst_sig_genes.csv
 
