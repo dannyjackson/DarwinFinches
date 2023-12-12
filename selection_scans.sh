@@ -9,7 +9,7 @@
 #SBATCH --mem-per-cpu=5gb
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=dannyjackson@arizona.edu
-#SBATCH --output=output.alignsort.%j
+#SBATCH --output=output.selection.%j
 
 
 # shell script to pull significant genes from an analysis of a vcf containing two populations: pop1 is of interest and pop2 is the reference
