@@ -31,11 +31,12 @@ if [ $# -lt 1 ]
     [-p] Path to pop1 vcf (reference population)
     [-q] Path to pop2 vcf (population of interest)
     [-r] Path to pixy population list file
-    [-g] Path to gff file"
+    [-g] Path to gff file
+    [-w] Window size for pixy analyses"
 
 
   else
-    while getopts v:n:o:p:q:r:g: option
+    while getopts v:n:o:p:q:r:g:w: option
     do
     case "${option}"
     in
