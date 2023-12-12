@@ -139,7 +139,7 @@ awk '{sub(/\./,"",$1)}1' ${outDir}/tajimasd/interestpop/${name}.chroms.Tajima.D 
 
 Rscript ~/programs/DarwinFinches/tajimasD.r ${outDir}/tajimasd/interestpop ${name}
 
-awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/interestpop/${name}.tD_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/interestpop/${name}.tD_sig_genes.csv
+awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/interestpop/${name}.tD_sig.tsv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/interestpop/${name}.tD_sig_genes.tsv
 
 # reference population
 
@@ -156,7 +156,7 @@ awk '{sub(/\./,"",$1)}1' ${outDir}/tajimasd/referencepop/${name}.chroms.Tajima.D
 
 Rscript ~/programs/DarwinFinches/tajimasD.r ${outDir}/tajimasd/referencepop ${name}
 
-awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/referencepop/${name}.tD_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/referencepop/${name}.tD_sig_genes.csv
+awk -F"[ \t]" 'NR==FNR{a["NC_0"substr($4, 1, length($4)-1)".1"]=$0; b=$5; c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/tajimasd/referencepop/${name}.tD_sig.tsv ${gff} | grep 'ID=gene' > ${outDir}/tajimasd/referencepop/${name}.tD_sig_genes.tsv
 
 
 fi
