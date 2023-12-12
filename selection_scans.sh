@@ -47,7 +47,7 @@ if [ $# -lt 1 ]
     q) pop2=${OPTARG};;
     r) pixypop=${OPTARG};;
     g) gff=${OPTARG};;
-    w) windowsize=${windowsize}
+    w) windowsize=${OPTARG};;
     esac
     done
 
