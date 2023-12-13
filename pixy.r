@@ -6,12 +6,10 @@ args = commandArgs()
 outDir <- args[6]
 name <- args[7]
 
-# outDir <- "/xdisk/mcnew/dannyjackson/finches/cra/pixy"
-# name <- "cra"
 
 ## pi
 
-pi.all <- read.table(paste0(outDir,"/pi/cra.chroms.pixy_pi.txt"),header=T)
+pi.all <- read.table(paste0(outDir,"/pi/",name,".chroms.pixy_pi.txt"),header=T)
 pi.subset<-pi.all[complete.cases(pi.all),]
 
 SNP<-c(1: (nrow(pi.subset)))
@@ -51,7 +49,7 @@ write.csv(mydf[ which(mydf$myBg=='TRUE'),], paste0(outDir,"/pi/",name,".pi_sig.c
 
 ## fst
 
-fst.all <- read.table(paste0(outDir,"/fst/cra.chroms.pixy_fst.txt"),header=T)
+fst.all <- read.table(paste0(outDir,"/fst/",name,".chroms.pixy_fst.txt"),header=T)
 fst.subset<-fst.all[complete.cases(fst.all),]
 
 SNP<-c(1: (nrow(fst.subset)))
@@ -119,7 +117,7 @@ dev.off()
 
 ## dxy 
 
-dxy.all <- read.table(paste0(outDir,"/dxy/cra.chroms.pixy_dxy.txt"),header=T)
+dxy.all <- read.table(paste0(outDir,"/dxy/",name,".chroms.pixy_dxy.txt"),header=T)
 dxy.subset<-dxy.all[complete.cases(dxy.all),]
 
 SNP<-c(1: (nrow(dxy.subset)))

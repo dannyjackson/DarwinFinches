@@ -92,59 +92,82 @@ bcftools stats -v /scratch/dnjacks4/cardinalis/to_b10k/b10k_filtered.geno25.maf1
 
 vcftools --vcf b10k_qualitysort.vcf --min-meanDP 2 --remove-indels --recode --out b10k_filtered
 
-sbatch ~/programs/slurmscripts/filtervcf.slurm -i /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_snps_multiallelic.vcf -n darwinfinches_nomaxDP
-squeue --job 1690206
+
 
 sed -i 's/\SRR2917/SRR/g' darwinfinches_filtered.recode.vcf
 
-plink --vcf darwinfinches_filtered.recode.vcf --allow-extra-chr --snps-only 'just-acgt' --geno 0.02 --mind 0.2 --maf 0.01 --recode vcf-iid --out darwinfinches_filtered_mind2
-
 
 ## I used this one in future analyses
-plink --vcf darwinfinches_filtered.recode.vcf --allow-extra-chr --snps-only 'just-acgt' --geno 0.25 --maf 0.1 --recode vcf-iid --indep-pairwise 50 5 0.5 --out darwinfinches_filtered.geno25.maf1
+plink --vcf darwinfinches_filtered.recode.vcf --allow-extra-chr --snps-only 'just-acgt' --geno 0.25 --maf 0.1 --recode vcf-iid --indep-pairwise 50 5 0.5 --out darwinfinches_filtered.geno25.maf1.indep
+
+plink --vcf darwinfinches_filtered.recode.vcf --allow-extra-chr --snps-only 'just-acgt' --geno 0.25 --maf 0.1 --recode vcf-iid --out darwinfinches_filtered.geno25.maf1.notindep
 
 plink --vcf darwinfinches_filtered.recode.vcf --allow-extra-chr --snps-only 'just-acgt' --geno 0.02 --mind 0.1 --maf 0.01 --recode vcf-iid --out darwinfinches_filtered_cleaned
 
-~/programs/vcf2phylip/vcf2phylip.py -i /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf
+~/programs/vcf2phylip/vcf2phylip.py -i /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf
 
 
 # subset by pre/post
 
 # pre
-bcftools view -s PARV1,PARV2,PL15,PL16,PL4,PL7,PL9,SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf --force-samples > /xdisk/mcnew/dannyjackson/finches/vcfs/pre.vcf
+bcftools view -s PARV1,PARV2,PL15,PL16,PL4,PL7,PL9,SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf --force-samples > /xdisk/mcnew/dannyjackson/finches/vcfs/pre.indep.vcf
+
+bcftools view -s PARV1,PARV2,PL15,PL16,PL4,PL7,PL9,SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf --force-samples > /xdisk/mcnew/dannyjackson/finches/vcfs/pre.notindep.vcf
 
 # post
 
-bcftools view -s JP4481,JP5410,JP9655,RHC097,RHC507,SM031,SM032,SM040,SM059,SM079,SM1067,SM1083,SM1156,SM1157,SM1200,SM1204,SM1231,SM1237,SM1240,SM1266,SM1270,SM1271,SM1272,SM1273 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf --force-samples > /xdisk/mcnew/dannyjackson/finches/vcfs/post.vcf
+bcftools view -s JP4481,JP5410,JP9655,RHC097,RHC507,SM031,SM032,SM040,SM059,SM079,SM1067,SM1083,SM1156,SM1157,SM1200,SM1204,SM1231,SM1237,SM1240,SM1266,SM1270,SM1271,SM1272,SM1273 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf --force-samples > /xdisk/mcnew/dannyjackson/finches/vcfs/post.indep.vcf
+
+bcftools view -s JP4481,JP5410,JP9655,RHC097,RHC507,SM031,SM032,SM040,SM059,SM079,SM1067,SM1083,SM1156,SM1157,SM1200,SM1204,SM1231,SM1237,SM1240,SM1266,SM1270,SM1271,SM1272,SM1273 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf --force-samples > /xdisk/mcnew/dannyjackson/finches/vcfs/post.notindep.vcf
 
 # subset by species
 # par
-bcftools view -s PARV1,PARV2,RHC097,RHC507,SM031,SM032,SM040,SM059,SM079,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf
+bcftools view -s PARV1,PARV2,RHC097,RHC507,SM031,SM032,SM040,SM059,SM079,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/par.indep.vcf
 
-bcftools view -s RHC097,RHC507,SM031,SM032,SM040,SM059,SM079 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/par_post.vcf
+bcftools view -s RHC097,RHC507,SM031,SM032,SM040,SM059,SM079 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/par_post.indep.vcf
 
-bcftools view -s PARV1,PARV2,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/par_pre.vcf
+bcftools view -s PARV1,PARV2,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/par_pre.indep.vcf
+
+
+bcftools view -s PARV1,PARV2,RHC097,RHC507,SM031,SM032,SM040,SM059,SM079,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/par.notindep.vcf
+
+bcftools view -s RHC097,RHC507,SM031,SM032,SM040,SM059,SM079 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/par_post.notindep.vcf
+
+bcftools view -s PARV1,PARV2,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/par_pre.notindep.vcf
+
+
 
 
 # cra
-bcftools view -s JP4481,JP5410,JP9655,PL15,PL16,PL4,PL7,PL9,SM1067,SM1157,SM1200,SM1231,SM1240,SM1266 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf
+bcftools view -s JP4481,JP5410,JP9655,PL15,PL16,PL4,PL7,PL9,SM1067,SM1157,SM1200,SM1231,SM1240,SM1266 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/cra.notindep.vcf
 
-bcftools view -s PL15,PL16,PL4,PL7,PL9 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf
+bcftools view -s PL15,PL16,PL4,PL7,PL9 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.notindep.vcf
 
 
-bcftools view -s JP4481,JP5410,JP9655,SM1067,SM1157,SM1200,SM1231,SM1240,SM1266 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf
+bcftools view -s JP4481,JP5410,JP9655,SM1067,SM1157,SM1200,SM1231,SM1240,SM1266 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.notindep.vcf
 
-plink --vcf /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf --allow-extra-chr --snps-only 'just-acgt' --geno 0.25 --maf 0.1 --recode vcf-iid --indep-pairwise 50 5 0.5 --out cra_filtered.geno25.maf1
 
+bcftools view -s JP4481,JP5410,JP9655,PL15,PL16,PL4,PL7,PL9,SM1067,SM1157,SM1200,SM1231,SM1240,SM1266 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/cra.indep.vcf
+
+bcftools view -s PL15,PL16,PL4,PL7,PL9 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.indep.vcf
+
+
+bcftools view -s JP4481,JP5410,JP9655,SM1067,SM1157,SM1200,SM1231,SM1240,SM1266 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.indep.vcf
 
 
 # for
-bcftools view -s SM1083,SM1156,SM1204,SM1237,SM1270,SM1271,SM1272,SM1273,SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf
+bcftools view -s SM1083,SM1156,SM1204,SM1237,SM1270,SM1271,SM1272,SM1273,SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for.notindep.vcf
 
-bcftools view -s SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for_pre.vcf
+bcftools view -s SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for_pre.notindep.vcf
 
-bcftools view -s SM1083,SM1156,SM1204,SM1237,SM1270,SM1271,SM1272,SM1273 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for_post.vcf
+bcftools view -s SM1083,SM1156,SM1204,SM1237,SM1270,SM1271,SM1272,SM1273 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for_post.notindep.vcf
 
+
+bcftools view -s SM1083,SM1156,SM1204,SM1237,SM1270,SM1271,SM1272,SM1273,SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for.indep.vcf
+
+bcftools view -s SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for_pre.indep.vcf
+
+bcftools view -s SM1083,SM1156,SM1204,SM1237,SM1270,SM1271,SM1272,SM1273 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for_post.indep.vcf
 
 # Run RAxML
 
@@ -251,7 +274,7 @@ echo -e "PAR" >> pops.txt
 
 module load R 
 
-~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.vcf  -o /xdisk/mcnew/dannyjackson/finches/PCA/all/ -p /xdisk/mcnew/dannyjackson/finches/PCA/all/pops.txt -n all -s y
+~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.indep.vcf  -o /xdisk/mcnew/dannyjackson/finches/PCA/all/ -p /xdisk/mcnew/dannyjackson/finches/PCA/all/pops.txt -n all -s y
 
 cd /xdisk/mcnew/dannyjackson/finches/PCA/all/
 sbatch ~/programs/slurmscripts/PCA_all.slurm
@@ -263,7 +286,6 @@ squeue -j 1690222
 
 # subset by species
 # cra
-/xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf
 
 #!/bin/bash
 
@@ -280,15 +302,13 @@ squeue -j 1690222
 
 module load R 
 
-~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf -o /xdisk/mcnew/dannyjackson/finches/PCA/cra/ -p /xdisk/mcnew/dannyjackson/finches/PCA/cra/pops.txt -n cra -s y
 
-
-~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra_filtered.geno25.maf1.vcf -o /xdisk/mcnew/dannyjackson/finches/PCA/cra_filtered/ -p /xdisk/mcnew/dannyjackson/finches/PCA/cra/pops.txt -n cra_filtered -s y
+~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.indep.vcf -o /xdisk/mcnew/dannyjackson/finches/PCA/cra/ -p /xdisk/mcnew/dannyjackson/finches/PCA/cra/pops.txt -n cra -s y
 
 
 cd /xdisk/mcnew/dannyjackson/finches/PCA/cra/
 sbatch ~/programs/slurmscripts/PCA_cra.slurm
-squeue --job 1682677
+
 
 post
 post
@@ -323,7 +343,6 @@ SM1240  CRA post
 SM1266  CRA post
 
 # par
-bcftools view -s JP9655,lamich_PARV1,lamich_PARV2,RHC097,RHC507,SM031,SM032,SM040,SM059,SM079,SRR329,SRR330,SRR331,SRR332,SRR333,SRR334,SRR335,SRR336,SRR337,SRR338 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.recode.vcf --force-samples > /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf
 
 #!/bin/bash
 
@@ -340,7 +359,7 @@ bcftools view -s JP9655,lamich_PARV1,lamich_PARV2,RHC097,RHC507,SM031,SM032,SM04
 
 module load R 
 
-~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf  -o /xdisk/mcnew/dannyjackson/finches/PCA/par/ -p /xdisk/mcnew/dannyjackson/finches/PCA/par/pops.txt -n par -s y
+~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/par.indep.vcf  -o /xdisk/mcnew/dannyjackson/finches/PCA/par/ -p /xdisk/mcnew/dannyjackson/finches/PCA/par/pops.txt -n par -s y
 
 cd /xdisk/mcnew/dannyjackson/finches/PCA/par/
 sbatch ~/programs/slurmscripts/PCA_par.slurm
@@ -390,8 +409,6 @@ SRR337  PAR pre
 SRR338  PAR pre
 
 # for
-bcftools view -s SM1083,SM1204,SM1231,SM1237,SM1270,SM1271,SM1272,SM1273,SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.recode.vcf --force-samples > /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf
-
 
 
 post
@@ -428,7 +445,7 @@ pre
 
 module load R 
 
-~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf  -o /xdisk/mcnew/dannyjackson/finches/PCA/for/ -p /xdisk/mcnew/dannyjackson/finches/PCA/for/pops.txt -n for -s y
+~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/for.indep.vcf  -o /xdisk/mcnew/dannyjackson/finches/PCA/for/ -p /xdisk/mcnew/dannyjackson/finches/PCA/for/pops.txt -n for -s y
 
 cd /xdisk/mcnew/dannyjackson/finches/PCA/for/
 sbatch ~/programs/slurmscripts/PCA_for.slurm
@@ -532,6 +549,33 @@ echo -e "SRR337" >> par_pre_pops.txt
 echo -e "SRR338" >> par_pre_pops.txt 
 
 
+## bayescan
+echo "INDIVIDUALS,STRATA" > par_bayescan_popfile.txt
+echo -e "PARV1,pre" >> par_bayescan_popfile.txt 
+echo -e "PARV2,pre" >> par_bayescan_popfile.txt 
+echo -e "RHC097,post" >> par_bayescan_popfile.txt 
+echo -e "RHC507,post" >> par_bayescan_popfile.txt 
+echo -e "SM031,post" >> par_bayescan_popfile.txt 
+echo -e "SM032,post" >> par_bayescan_popfile.txt 
+echo -e "SM040,post" >> par_bayescan_popfile.txt 
+echo -e "SM059,post" >> par_bayescan_popfile.txt 
+echo -e "SM079,post" >> par_bayescan_popfile.txt 
+echo -e "SRR329,pre" >> par_bayescan_popfile.txt 
+echo -e "SRR330,pre" >> par_bayescan_popfile.txt 
+echo -e "SRR331,pre" >> par_bayescan_popfile.txt 
+echo -e "SRR332,pre" >> par_bayescan_popfile.txt 
+echo -e "SRR333,pre" >> par_bayescan_popfile.txt 
+echo -e "SRR334,pre" >> par_bayescan_popfile.txt 
+echo -e "SRR335,pre" >> par_bayescan_popfile.txt 
+echo -e "SRR336,pre" >> par_bayescan_popfile.txt 
+echo -e "SRR337,pre" >> par_bayescan_popfile.txt 
+echo -e "SRR338,pre" >> par_bayescan_popfile.txt 
+
+
+sed 1d /xdisk/mcnew/dannyjackson/finches/reference_lists/par_bayescan_popfile.txt > /xdisk/mcnew/dannyjackson/finches/reference_lists/par_pixy_popfile.txt
+
+sed -i 's/\,/\t/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/par_pixy_popfile.txt
+
 
 # CRA
 echo -e "JP4481" > cra_post_pops.txt 
@@ -552,7 +596,7 @@ echo -e "SM1266" >> cra_post_pops.txt
 
 
 echo "INDIVIDUALS,STRATA" > cra_bayescan_popfile.txt
-echo -e "JP4481,post" > cra_bayescan_popfile.txt 
+echo -e "JP4481,post" >> cra_bayescan_popfile.txt 
 echo -e "JP5410,post" >> cra_bayescan_popfile.txt 
 echo -e "JP9655,post" >> cra_bayescan_popfile.txt 
 echo -e "PL15,pre" >> cra_bayescan_popfile.txt 
@@ -567,7 +611,10 @@ echo -e "SM1231,post" >> cra_bayescan_popfile.txt
 echo -e "SM1240,post" >> cra_bayescan_popfile.txt 
 echo -e "SM1266,post" >> cra_bayescan_popfile.txt 
 
-sed -i 's/,/\t/g' /scratch/dnjacks4/cardinalis/to_parus/reference_lists/pyrr_bayescan_popfile.txt
+
+sed 1d /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_bayescan_popfile.txt > /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt
+
+sed -i 's/\,/\t/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt
 
 # FOR
 echo -e "SM1083" > for_post_pops.txt 
@@ -589,7 +636,31 @@ echo -e "SRR296" >> for_pre_pops.txt
 echo -e "SRR297" >> for_pre_pops.txt 
 echo -e "SRR298" >> for_pre_pops.txt 
 
+# bayescan
+echo "INDIVIDUALS,STRATA" > for_bayescan_popfile.txt
 
+echo -e "SM1083,post" >> for_bayescan_popfile.txt 
+echo -e "SM1156,post" >> for_bayescan_popfile.txt 
+echo -e "SM1204,post" >> for_bayescan_popfile.txt 
+echo -e "SM1237,post" >> for_bayescan_popfile.txt 
+echo -e "SM1270,post" >> for_bayescan_popfile.txt 
+echo -e "SM1271,post" >> for_bayescan_popfile.txt 
+echo -e "SM1272,post" >> for_bayescan_popfile.txt 
+echo -e "SM1273,post" >> for_bayescan_popfile.txt 
+echo -e "SRR289,pre" >> for_bayescan_popfile.txt 
+echo -e "SRR290,pre" >> for_bayescan_popfile.txt 
+echo -e "SRR291,pre" >> for_bayescan_popfile.txt 
+echo -e "SRR292,pre" >> for_bayescan_popfile.txt 
+echo -e "SRR293,pre" >> for_bayescan_popfile.txt 
+echo -e "SRR294,pre" >> for_bayescan_popfile.txt 
+echo -e "SRR295,pre" >> for_bayescan_popfile.txt 
+echo -e "SRR296,pre" >> for_bayescan_popfile.txt 
+echo -e "SRR297,pre" >> for_bayescan_popfile.txt 
+echo -e "SRR298,pre" >> for_bayescan_popfile.txt 
+
+sed 1d /xdisk/mcnew/dannyjackson/finches/reference_lists/for_bayescan_popfile.txt > /xdisk/mcnew/dannyjackson/finches/reference_lists/for_pixy_popfile.txt
+
+sed -i 's/\,/\t/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/for_pixy_popfile.txt
 
 # Selection Scans
 
@@ -609,6 +680,10 @@ sed 's/\,/\t/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/for_bayescan_p
 
 sed 's/\,/\t/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/par_bayescan_popfile.txt > /xdisk/mcnew/dannyjackson/finches/reference_lists/par_pixy_popfile.txt
 
+
+
+bgzip /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf
+tabix /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf.gz
 
 sbatch ~/programs/DarwinFinches/selection_scans.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf.gz -n cra -o /xdisk/mcnew/dannyjackson/finches/cra/ -p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf -q /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf -r /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff 
 

@@ -2017,9 +2017,11 @@ awk -F"[,\t]" 'NR==FNR{a["NC_0"$4]=$0; b=($5-10000); c=($5 +20000); next} ($1 in
 
 
 # CRA
+bgzip /xdisk/mcnew/dannyjackson/finches/vcfs/cra.notindep.vcf
+tabix /xdisk/mcnew/dannyjackson/finches/vcfs/cra.notindep.vcf.gz
 
 sbatch ~/programs/DarwinFinches/selection_scans.sh \
--v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf \
+-v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.notindep.vcf.gz \
 -n cra \
 -o /xdisk/mcnew/dannyjackson/finches/cra/ \
 -p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf \
@@ -2028,12 +2030,14 @@ sbatch ~/programs/DarwinFinches/selection_scans.sh \
 -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff \
 -w 10000
 
-Submitted batch job 1708847
+Submitted batch job 1709717 ## look in /vcfs for output
 
 # FOR
+bgzip /xdisk/mcnew/dannyjackson/finches/vcfs/for.notindep.vcf
+tabix /xdisk/mcnew/dannyjackson/finches/vcfs/for.notindep.vcf.gz
 
 sbatch ~/programs/DarwinFinches/selection_scans.sh \
--v /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf \
+-v /xdisk/mcnew/dannyjackson/finches/vcfs/for.notindep.vcf.gz \
 -n for \
 -o /xdisk/mcnew/dannyjackson/finches/for/ \
 -p /xdisk/mcnew/dannyjackson/finches/vcfs/for_pre.vcf \
@@ -2042,12 +2046,14 @@ sbatch ~/programs/DarwinFinches/selection_scans.sh \
 -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff \
 -w 10000
 
-
+Submitted batch job 1709719
 
 # PAR
+bgzip /xdisk/mcnew/dannyjackson/finches/vcfs/par.notindep.vcf
+tabix /xdisk/mcnew/dannyjackson/finches/vcfs/par.notindep.vcf.gz
 
 sbatch ~/programs/DarwinFinches/selection_scans.sh \
--v /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf \
+-v /xdisk/mcnew/dannyjackson/finches/vcfs/par.indep.vcf.gz \
 -n par \
 -o /xdisk/mcnew/dannyjackson/finches/par/ \
 -p /xdisk/mcnew/dannyjackson/finches/vcfs/par_pre.vcf \
@@ -2056,7 +2062,7 @@ sbatch ~/programs/DarwinFinches/selection_scans.sh \
 -g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff \
 -w 10000
 
-Submitted batch job 1708849
+Submitted batch job 8750066
 
 
 
@@ -2115,11 +2121,13 @@ write.table(tab, file = paste0(outDir,"/",name,"_subset.txt"), sep = "\t")
 
 tab <- read.table(paste0(outDir,"/",name,"_subset.txt"), header = TRUE, sep = "\t", stringsAsFactors=T)
 
+PC1.PV = pc.percent[1]
+PC2.PV = pc.percent[2]
 
 #draw it:
 pdf(file = paste0(outDir,"/",name,"_pca_populations_subsetted.pdf"), useDingbats=FALSE)
 
-plot(tab$EV1, tab$EV2, col=as.integer(tab$pop), xlab=paste0("PC1 (Percent variation ="pc.percent[1]")"), ylab=paste0("PC2 (Percent variation ="pc.percent[2]")"))
+plot(tab$EV1, tab$EV2, col=as.integer(tab$pop), xlab=paste0("PC1 (Percent Variation =",PC1.PV,")"), ylab=paste0("PC2 (Percent Variation =",PC1.PV,")"))
 legend("topright", legend=levels(tab$pop), pch="o", col=1:nlevels(tab$pop))
 
 dev.off()
