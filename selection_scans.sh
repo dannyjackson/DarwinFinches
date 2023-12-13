@@ -64,9 +64,6 @@ source activate pixy
 
 module load samtools
 
-bgzip ${vcf}
-tabix ${vcf}.gz
-
 pixy --stats pi fst dxy --vcf ${vcf}.gz --populations ${pixypop} --window_size ${windowsize} --output_folder ${outDir}/pixy --bypass_invariant_check yes
 
 

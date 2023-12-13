@@ -1999,5 +1999,134 @@ sbatch ~/programs/DarwinFinches/pixy.sh -v /xdisk/mcnew/dannyjackson/finches/vcf
 
 sbatch ~/programs/DarwinFinches/pixy.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf.gz -o /xdisk/mcnew/dannyjackson/finches/for/ -r /xdisk/mcnew/dannyjackson/finches/reference_lists/for_pixy_popfile.txt -w 10000
 
+outDir="/xdisk/mcnew/dannyjackson/finches/cra"
+name="cra"
 
-squeue --job 1707595
+head -1 ${outDir}/pixy/pixy_dxy.txt > ${outDir}/pixy/${name}.chroms.pixy_dxy.txt
+grep 'NC' ${outDir}/pixy/pixy_dxy.txt >> ${outDir}/pixy/${name}.chroms.pixy_dxy.txt
+sed -i 's/NC_//g' ${outDir}/pixy/${name}.chroms.pixy_dxy.txt
+awk '{sub(/\./,"",$1)}1' ${outDir}/pixy/${name}.chroms.pixy_dxy.txt | column -t > ${outDir}/pixy/${name}.chroms.pixy_dxy.formanhattan.txt
+
+
+Rscript ~/programs/DarwinFinches/pixy.r ${outDir}/pixy ${name}
+
+
+## December 12th
+
+awk -F"[,\t]" 'NR==FNR{a["NC_0"$4]=$0; b=($5-10000); c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/pixy/fst/${name}.zfst_sig.csv ${gff} | grep 'ID=gene'
+
+
+# CRA
+
+sbatch ~/programs/DarwinFinches/selection_scans.sh \
+-v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf \
+-n cra \
+-o /xdisk/mcnew/dannyjackson/finches/cra/ \
+-p /xdisk/mcnew/dannyjackson/finches/vcfs/cra_pre.vcf \
+-q /xdisk/mcnew/dannyjackson/finches/vcfs/cra_post.vcf \
+-r /xdisk/mcnew/dannyjackson/finches/reference_lists/cra_pixy_popfile.txt \
+-g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff \
+-w 10000
+
+Submitted batch job 1708847
+
+# FOR
+
+sbatch ~/programs/DarwinFinches/selection_scans.sh \
+-v /xdisk/mcnew/dannyjackson/finches/vcfs/for.vcf \
+-n for \
+-o /xdisk/mcnew/dannyjackson/finches/for/ \
+-p /xdisk/mcnew/dannyjackson/finches/vcfs/for_pre.vcf \
+-q /xdisk/mcnew/dannyjackson/finches/vcfs/for_post.vcf \
+-r /xdisk/mcnew/dannyjackson/finches/reference_lists/for_pixy_popfile.txt \
+-g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff \
+-w 10000
+
+
+
+# PAR
+
+sbatch ~/programs/DarwinFinches/selection_scans.sh \
+-v /xdisk/mcnew/dannyjackson/finches/vcfs/par.vcf \
+-n par \
+-o /xdisk/mcnew/dannyjackson/finches/par/ \
+-p /xdisk/mcnew/dannyjackson/finches/vcfs/par_pre.vcf \
+-q /xdisk/mcnew/dannyjackson/finches/vcfs/par_post.vcf \
+-r /xdisk/mcnew/dannyjackson/finches/reference_lists/par_pixy_popfile.txt \
+-g /xdisk/mcnew/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/genomic.gff \
+-w 10000
+
+Submitted batch job 1708849
+
+
+
+
+
+
+
+
+# fixing PCA script
+
+~/programs/genomics/PCA_r.sh -v /xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf -o /xdisk/mcnew/dannyjackson/finches/PCA/cra/ -p /xdisk/mcnew/dannyjackson/finches/PCA/cra/pops.txt -n cra -s y
+
+
+dataset <- "/xdisk/mcnew/dannyjackson/finches/vcfs/cra.vcf"
+outDir <- "/xdisk/mcnew/dannyjackson/finches/PCA/cra/"
+pops <- "/xdisk/mcnew/dannyjackson/finches/PCA/cra/pops.txt"
+name <- "cra"
+
+library(gdsfmt)
+library(SNPRelate)
+
+#open the GDS file
+genofile <- snpgdsOpen(paste0(outDir,"/",name,".gds"))
+
+#get population information
+pop_code <- scan(paste(pops), what=character())
+table(pop_code)
+
+#prune SNPS based on linkage disequilibrium
+set.seed(1000)
+snpset <- snpgdsLDpruning(genofile, ld.threshold=0.2, autosome.only = FALSE)
+snpset.id <- unlist(snpset)
+
+#run PCA
+#with subsetted snps
+pca <- snpgdsPCA(genofile, snp.id=snpset.id, num.thread=2, autosome.only = FALSE)
+
+#to calculate percent of variation that is accounted for by top PCA components:
+pc.percent <- pca$varprop*100
+sink(paste0(outDir,"/",name,"_percentvariation.txt"), append=TRUE, split=FALSE)
+head(round(pc.percent, 2))
+sink()
+
+#get sample id
+sample.id <- read.gdsn(index.gdsn(genofile, "sample.id"))
+
+#make data frame
+tab <- data.frame(sample.id = pca$sample.id,
+pop = factor(pop_code)[match(pca$sample.id, sample.id)],
+EV1 = pca$eigenvect[,1],    # the first eigenvector
+EV2 = pca$eigenvect[,2],    # the second eigenvector
+stringsAsFactors = FALSE)
+
+#save files:
+write.table(tab, file = paste0(outDir,"/",name,"_subset.txt"), sep = "\t")
+
+tab <- read.table(paste0(outDir,"/",name,"_subset.txt"), header = TRUE, sep = "\t", stringsAsFactors=T)
+
+
+#draw it:
+pdf(file = paste0(outDir,"/",name,"_pca_populations_subsetted.pdf"), useDingbats=FALSE)
+
+plot(tab$EV1, tab$EV2, col=as.integer(tab$pop), xlab=paste0("PC1 (Percent variation ="pc.percent[1]")"), ylab=paste0("PC2 (Percent variation ="pc.percent[2]")"))
+legend("topright", legend=levels(tab$pop), pch="o", col=1:nlevels(tab$pop))
+
+dev.off()
+
+pdf(file = paste0(outDir,"/",name,"_pca_individuals_subsetted.pdf"), useDingbats=FALSE)
+
+plot(tab$EV1, tab$EV2, col=as.integer(tab$sample.id), xlab="PC1", ylab="PC2")
+legend("topright", legend=levels(tab$sample.id), pch="o", col=1:nlevels(tab$sample.id))
+
+dev.off()
