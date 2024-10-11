@@ -64,7 +64,7 @@ source activate pixy
 
 module load samtools
 
-pixy --stats pi fst dxy --vcf ${vcf} --populations ${pixypop} --window_size ${windowsize} --output_folder ${outDir}/pixy --bypass_invariant_check yes
+pixy --stats pi fst dxy --vcf ${vcf}.gz --populations ${pixypop} --window_size ${windowsize} --output_folder ${outDir}/pixy --bypass_invariant_check yes
 
 
 
@@ -116,7 +116,7 @@ Rscript ~/programs/DarwinFinches/pixy.r ${outDir}/pixy/ ${name}
 awk -F"[,\t]" 'NR==FNR{a["NC_0"$4]=$0; b=($5-10000); c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/pixy/fst/${name}.zfst_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/pixy/fst/${name}.zfst_sig_genes.csv
 
 ## dxy
-awk -F"[,\t]" 'NR==FNR{a["NC_0"$4]=$0; b=($5-10000); c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/pixy/dxy/${name}.zdxy_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/pixy/fst/${name}.dxy_sig_genes.csv
+awk -F"[,\t]" 'NR==FNR{a["NC_0"$4]=$0; b=($5-10000); c=($5 +20000); next} ($1 in a && $5 >= b && $4<=c){print $0}' ${outDir}/pixy/dxy/${name}.zdxy_sig.csv ${gff} | grep 'ID=gene' > ${outDir}/pixy/fst/${name}.zdxy_sig_genes.csv
 
 
 ## Tajima's D

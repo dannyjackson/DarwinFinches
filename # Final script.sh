@@ -76,6 +76,12 @@ ID="darwinfinches"
 bcftools mpileup -Ou -f "$ref" -a FORMAT/AD,DP,INFO/AD,SP "$bamdir"*.sorted.marked.bam | bcftools call -mv -V indels > "$ID"_snps_multiallelic.vcf
 
 
+ref="/xdisk/mcnew/finch_wgs/fastqs/GCF_901933205.fa"
+bamdir="/xdisk/mcnew/dannyjackson/finches/fastqs/sorted_marked_bams/"
+ID="darwinfinches"
+bcftools mpileup -Ou -f "$ref" -a FORMAT/AD,DP,GT,INFO/AD,SP,GT "$bamdir"*.sorted.marked.bam | bcftools call -mv -V indels > "$ID"_snps_multiallelic.vcf
+
+
 sbatch ~/programs/slurmscripts/vcfstats.slurm -i /xdisk/mcnew/dannyjackson/vcfs/darwinfinches_snps_multiallelic.vcf
 
 
@@ -83,7 +89,18 @@ sbatch ~/programs/slurmscripts/vcfstats.slurm -i /xdisk/mcnew/dannyjackson/vcfs/
 
 bcftools view -i 'QUAL>100' /xdisk/mcnew/dannyjackson/vcfs/darwinfinches_snps_multiallelic.vcf  > darwinfinches_qualitysort.vcf
 
-vcftools --vcf darwinfinches_qualitysort.vcf --min-meanDP 2 --remove-indels --recode --out darwinfinches_filtered
+
+
+bcftools view  -i  'MIN(FORMAT/DP)>5'  /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_snps_multiallelic.vcf  > darwinfinches_DP5.vcf
+
+
+bcftools view  -i  'MIN(FORMAT/AD)>5'  /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_DP5.vcf  > darwinfinches_DP5_AD5.vcf
+
+bcftools view  -i  'MIN(FORMAT/AD)>5'  /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_snps_multiallelic.vcf  > darwinfinches_AD5.vcf
+
+bcftools view  -i  'MIN(FORMAT/AD)>2'  /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_snps_multiallelic.vcf  > darwinfinches_AD2.vcf
+
+bcftools view  -i  'MIN(FORMAT/DP)>2'  /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_snps_multiallelic.vcf  > darwinfinches_DP2.vcf
 
 
 bcftools stats -v /scratch/dnjacks4/cardinalis/to_b10k/b10k_filtered.recode.vcf > b10k_filtered.recode.stats.txt
@@ -156,9 +173,9 @@ bcftools view -s JP4481,JP5410,JP9655,SM1067,SM1157,SM1200,SM1231,SM1240,SM1266 
 
 
 # for
-bcftools view -s SM1083,SM1156,SM1204,SM1237,SM1270,SM1271,SM1272,SM1273,SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for.notindep.vcf
+bcftools view -s SM1083,SM1156,SM1204,SM1237,SM1270,SM1271,SM1272,SM1273,SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf.gz > /xdisk/mcnew/dannyjackson/finches/vcfs/for.notindep.vcf
 
-bcftools view -s SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for_pre.notindep.vcf
+bcftools view -s SRR289,SRR290,SRR291,SRR292,SRR293,SRR294,SRR295,SRR296,SRR297,SRR298 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf.gz > /xdisk/mcnew/dannyjackson/finches/vcfs/for_pre.notindep.vcf
 
 bcftools view -s SM1083,SM1156,SM1204,SM1237,SM1270,SM1271,SM1272,SM1273 /xdisk/mcnew/dannyjackson/finches/vcfs/darwinfinches_filtered.geno25.maf1.notindep.vcf > /xdisk/mcnew/dannyjackson/finches/vcfs/for_post.notindep.vcf
 

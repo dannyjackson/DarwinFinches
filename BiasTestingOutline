@@ -1,0 +1,88 @@
+# Run tests of biases
+
+
+Testing for and mitigating various types of batch effects
+3. Test for Batch Effects of Sequencing platform 
+Question 1: 
+  Do our samples differ in their sequencing platform?
+How to test for presence of batch effects: 
+  Look up sequencing platform used in other sequencing
+
+Question 2: 
+  Do sequencing platforms affect population statistics?
+
+How to test for presence of batch effects:
+  Examine the base composition at each read position in raw fastq files (e.g., with fastqc)
+
+Recommended mitigation of batch effects: 
+  Trim off ends of reads with low base quality within sliding windows (e.g., the cut_right option in fastp, or the SLIDINGWINDOW option in trimmomatic)
+
+
+
+
+1. Test for Batch Effects of Depth
+Question: 
+  Does depth of coverage affect population statistics? 
+
+How to test for presence of batch effects:
+  Downsample the batch of data with higher coverage and compare the results generated from before and after downsampling
+
+Recommended mitigation of batch effects: 
+  PCA generated from the -doCov 1 option in angsd does not show obvious signs of batch effects when other causes of batch effects are controlled for, despite the difference in sequencing depth between the two batches (Figure 1b “after” and 5b). In contrast, PCA generated from pcangsd still has individuals from different batches clustering separately (Figure S6).
+
+
+
+2. Test for Batch Effects of Age / degradation
+
+How to test for presence of batch effects:
+  1. Compare the frequencies of different types of base substitutions among the private alleles in each batch (Figure 5c)
+  2. Compare the drop in diversity estimates (e.g., individual heterozygosity) after excluding all transitions between different batches of data (Figure 5d)
+
+Recommended mitigation of batch effects: 
+  1. Exclude transitions from certain analyses (Figure 5a “excluding transitions”; Figure S3)
+  2. Recalibrate base quality scores for degradated DNA (e.g., mapdamage) (Jónsson et al., 2013)
+  3. Use genotype likelihood models that take postmortem damage into account (e.g., atlas) (Link et al., 2017)
+
+
+
+
+4. Test for Batch Effects of Using Duplicate Sequencing of Individuals
+Question: 
+  Does combining sequencing runs of the same individual to increase depth lead to different levels of miscalibration in base quality scores?
+
+# I'm treating this as the same question as "Do separate sequencing runs lead to different levels of miscalibration in base quality scores?"
+
+How to test for presence of batch effects:
+  Compare diversity estimates(e.g.,individual heterozygosity) using a relaxed vs. stringent base quality threshold within each batch
+
+Recommended mitigation of batch effects: 
+  1. Use a more stringent base quality threshold in all batches (Figure 1a “after” and 3; Figure S3)
+  2. Use base quality score recalibration (Figure S4) if there is a comprehensive variant database (e.g., the soapSNP model in angsd, gatk) (Korneliussen et al., 2014; McKenna et al., 2010) or if control sequences (e.g., PhiX) are included in the sequencing run (Ni & Stoneking, 2016; Orr, 2020; Zook et al., 2012)
+
+
+
+5. Test for Batch Effects of Sample size
+Question:
+  Does uneven sample size affect population statistics?
+  
+How to test for presence of batch effects:
+  Not outlined in the Nina papers.
+  I guess just compare pop stats using all samples and again with even subsets of samples. Could randomize subsets of samples and create a "null distribution" even to compare to the uneven sample size.
+
+Recommended mitigation of batch effects: 
+  Idk bro maybe downsample if it isn't also biased
+
+
+
+
+
+
+
+
+# Start writing code for these different runs
+# What filtering parameters should I have as my default?
+Platform
+Dups
+Depth
+Age
+Sample Size

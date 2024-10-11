@@ -55,3 +55,143 @@ SRR335  PAR pre
 SRR336  PAR pre
 SRR337  PAR pre
 SRR338  PAR pre
+
+
+
+
+
+# revised full sample list 
+PAR = Camarhynchus parvulus	Small tree finch
+lamich_PARV1	PAR	pre
+lamich_PARV2	PAR	pre
+RHC097	PAR	post
+RHC507	PAR	post
+SM031	PAR	post
+SM032	PAR	post
+SM040	PAR	post
+SM059	PAR	post
+SM079	PAR	post
+SRR2917329	PAR	pre
+SRR2917330	PAR	pre
+SRR2917331	PAR	pre
+SRR2917332	PAR	pre
+SRR2917333	PAR	pre
+SRR2917334	PAR	pre
+SRR2917335	PAR	pre
+SRR2917336	PAR	pre
+SRR2917337	PAR	pre
+SRR2917338	PAR	pre
+
+CRA = Platyspiza crassirostris	Vegetarian finch
+JP4481	CRA	post
+JP5410	CRA	post
+JP9655	CRA	post
+lamich_PL15	CRA	pre
+lamich_PL16	CRA	pre
+lamich_PL4	CRA	pre
+lamich_PL7	CRA	pre
+lamich_PL9	CRA	pre
+SM1067	CRA	post
+SM1157	CRA	post
+SM1200	CRA	post
+SM1231	CRA	post
+SM1240	CRA	post
+SM1266	CRA	post
+
+FOR = Geospiza fortis	Medium ground finch
+SM1270	FOR	post
+SM1271	FOR	post
+SM1272	FOR	post
+SM1273	FOR	post
+SRR2917289	FOR	pre
+SRR2917290	FOR	pre
+SRR2917291	FOR	pre
+SRR2917292	FOR	pre
+SRR2917293	FOR	pre
+SRR2917294	FOR	pre
+SRR2917295	FOR	pre
+SRR2917296	FOR	pre
+SRR2917297	FOR	pre
+SRR2917298	FOR	pre
+SM1083	FOR	post
+SM1156	FOR	post
+SM1204	FOR	post
+SM1237	FOR	post
+
+
+
+
+# Lamich duplicates
+SRR1607504	lamich_par_PARV1
+SRR1607505	lamich_par_PARV1
+SRR1607506	lamich_par_PARV2
+SRR1607507	lamich_par_PARV2
+SRR1607532	lamich_cra_PL15
+SRR1607533	lamich_cra_PL15
+SRR1607534	lamich_cra_PL16
+SRR1607535	lamich_cra_PL16
+SRR1607536	lamich_cra_PL16
+SRR1607537	lamich_cra_PL4
+SRR1607538	lamich_cra_PL4
+SRR1607539	lamich_cra_PL7
+SRR1607540	lamich_cra_PL7
+SRR1607541	lamich_cra_PL9
+SRR1607542	lamich_cra_PL9
+
+
+# All pre
+
+lamich_PARV1  PAR pre
+lamich_PARV2  PAR pre
+lamich_PL15 CRA pre
+lamich_PL16 CRA pre
+lamich_PL4  CRA pre
+lamich_PL7  CRA pre
+lamich_PL9  CRA pre
+SRR289  FOR pre
+SRR290  FOR pre
+SRR291  FOR pre
+SRR292  FOR pre
+SRR293  FOR pre
+SRR294  FOR pre
+SRR295  FOR pre
+SRR296  FOR pre
+SRR297  FOR pre
+SRR298  FOR pre
+SRR329  PAR pre
+SRR330  PAR pre
+SRR331  PAR pre
+SRR332  PAR pre
+SRR333  PAR pre
+SRR334  PAR pre
+SRR335  PAR pre
+SRR336  PAR pre
+SRR337  PAR pre
+SRR338  PAR pre
+
+
+# All post 
+JP4481  CRA post
+JP5410  CRA post
+JP9655  CRA post
+RHC097  PAR post
+RHC507  PAR post
+SM031 PAR post
+SM032 PAR post
+SM040 PAR post
+SM059 PAR post
+SM079 PAR post
+SM1067  CRA post
+SM1083  FOR post
+SM1156  FOR post
+SM1157  CRA post
+SM1200  CRA post
+SM1204  FOR post
+SM1231  CRA post
+SM1237  FOR post
+SM1240  CRA post
+SM1266  CRA post
+SM1270  FOR post
+SM1271  FOR post
+SM1272  FOR post
+SM1273  FOR post
