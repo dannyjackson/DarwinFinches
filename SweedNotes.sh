@@ -1985,3 +1985,11 @@ cp for.pre.relevantgenenames_15kb.txt /xdisk/mcnew/dannyjackson/copythis/for.pre
 
 sbatch post_bcfs.sh 
 Submitted batch job 2147197
+
+
+
+bcftools convert all.bcf  -o all.vcf -O v 
+
+sed -i 's/\/xdisk\/mcnew\/dannyjackson\/finches\/bias_testing\/batchnaive\/indelrealignment\///g' all.vcf
+
+sed -i 's/\.realigned\.bam//g' all.vcf
