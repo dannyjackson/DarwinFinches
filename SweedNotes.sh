@@ -1965,31 +1965,3 @@ cp for.pre.relevantgenenames_15kb.txt /xdisk/mcnew/dannyjackson/copythis/for.pre
 
 
 
-
-# make vcfs for dadi
-
-#!/bin/bash
-
-#SBATCH --job-name=post_bcf
-#SBATCH --ntasks=8
-#SBATCH --nodes=1             
-#SBATCH --time=40:00:00   
-#SBATCH --partition=standard
-#SBATCH --account=mcnew
-#SBATCH --mem-per-cpu=10gb
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=dannyjackson@arizona.edu
-#SBATCH --output=output.post_bcf.%j
-
-~/programs/angsd/angsd -dosaf 1 -GL 1 -doGlf 2 -doMaf 1 -doMajorMinor 3 -doCounts 1 -doDepth 1 -setMinDepthInd 4 -minInd 2 -minQ 30 -minMapQ 30 -sites /xdisk/mcnew/dannyjackson/finches/angsty/analyses/sites_headless.mafs -bam /xdisk/mcnew/dannyjackson/finches/reference_lists/postbams.txt -out /xdisk/mcnew/dannyjackson/finches/dadi/post/all/all -anc /xdisk/mcnew/dannyjackson/finch_wgs/fastqs/GCF_901933205.fa -nThreads 8 -doBcf 1 -doPost 1
-
-sbatch post_bcfs.sh 
-Submitted batch job 2147197
-
-
-
-bcftools convert all.bcf  -o all.vcf -O v 
-
-sed -i 's/\/xdisk\/mcnew\/dannyjackson\/finches\/bias_testing\/batchnaive\/indelrealignment\///g' all.vcf
-
-sed -i 's/\.realigned\.bam//g' all.vcf

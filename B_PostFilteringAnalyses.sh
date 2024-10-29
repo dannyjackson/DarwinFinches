@@ -630,6 +630,8 @@ Submitted batch job 9931679
 #get the global estimate
 ~/programs/angsd/misc/realSFS fst stats here.fst.idx 
 
+
+
 	-> FST.Unweight[nObs:8400488]:0.030847 Fst.Weight:0.031077
 
 #below is not tested that much, but seems to work
