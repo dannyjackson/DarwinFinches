@@ -2461,3 +2461,102 @@ do
 done < SweeD_Report.noca_urban_manhattan
 
 sed -i 's/VYXE//g' SweeD_Report.noca_urban_manhattan_scaffnames
+
+
+
+
+
+
+# make vcfs with likelihoods
+
+#!/bin/bash
+
+#SBATCH --job-name=angsdvcf
+#SBATCH --ntasks=12
+#SBATCH --nodes=1             
+#SBATCH --time=40:00:00   
+#SBATCH --partition=standard
+#SBATCH --account=mcnew
+#SBATCH --mem-per-cpu=300gb
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=dannyjackson@arizona.edu
+#SBATCH --output=output.angsdvcf.%j
+
+cd /xdisk/mcnew/dannyjackson/finches/vcf_likelihoods/all
+
+~/programs/angsd/angsd -b /xdisk/mcnew/dannyjackson/finches/reference_lists/allsamplebams.txt -gl 1 -dopost 1 -domajorminor 1 -domaf 1 -snp_pval 1e-6 -sites /xdisk/mcnew/dannyjackson/finches/angsty/analyses/sites_headless.mafs -doBcf 1 -doGlf 3 -nThreads 12
+
+sbatch makevcfs.sh 
+Submitted batch job 2192335
+
+#!/bin/bash
+
+#SBATCH --job-name=angsdvcf
+#SBATCH --ntasks=12
+#SBATCH --nodes=3             
+#SBATCH --time=40:00:00   
+#SBATCH --partition=standard
+#SBATCH --account=mcnew
+#SBATCH --mem-per-cpu=300gb
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=dannyjackson@arizona.edu
+#SBATCH --output=output.angsdvcf.%j
+
+module load parallel
+
+angsting () { 
+
+cd /xdisk/mcnew/dannyjackson/finches/vcf_likelihoods/"$@"/post
+
+~/programs/angsd/angsd -b /xdisk/mcnew/dannyjackson/finches/reference_lists/"$@"_post_bams.txt -gl 1 -dopost 1 -domajorminor 1 -domaf 1 -snp_pval 1e-6 -sites /xdisk/mcnew/dannyjackson/finches/angsty/analyses/sites_headless.mafs -doBcf 1 -doGlf 3 -nThreads 12
+
+cd /xdisk/mcnew/dannyjackson/finches/vcf_likelihoods/"$@"/pre
+
+~/programs/angsd/angsd -b /xdisk/mcnew/dannyjackson/finches/reference_lists/"$@"_pre_bams.txt -gl 1 -dopost 1 -domajorminor 1 -domaf 1 -snp_pval 1e-6 -sites /xdisk/mcnew/dannyjackson/finches/angsty/analyses/sites_headless.mafs -doBcf 1 -doGlf 3 -nThreads 12
+
+}
+
+export -f angsting 
+
+parallel -j 3 angsting ::: cra for par
+
+sbatch angsdvcfs.sh 
+Submitted batch job 2192337
+
+
+
+#!/bin/bash
+
+#SBATCH --job-name=makevcf
+#SBATCH --ntasks=3
+#SBATCH --nodes=3             
+#SBATCH --time=20:00:00   
+#SBATCH --partition=standard
+#SBATCH --account=mcnew
+#SBATCH --mem-per-cpu=300gb
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=dannyjackson@arizona.edu
+#SBATCH --output=output.makevcf.%j
+
+module load bcftools 
+module load parallel 
+
+makevcf () {
+
+cd /xdisk/mcnew/dannyjackson/finches/vcf_likelihoods/"$@"/pre
+
+bcftools convert -O z -o angsdput.vcf.gz angsdput.bcf
+
+cd /xdisk/mcnew/dannyjackson/finches/vcf_likelihoods/"$@"/post
+
+bcftools convert -O z -o angsdput.vcf.gz angsdput.bcf
+
+
+}
+
+export -f makevcf 
+
+parallel -j 3 makevcf ::: cra for par
+
+sbatch makevcf.sh 
+Submitted batch job 2192768

@@ -4,6 +4,15 @@ https://github.com/SchriderLab/Timesweeper/blob/master/README.md#workflow-overvi
 
 1. Create a SLiM script based on the example_demo_model.slim example
 
+cd /xdisk/mcnew/dannyjackson/finches/timesweeper
+
+conda create -n blinx -c conda-forge -c bioconda python slim=3.7 samtools bcftools
+conda activate blinx
+
+git clone https://github.com/SchriderLab/Timesweeper.git
+cd Timesweeper
+pip install .
+
 2. Simulate demographic model with time-series sampling sim_custom if using custom SLiM script
     
     Note: If available, we suggest using a job submission platform such as SLURM to parallelize simulations. This is the most resource and time-intensive part of the module by far.
