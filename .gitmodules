@@ -1,0 +1,3 @@
+[submodule "Genomics-Main"]
+	path = Genomics-Main
+	url = git@github.com:dannyjackson/Genomics-Main.git
