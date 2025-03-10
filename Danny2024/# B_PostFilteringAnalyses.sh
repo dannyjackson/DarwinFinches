@@ -61,42 +61,6 @@ sed -e 's/$/.realigned.bam/g' /xdisk/mcnew/dannyjackson/finches/reference_lists/
 
 #!/bin/bash
 
-#SBATCH --job-name=angsdsnps
-#SBATCH --ntasks=10
-#SBATCH --nodes=1             
-#SBATCH --time=20:00:00   
-#SBATCH --partition=standard
-#SBATCH --account=mcnew
-#SBATCH --mem-per-cpu=50gb
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=dannyjackson@arizona.edu
-#SBATCH --output=output.angsdsnps.%j
-
-cd /xdisk/mcnew/dannyjackson/finches/angsty/analyses/
-
-
-~/programs/angsd/angsd -GL 1 -doGlf 2 -doMaf 1 -doMajorMinor 1 -doCounts 1 -doDepth 1 -dumpCounts 1 -doIBS 1 -makematrix 1 -doCov 1 -P 32 -SNP_pval 1e-6 -setMinDepthInd 4 -minInd 20 -minQ 30 -minMaf 0.05 -minMapQ 30 -bam /xdisk/mcnew/dannyjackson/finches/reference_lists/allsamplebams.txt -out /xdisk/mcnew/dannyjackson/finches/angsty/analyses/allsnps -nThreads 10 
-
-sbatch angsd_snps.sh 
-Submitted batch job 1958972
-
-
-# generated 8,572,849 snps
-# To be overly cautious, we could eliminate any private alleles between batches (pre vs post), but that would eliminate a lot of our potential resolution. Probably worth checking on them anyway so I'll follow that step anyway. See the rates of pre vs post private alleles...
-
-We then estimated the sample allele frequency (SAF) likelihoods and the minor allele frequencies (MAF) in each batch of data (pooling all populations together) at this set of SNPs 
-    
-~/programs/angsd/angsd sites index 
-
-zcat /xdisk/mcnew/dannyjackson/finches/angsty/analyses/allsnps.mafs.gz | awk '{print $1, $2, $3, $4}' > sites.mafs
-
-
-tail -n +2 sites.mafs > sites_headless.mafs
-
-~/programs/angsd/angsd sites index sites_headless.mafs
-
-#!/bin/bash
-
 #SBATCH --job-name=angsdsaf
 #SBATCH --ntasks=10
 #SBATCH --nodes=1             
@@ -2465,29 +2429,6 @@ sed -i 's/VYXE//g' SweeD_Report.noca_urban_manhattan_scaffnames
 
 
 
-
-
-# make vcfs with likelihoods
-
-#!/bin/bash
-
-#SBATCH --job-name=angsdvcf
-#SBATCH --ntasks=12
-#SBATCH --nodes=1             
-#SBATCH --time=40:00:00   
-#SBATCH --partition=standard
-#SBATCH --account=mcnew
-#SBATCH --mem-per-cpu=300gb
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=dannyjackson@arizona.edu
-#SBATCH --output=output.angsdvcf.%j
-
-cd /xdisk/mcnew/dannyjackson/finches/vcf_likelihoods/all
-
-~/programs/angsd/angsd -b /xdisk/mcnew/dannyjackson/finches/reference_lists/allsamplebams.txt -gl 1 -dopost 1 -domajorminor 1 -domaf 1 -snp_pval 1e-6 -sites /xdisk/mcnew/dannyjackson/finches/angsty/analyses/sites_headless.mafs -doBcf 1 -doGlf 3 -nThreads 12
-
-sbatch makevcfs.sh 
-Submitted batch job 2192335
 
 #!/bin/bash
 

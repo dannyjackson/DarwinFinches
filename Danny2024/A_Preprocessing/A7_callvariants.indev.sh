@@ -6,7 +6,7 @@ ID="finches"
 
 cd /xdisk/mcnew/finches/dannyjackson/finches/datafiles/genotype_calls/
 
-bcftools mpileup -Ou -f "$ref" -a FORMAT/AD,DP,INFO/AD,SP -S /xdisk/mcnew/dannyjackson/finches/reference_lists/allsamplebams.txt | bcftools call -mv -V indels > "$ID"_snps_multiallelic.vcf
+bcftools mpileup -Ou -f "$ref" -a FORMAT/AD,DP,INFO/AD,SP --bam-list /xdisk/mcnew/finches/dannyjackson/finches/reference_lists/allsamplebams.txt | bcftools call -mv -V indels > "$ID"_snps_multiallelic.vcf
 
 
 sbatch --account=mcnew \
@@ -19,5 +19,5 @@ sbatch --account=mcnew \
 --time=100:00:00 \
 callvariants.sh
 
-# Submitted batch job 3915974
-# 100 hrs 3916084
+# Submitted batch job 
+# 100 hrs 3916091
