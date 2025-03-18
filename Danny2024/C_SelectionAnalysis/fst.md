@@ -120,7 +120,6 @@ window_sizes=( 1 )
 # Iterate over each combination
 for win in "${window_sizes[@]}"; do
     for sp in "${species[@]}"; do
-        time_limit=${time_limits[$win]}
 
         sbatch --account=mcnew \
                --job-name=fst_${win}_${sp} \
