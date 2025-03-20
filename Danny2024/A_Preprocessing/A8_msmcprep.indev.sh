@@ -1,4 +1,8 @@
+# I don't think I need to do any of this since the cardinal msmc prep processed the same reference genome
+
 # msmc
+cp -r /xdisk/mcnew/dannyjackson/cardinals/analyses/msmc/msmc2_scripts .
+cd msmc2_scripts/
 
 cd ~/programs
 git clone https://github.com/stschiff/msmc2
@@ -12,7 +16,7 @@ pip3 install --user whatshap
 # following Jessi Rick's tutorial, found here: https://github.com/jessicarick/msmc2_scripts?tab=readme-ov-file
 # Step 0: Create mappability mask
 
-cd /xdisk/mcnew/dannyjackson/cardinals_dfinch/analyses/msmc
+cd /xdisk/mcnew/finches/dannyjackson/finches/analyses/msmc
 
 
 sbatch --account=mcnew \
@@ -23,14 +27,18 @@ sbatch --account=mcnew \
 --nodes=1 \
 --ntasks-per-node=16 \
 --time=48:00:00 \
-/xdisk/mcnew/dannyjackson/cardinals_dfinch/analyses/msmc/msmc2_scripts/run_snpable2.sh
+/xdisk/mcnew/finches/dannyjackson/finches/analyses/msmc/msmc2_scripts/run_snpable2.sh
 
 # Submitted batch job 11143339
 
-awk '{print $1}' /xdisk/mcnew/finches/dannyjackson/finch_wgs/fastqs/GCF_901933205.fa.fai > /xdisk/mcnew/dannyjackson/cardinals_dfinch/analyses/msmc/msmc2_scripts/SCAFFOLDS.txt
+# awk '{print $1}' /xdisk/mcnew/finches/dannyjackson/finch_wgs/fastqs/GCF_901933205.fa.fai > /xdisk/mcnew/dannyjackson/cardinals_dfinch/analyses/msmc/msmc2_scripts/SCAFFOLDS.txt
 
 # then edit the makeMappabilityMask.py script (lines 26 & 30) for your genome, and run the script
 # on line 30, use curly braces {} to indicate where in the name the scaffold name should go
+
+/xdisk/mcnew/dannyjackson/cardinals/datafiles/snpable/GCF_901933205_mask.150.50.fa
+with open("/xdisk/mcnew/dannyjackson/cardinals/datafiles/snpable/GCF_901933205_mask.150.50.fa", "r") as f:
+      mask = MaskGenerator("/xdisk/mcnew/finches/dannyjackson/finches/analyses/msmc/mask/GCF_963921805_{}.mask.150.50.bed.gz".format(chr), chr)
 
 # /xdisk/mcnew/dannyjackson/sulidae/analyses/msmc
 
