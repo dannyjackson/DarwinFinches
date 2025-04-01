@@ -1,6 +1,7 @@
 # Phase data
 
-cp ~/programs/msmc2_scripts/SCAFFOLDS.txt .
+# multisample phasing
+/xdisk/mcnew/finches/dannyjackson/finches/datafiles/genotype_calls/finches_snps_multiallelic.vcf
 
 #!/bin/sh 
 module load python
@@ -8,12 +9,9 @@ module load python
 scriptdir=/xdisk/mcnew/finches/dannyjackson/finches/analyses/msmc/msmc2_scripts
 source ${scriptdir}/msmc_params.sh
 
-BAMFILE=$1
-IND=$(basename "$BAMFILE" .realigned.bam)  # Extract filename without path and extension
-
 echo "working with individual $IND"
 
-for s in `cat ~/xdisk/mcnew/finches/dannyjackson/finches/referencelists/SCAFFOLDS.txt`;
+for s in `cat /xdisk/mcnew/finches/dannyjackson/finches/referencelists/SCAFFOLDS.txt`;
     do echo "working with scaffold $s";
     if [ -f ${OUTDIR}/vcf/${IND}.${s}.${phasing}.samtools.vcf.gz ]; then
             echo "phased VCF already exists; moving onto next scaffold";
@@ -26,30 +24,34 @@ for s in `cat ~/xdisk/mcnew/finches/dannyjackson/finches/referencelists/SCAFFOLD
     fi;
 done
 
-
-
 echo "finished with individual $IND"
 date
 
 
 for i in `cat /xdisk/mcnew/finches/dannyjackson/finches/referencelists/allsamplebams.txt`;
+
+for i in `cat /xdisk/mcnew/finches/dannyjackson/finches/referencelists/duplicatedsamples.txt`;
+
+# for i in `cat msmc2_scripts/test_samplebam.txt`;
 	do echo $i
+    IND=$(basename "$i" .realigned.bam)  # Extract filename without path and extension
+    
 	sbatch --account=mcnew \
-	--job-name=phasing${i} \
+	--job-name=phasing_${IND} \
     --partition=standard \
 	--mail-type=ALL \
-	--output=slurm_output/output.phasing${i}.%j \
+	--output=slurm_output/output.phasing${IND}.%j \
 	--nodes=1 \
 	--ntasks-per-node=4 \
 	--time=25:00:00 \
 	phasing.sh $i
 done
 
-3925514..3925564
+3925855..3925905
 
 
 
 # 11152196 - 11152229
-for job in {3583203..3583233}; do
+for job in {3925514..3925564}; do
     scancel $job
 done

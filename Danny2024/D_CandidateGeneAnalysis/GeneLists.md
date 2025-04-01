@@ -65,3 +65,46 @@ GFF=/xdisk/mcnew/dannyjackson/cardinals/datafiles/referencegenome/ncbi_dataset/d
 bedtools intersect -a ${GFF} -b crapost.tajima_diff.50000kb.chr11.bed -wa > ../genes/crapost.tajima_diff.50000kb.chr11.genes.txt
 
 grep 'ID\=gene' ../genes/crapost.tajima_diff.50000kb.chr11.genes.txt | awk '{OFS = "\t"} {split($9, arr, ";"); print(arr[1])}' | sed 's/ID\=gene\-//g' | sort -u > ../gene_names/crapost.tajima_diff.50000kb.chr11.genenames.txt
+
+
+
+# raisd
+
+
+species=( "cra_pre" "cra_post" "for_pre" "for_post" "par_pre" "par_post" )
+window_sizes=( 50 )
+
+
+
+# Iterate over each combination
+for win in "${window_sizes[@]}"; do
+    for sp in "${species[@]}"; do
+
+    echo ${sp}
+    ~/programs/DarwinFinches/Genomics-Main/general_scripts/bed_to_genelist.sh \
+    -p ~/programs/DarwinFinches/param_files/${sp}_params_raisd.sh \
+    -i /xdisk/mcnew/finches/dannyjackson/finches/analyses/raisd/${sp}/${sp}.raisd_${win}.outlier.csv \
+    -n ${sp} \
+    -m raisd \
+    -w ${win}
+
+    done
+done
+
+# RAiSD
+chmod +x ~/programs/DarwinFinches/Genomics-Main/D_GeneVisualization/D2_uniquegenes.sh
+species=( "cra" "for" "par" )
+window_sizes=( 50 )
+
+for win in "${window_sizes[@]}"; do
+    for sp in "${species[@]}"; do
+
+    ~/programs/DarwinFinches/Genomics-Main/D_GeneVisualization/D2_uniquegenes.sh \
+    -p ~/programs/DarwinFinches/param_files/params_base.sh \
+    -i ${sp}_post \
+    -q ${sp}_pre \
+    -m raisd \
+    -w ${win}
+
+    done
+done
