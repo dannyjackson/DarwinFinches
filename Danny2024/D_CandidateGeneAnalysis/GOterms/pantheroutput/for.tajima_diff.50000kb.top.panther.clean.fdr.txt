@@ -1,0 +1,8 @@
+PANTHER.GO.Slim.Biological.Process,background_genes.thetas.txt...REFLIST..11894.,X.312.,X.expected.,X.over.under.,X.fold.Enrichment.,P.value,qvals
+kinetochore assembly (GO:0051382),6,3,0.16,+,19.06,0.000337,0.1399898
+acetylcholine receptor signaling pathway (GO:0095500),21,5,0.55,+,9.08,0.000173,0.119773666666667
+chromosome segregation (GO:0007059),82,10,2.15,+,4.65,5.37e-05,0.09938445
+cell cycle process (GO:0022402),226,17,5.93,+,2.87,9.57e-05,0.09938445
+cell cycle (GO:0007049),250,17,6.56,+,2.59,0.000321,0.1399898
+organelle organization (GO:0006996),957,43,25.1,+,1.71,0.000449,0.155428833333333
+RNA processing (GO:0006396),301,0,7.9,-, < 0.01,0.000674,0.199985428571429

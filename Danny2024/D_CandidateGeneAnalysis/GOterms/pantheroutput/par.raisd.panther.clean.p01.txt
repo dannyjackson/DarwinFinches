@@ -1,0 +1,19 @@
+PANTHER GO-Slim Biological Process	background_genes.par_all.raisd.txt - REFLIST (10833)	(146)	(expected)	(over/under)	(fold Enrichment)	P-value
+kinetochore assembly (GO:0051382)	6	2	.08	+	24.73	2.61E-03
+calcineurin-mediated signaling (GO:0097720)	7	2	.09	+	21.20	3.62E-03
+response to UV (GO:0009411)	7	2	.09	+	21.20	3.62E-03
+endoderm development (GO:0007492)	7	2	.09	+	21.20	3.62E-03
+positive regulation of apoptotic signaling pathway (GO:2001235)	7	2	.09	+	21.20	3.62E-03
+endoderm formation (GO:0001706)	7	2	.09	+	21.20	3.62E-03
+kinetochore organization (GO:0051383)	8	2	.11	+	18.55	4.79E-03
+mRNA splice site recognition (GO:0006376)	10	2	.13	+	14.84	7.56E-03
+centrosome duplication (GO:0051298)	10	2	.13	+	14.84	7.56E-03
+positive regulation of protein serine/threonine kinase activity (GO:0071902)	11	2	.15	+	13.49	9.16E-03
+negative regulation of MAPK cascade (GO:0043409)	24	4	.32	+	12.37	2.73E-04
+negative regulation of intracellular signal transduction (GO:1902532)	54	5	.73	+	6.87	7.72E-04
+activation of GTPase activity (GO:0090630)	33	3	.44	+	6.75	9.73E-03
+non-membrane-bounded organelle assembly (GO:0140694)	85	5	1.15	+	4.36	5.74E-03
+regulation of MAPK cascade (GO:0043408)	110	6	1.48	+	4.05	3.67E-03
+negative regulation of response to stimulus (GO:0048585)	166	7	2.24	+	3.13	7.16E-03
+regulation of cell communication (GO:0010646)	490	14	6.60	+	2.12	7.43E-03
+regulation of signaling (GO:0023051)	494	14	6.66	+	2.10	7.83E-03

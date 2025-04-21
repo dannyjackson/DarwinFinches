@@ -1,0 +1,25 @@
+PANTHER GO-Slim Biological Process	background_genes.fst.txt - REFLIST (11890)	(383)	(expected)	(over/under)	(fold Enrichment)	P-value
+regeneration (GO:0031099)	2	2	.06	+	31.04	1.03E-03
+tissue regeneration (GO:0042246)	2	2	.06	+	31.04	1.03E-03
+DNA unwinding involved in DNA replication (GO:0006268)	7	3	.23	+	13.30	1.05E-03
+defense response to bacterium (GO:0042742)	5	2	.16	+	12.42	9.70E-03
+regulation of cell adhesion mediated by integrin (GO:0033628)	5	2	.16	+	12.42	9.70E-03
+DNA geometric change (GO:0032392)	12	4	.39	+	10.35	4.27E-04
+DNA duplex unwinding (GO:0032508)	12	4	.39	+	10.35	4.27E-04
+centriole assembly (GO:0098534)	9	3	.29	+	10.35	2.41E-03
+DNA conformation change (GO:0071103)	15	5	.48	+	10.35	7.77E-05
+centriole replication (GO:0007099)	9	3	.29	+	10.35	2.41E-03
+centrosome duplication (GO:0051298)	10	3	.32	+	9.31	3.36E-03
+response to wounding (GO:0009611)	24	4	.77	+	5.17	6.76E-03
+angiogenesis (GO:0001525)	32	5	1.03	+	4.85	3.32E-03
+blood vessel morphogenesis (GO:0048514)	36	5	1.16	+	4.31	5.60E-03
+blood vessel development (GO:0001568)	37	5	1.19	+	4.20	6.30E-03
+vasculature development (GO:0001944)	38	5	1.22	+	4.08	7.07E-03
+tube morphogenesis (GO:0035239)	38	5	1.22	+	4.08	7.07E-03
+tube development (GO:0035295)	40	5	1.29	+	3.88	8.80E-03
+DNA recombination (GO:0006310)	77	8	2.48	+	3.23	3.26E-03
+chromosome organization (GO:0051276)	113	10	3.64	+	2.75	3.48E-03
+microtubule cytoskeleton organization (GO:0000226)	164	12	5.28	+	2.27	6.78E-03
+microtubule-based process (GO:0007017)	246	17	7.92	+	2.15	2.86E-03
+cellular response to stress (GO:0033554)	333	21	10.73	+	1.96	3.82E-03
+response to stress (GO:0006950)	446	26	14.37	+	1.81	3.61E-03

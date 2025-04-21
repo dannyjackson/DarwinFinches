@@ -13,7 +13,7 @@ echo "working with individual $IND"
 
 for s in `cat /xdisk/mcnew/finches/dannyjackson/finches/referencelists/SCAFFOLDS.txt`;
     do echo "working with scaffold $s";
-    if [ -f ${OUTDIR}/vcf/${IND}.${s}.${phasing}.samtools.vcf.gz ]; then
+    if [ -f ${OUTDIR}/vcf2/${IND}.${s}.${phasing}.samtools.vcf.gz ]; then
             echo "phased VCF already exists; moving onto next scaffold";
     else
             echo "phased VCF does not exist; phasing VCF for scaffold $s"

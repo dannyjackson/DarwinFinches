@@ -1,0 +1,4 @@
+PANTHER.GO.Slim.Biological.Process,background_genes.thetas.txt...REFLIST..11894.,X.391.,X.expected.,X.over.under.,X.fold.Enrichment.,P.value,qvals
+regulation of intrinsic apoptotic signaling pathway (GO:2001242),7,4,0.23,+,17.38,3.72e-05,0.0684025333333333
+regulation of extrinsic apoptotic signaling pathway (GO:2001236),15,5,0.49,+,10.14,8.56e-05,0.0684025333333333
+regulation of apoptotic signaling pathway (GO:2001233),24,6,0.79,+,7.60,9.88e-05,0.0684025333333333

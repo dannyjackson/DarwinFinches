@@ -98,3 +98,50 @@ done
 /xdisk/mcnew/finches/dannyjackson/finches/datafiles/vcf/JP4481_all.NC_044571.1.vcf
 
 3926689..3926739
+
+# do for duplicated bams
+
+# run in a slurm array
+for IND in `cat /xdisk/mcnew/finches/dannyjackson/finches/referencelists/duplicatedsamples.txt `;
+	do echo $IND
+    sbatch --account=mcnew \
+    --job-name=phase_${IND} \
+    --partition=standard \
+    --mail-type=ALL \
+    --output=slurm_output/output.phase_${IND}.%j \
+    --nodes=1 \
+    --ntasks-per-node=8 \
+    --time=48:00:00 \
+    ~/programs/DarwinFinches/Genomics-Main/A_Preprocessing/A2.5_phasing.sh -p ~/programs/DarwinFinches/params_preprocessing.sh -b /xdisk/mcnew/finches/dannyjackson/finches/datafiles/indelrealignment/ -i $IND
+done
+
+
+
+# sort and index all files
+find /xdisk/mcnew/finches/dannyjackson/finches/datafiles/vcf2 -name "*.vcf.gz" > list.txt
+
+cd /xdisk/mcnew/finches/dannyjackson/finches/analyses/msmc
+
+#!/bin/bash
+
+module load parallel
+module load bcftools
+
+cd /xdisk/mcnew/finches/dannyjackson/finches/datafiles/vcf2
+
+cat list.txt | parallel -j 12 '
+file={}
+sorted_file=${file/input_file/sorted_input_file}
+bcftools sort "$file" -Oz -o "$sorted_file"
+bcftools index -t "$sorted_file"
+'
+
+sbatch --account=mcnew \
+--job-name=sortindex \
+--partition=standard \
+--mail-type=ALL \
+--output=slurm_output/output.sortindex.%j \
+--nodes=1 \
+--ntasks-per-node=12 \
+--time=48:00:00 \
+/xdisk/mcnew/finches/dannyjackson/finches/analyses/msmc/sort_index_vcf2.sh 

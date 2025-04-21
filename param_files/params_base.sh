@@ -29,4 +29,9 @@ GFF=/xdisk/mcnew/dannyjackson/cardinals/datafiles/referencegenome/ncbi_dataset/d
 # define the path for the chromosome conversion file (converts chromosome ascension names to numbers)
 CHR_FILE="/xdisk/mcnew/dannyjackson/cardinals/referencelists/GCF_901933205_chromconversion.txt"
 
+# define variables for filtering in angsd
+MINMAPQ=30
+MINQ=30
+MININD=4
+
 source ~/programs/DarwinFinches/base_setup.sh

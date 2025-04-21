@@ -17,7 +17,7 @@
 
 module load fastqc/0.11.9
 
-cd /xdisk/mcnew/dannyjackson/finches/bias_testing/platform/raw_fastqcs
+cd /xdisk/mcnew/finches/dannyjackson/finches/bias_testing/platform/raw_fastqcs
 
 
 fastqc -t 12 /xdisk/mcnew/dannyjackson/finch_wgs/danny_fastqs/*_1.round1.fq.gz 

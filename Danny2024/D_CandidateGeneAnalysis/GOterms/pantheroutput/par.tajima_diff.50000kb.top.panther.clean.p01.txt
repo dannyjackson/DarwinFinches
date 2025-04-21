@@ -1,0 +1,9 @@
+PANTHER GO-Slim Biological Process	background_genes.thetas.txt - REFLIST (11894)	(417)	(expected)	(over/under)	(fold Enrichment)	P-value
+COPII-coated vesicle budding (GO:0090114)	11	3	.39	+	7.78	5.72E-03
+DNA geometric change (GO:0032392)	12	3	.42	+	7.13	7.43E-03
+DNA duplex unwinding (GO:0032508)	12	3	.42	+	7.13	7.43E-03
+cortical actin cytoskeleton organization (GO:0030866)	13	3	.46	+	6.58	9.41E-03
+endoplasmic reticulum organization (GO:0007029)	22	4	.77	+	5.19	6.60E-03
+negative regulation of nitrogen compound metabolic process (GO:0051172)	272	2	9.54	-	.21	6.74E-03
+negative regulation of DNA-templated transcription (GO:0045892)	152	0	5.33	-	 < 0.01	6.91E-03
+negative regulation of RNA biosynthetic process (GO:1902679)	152	0	5.33	-	 < 0.01	6.91E-03
