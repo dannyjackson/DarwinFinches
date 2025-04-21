@@ -1,5 +1,5 @@
 # params_fst
-source /home/u15/dannyjackson/programs/DarwinFinches/params_base.sh
+source /home/u15/dannyjackson/programs/DarwinFinches/param_files/params_base.sh
 
 ANGSD=~/programs/angsd/ # path to directory with angsd executables
 
