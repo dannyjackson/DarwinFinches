@@ -23,11 +23,17 @@ fi
 
 
 # Make a file with chromosome name and length of chromosome
-awk 'BEGIN {OFS = "\t"} {print $1,$2}' ${REF}.fai | grep ${CHRLEAD} | grep -v ${SEXCHR} > ${OUTDIR}/referencelists/autosomes_lengths.txt
+if [ -f "${OUTDIR}/referencelists/autosomes_lengths.txt" ];
+        then
+            echo "autosomes_lengths.txt already exists, moving on!"
+        else
+        awk 'BEGIN {OFS = "\t"} {print $1,$2}' ${REF}.fai | grep ${CHRLEAD} | grep -v ${SEXCHR} > ${OUTDIR}/referencelists/autosomes_lengths.txt
+        while IFS=',' read -r first second; do
+            sed -i "s|$second|$first|g" "${OUTDIR}/referencelists/autosomes_lengths.txt"
+        done <<< "$CHR_FILE"
+fi 
 
-while IFS=',' read -r first second; do
-    sed -i "s/$second/$first/g" ${OUTDIR}/referencelists/autosomes_lengths.txt 
-done <<< "$CHR_FILE"
+
 
 # Make a comma separated chromosome conversion file without a header where the first column is the name of the chromosome and the second is the name of the associated scaffold in the reference genome:
 
