@@ -34,4 +34,4 @@ MINMAPQ=30
 MINQ=30
 MININD=4
 
-source ~/programs/DarwinFinches/base_setup.sh
+source ~/programs/DarwinFinches/param_files/base_setup.sh
