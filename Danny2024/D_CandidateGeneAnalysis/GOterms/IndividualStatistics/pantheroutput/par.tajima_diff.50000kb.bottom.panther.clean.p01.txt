@@ -1,0 +1,12 @@
+PANTHER GO-Slim Biological Process	background_genes.thetas.txt - REFLIST (11894)	(350)	(expected)	(over/under)	(fold Enrichment)	P-value
+osteoclast differentiation (GO:0030316)	4	2	.12	+	16.99	4.98E-03
+motile cilium assembly (GO:0044458)	4	2	.12	+	16.99	4.98E-03
+myeloid cell differentiation (GO:0030099)	10	3	.29	+	10.19	2.60E-03
+protein export from nucleus (GO:0006611)	10	3	.29	+	10.19	2.60E-03
+lytic vacuole organization (GO:0080171)	14	3	.41	+	7.28	7.22E-03
+lysosome organization (GO:0007040)	14	3	.41	+	7.28	7.22E-03
+regulation of neurotransmitter secretion (GO:0046928)	14	3	.41	+	7.28	7.22E-03
+negative regulation of transport (GO:0051051)	30	5	.88	+	5.66	1.67E-03
+regulation of exocytosis (GO:0017157)	26	4	.77	+	5.23	6.60E-03
+hemopoiesis (GO:0030097)	27	4	.79	+	5.03	7.57E-03
+regulation of vesicle-mediated transport (GO:0060627)	59	6	1.74	+	3.46	7.54E-03

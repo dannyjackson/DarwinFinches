@@ -1,0 +1,13 @@
+PANTHER GO-Slim Biological Process	background_genes.fst.txt - REFLIST (11890)	(433)	(expected)	(over/under)	(fold Enrichment)	P-value
+regulation of cell size (GO:0008361)	13	4	.47	+	8.45	9.54E-04
+DNA strand elongation involved in DNA replication (GO:0006271)	12	3	.44	+	6.86	8.26E-03
+adherens junction organization (GO:0034332)	23	5	.84	+	5.97	1.22E-03
+synaptic vesicle exocytosis (GO:0016079)	21	4	.76	+	5.23	6.34E-03
+nucleoside phosphate catabolic process (GO:1901292)	32	5	1.17	+	4.29	5.59E-03
+synaptic vesicle cycle (GO:0099504)	49	7	1.78	+	3.92	1.85E-03
+vesicle-mediated transport in synapse (GO:0099003)	49	7	1.78	+	3.92	1.85E-03
+cell-cell junction assembly (GO:0007043)	35	5	1.27	+	3.92	8.25E-03
+chemical synaptic transmission (GO:0007268)	132	12	4.81	+	2.50	3.15E-03
+anterograde trans-synaptic signaling (GO:0098916)	132	12	4.81	+	2.50	3.15E-03
+trans-synaptic signaling (GO:0099537)	133	12	4.84	+	2.48	3.35E-03
+synaptic signaling (GO:0099536)	142	12	5.17	+	2.32	5.67E-03

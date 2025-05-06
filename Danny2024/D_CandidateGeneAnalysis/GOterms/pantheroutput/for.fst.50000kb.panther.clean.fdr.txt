@@ -1,2 +1,0 @@
-PANTHER.GO.Slim.Biological.Process,background_genes.fst.txt...REFLIST..11890.,X.276.,X.expected.,X.over.under.,X.fold.Enrichment.,P.value,qvals
-lipid storage (GO:0019915),3,3,0.07,+,43.08,1.24e-05,0.0257548

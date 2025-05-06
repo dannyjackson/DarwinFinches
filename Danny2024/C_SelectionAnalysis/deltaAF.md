@@ -63,13 +63,217 @@ done
 
 
 
+# Estimate Joint 2D SFS
+~/programs/angsd/misc/realSFS crapre_pruned.saf.idx crapost_pruned.saf.idx > cra_pre_post_pruned.sfs
+~/programs/angsd/misc/realSFS forpre_pruned.saf.idx forpost_pruned.saf.idx > for_pre_post_pruned.sfs
+~/programs/angsd/misc/realSFS parpre_pruned.saf.idx parpost_pruned.saf.idx > par_pre_post_pruned.sfs
+
+
+# make mafs files
+species=( "cra" "for" "par")
+populations=( "pre" "post" )
+
+for sp in "${species[@]}"; do
+    for pop in "${populations[@]}"; do
+        sbatch --account=mcnew \
+                --job-name=posterior.${sp}.${pop} \
+                --partition=standard \
+                --mail-type=ALL \
+                --output=slurm_output/output.posterior.${sp}.${pop}.%j \
+                --nodes=1 \
+                --ntasks-per-node=4 \
+                --time=7:00:00 \
+                --mem=100gb \
+                ~/programs/DarwinFinches/Genomics-Main/C_SelectionAnalysis/deltaAF/PosteriorAF.pruned.sh \
+                -p ~/programs/DarwinFinches/param_files/${sp}_params_fst.sh \
+                -s ${sp} -q ${pop}
+    done
+done
+
+
+
+# filter out scaffolds and sex chromosomes
+
+# cra_pruned
+(zcat cra_pruned/cra_pruned_pre_postmafs.mafs.gz | head -n 1 && zcat cra_pruned/cra_pruned_pre_postmafs.mafs.gz | tail -n +2 | grep 'NC_' | grep -v 'NC_044601') | bgzip > cra_pruned/cra_pruned_pre.mafs.gz
+(zcat cra_pruned/cra_pruned_post_postmafs.mafs.gz | head -n 1 && zcat cra_pruned/cra_pruned_post_postmafs.mafs.gz | tail -n +2 | grep 'NC_' | grep -v 'NC_044601') | bgzip > cra_pruned/cra_pruned_post.mafs.gz
+
+# for_pruned
+(zcat for_pruned/for_pruned_pre_postmafs.mafs.gz | head -n 1 && zcat for_pruned/for_pruned_pre_postmafs.mafs.gz | tail -n +2 | grep 'NC_' | grep -v 'NC_044601') | bgzip > for_pruned/for_pruned_pre.mafs.gz
+(zcat for_pruned/for_pruned_post_postmafs.mafs.gz | head -n 1 && zcat for_pruned/for_pruned_post_postmafs.mafs.gz | tail -n +2 | grep 'NC_' | grep -v 'NC_044601') | bgzip > for_pruned/for_pruned_post.mafs.gz
+
+# par_pruned
+(zcat par_pruned/par_pruned_pre_postmafs.mafs.gz | head -n 1 && zcat par_pruned/par_pruned_pre_postmafs.mafs.gz | tail -n +2 | grep 'NC_' | grep -v 'NC_044601') | bgzip > par_pruned/par_pruned_pre.mafs.gz
+(zcat par_pruned/par_pruned_post_postmafs.mafs.gz | head -n 1 && zcat par_pruned/par_pruned_post_postmafs.mafs.gz | tail -n +2 | grep 'NC_' | grep -v 'NC_044601') | bgzip > par_pruned/par_pruned_post.mafs.gz
+
+
+# compute delta AF and test for significance 
+# First, filter snps on linkage
+# the linkage disequilibrium between neighboring SNP (using PLINK [98], we removed one SNP from pairs of SNP harboring R2> 0.99 over 20 successive SNP and 50 kb of distance in any sample)
+
+
+species=( "cra" "for" "par")
+
+for sp in "${species[@]}"; do
+
+    Rscript ~/programs/DarwinFinches/Genomics-Main/C_SelectionAnalysis/deltaAF/deltaAF.likelihoodratio.r "/xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/${sp}_pruned" "${sp}_pruned" 
+
+done
+
+
+CHROM="/xdisk/mcnew/dannyjackson/cardinals/referencelists/GCF_901933205_chromconversion.txt"
+cp deltaAF_lrt_significant_q0.20.tsv deltaAF_lrt_significant_q0.20.chrom.tsv
+WIN_OUT="deltaAF_lrt_significant_q0.20.chrom.tsv"
+if [ -n "$CHROM" ]; then
+    echo "Replacing chromosome names based on conversion file..."
+    while IFS=',' read -r first second; do
+        echo "Replacing $second with $first..."
+        sed -i "s/$second/$first/g" "$WIN_OUT" 
+    done < "$CHROM"
+fi
+
+CHROM="/xdisk/mcnew/dannyjackson/cardinals/referencelists/GCF_901933205_chromconversion.txt"
+cp deltaAF_lrt_significant_q0.08.tsv deltaAF_lrt_significant_q0.08.chrom.tsv
+WIN_OUT="deltaAF_lrt_significant_q0.08.chrom.tsv"
+if [ -n "$CHROM" ]; then
+    echo "Replacing chromosome names based on conversion file..."
+    while IFS=',' read -r first second; do
+        echo "Replacing $second with $first..."
+        sed -i "s/$second/$first/g" "$WIN_OUT" 
+    done < "$CHROM"
+fi
+
+
+
+
+CHROM="/xdisk/mcnew/dannyjackson/cardinals/referencelists/GCF_901933205_chromconversion.txt"
+cp deltaAF_lrt_significant_p0.001.tsv deltaAF_lrt_significant_p0.001.chrom.tsv
+WIN_OUT="deltaAF_lrt_significant_p0.001.chrom.tsv"
+if [ -n "$CHROM" ]; then
+    echo "Replacing chromosome names based on conversion file..."
+    while IFS=',' read -r first second; do
+        echo "Replacing $second with $first..."
+        sed -i "s/$second/$first/g" "$WIN_OUT" 
+    done < "$CHROM"
+fi
 
 
 
 
 
 
+awk '($22 < -0.25 || $22 > 0.25) {count++} END {print count}' deltaAF_lrt_nonzero_deltaAF.tsv
+awk '($23 < 0.001) {count++} END {print count}' deltaAF_lrt_nonzero_deltaAF.tsv
 
+awk '{print $23}' deltaAF_lrt_nonzero_deltaAF.tsv | sort -un | head
+
+awk '{print $21}' cra/deltaAF_lrt_nonzero_deltaAF.tsv | sort -un | head -n 3
+awk '{print $21}' for/deltaAF_lrt_nonzero_deltaAF.tsv | sort -un | head -n 3
+awk '{print $21}' par/deltaAF_lrt_nonzero_deltaAF.tsv | sort -un | head -n 3
+
+ awk '{print $22}' cra/deltaAF_lrt_full.tsv | sort -g | tail
+ awk '{print $22}' for/deltaAF_lrt_full.tsv | sort -g | tail
+ awk '{print $22}' par/deltaAF_lrt_full.tsv | sort -g | tail
+
+
+
+### Identify top 1% of outliers
+
+#### CRA
+```
+# Step 1: Extract absolute values of column 7 (ignoring header), then sort numerically
+awk 'NR > 1 { val = ($4 < 0) ? -$4 : $4; print val }' deltaAF_lrt_full.windowedavg.tsv | sort -g > deltaAF_lrt_full.windowedavg.tsv.deltaAF_abs
+
+# Step 2: Find the 99th percentile cutoff
+total=$(wc -l < deltaAF_lrt_full.windowedavg.tsv.deltaAF_abs)
+index=$(awk -v total="$total" 'BEGIN { printf("%d", (total*0.99 == int(total*0.99)) ? total*0.99 : int(total*0.99)+1) }')
+cutoff=$(awk -v idx="$index" 'NR == idx {print; exit}' deltaAF_lrt_full.windowedavg.tsv.deltaAF_abs)
+
+echo "Cutoff for top 1% (absolute value) is: $cutoff"
+
+# Cutoff: 0.0491276
+
+#### Step 3: Now filter the original file based on this cutoff
+echo -e 'chromo\twin_start\twin_end\trel_delta_af\tnSites\tposition' > deltaAF_lrt_full.windowedavg.tsv.header
+cat deltaAF_lrt_full.windowedavg.tsv >> deltaAF_lrt_full.windowedavg.tsv.header
+
+awk -v cutoff="$cutoff" 'NR==1 || (($4 < 0 ? -$4 : $4) >= cutoff)' deltaAF_lrt_full.windowedavg.tsv.header > deltaAF_lrt_full.windowedavg.1percent.tsv
+
+#### make bed file
+awk '{print $1,$2,$3}' deltaAF_lrt_full.windowedavg.1percent.tsv | tail -n +2 | awk '{$1=$1; OFS="\t"}1' > deltaAF_lrt_full.windowedavg.1percent.bed
+
+OUT_FILE="/xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/cra/deltaAF_lrt_full.windowedavg.1percent.bed"
+GFF="/xdisk/mcnew/dannyjackson/cardinals/datafiles/referencegenome/ncbi_dataset/data/GCF_901933205.1/genomic.gff" # path to gff file
+GENES_FILE="/xdisk/mcnew/finches/dannyjackson/finches/analyses/genelist/genes/cra.delta_af.windows.1percent.txt"
+GENENAMES="/xdisk/mcnew/finches/dannyjackson/finches/analyses/genelist/gene_names/cra.delta_af.windows.1percent.genenames.txt"
+bedtools intersect -a ${GFF} -b ${OUT_FILE} -wa > ${GENES_FILE}
+
+grep 'ID\=gene' ${GENES_FILE} | awk '{OFS = "\t"} {split($9, arr, ";"); print(arr[1])}' | sed 's/ID\=gene\-//g' | sort -u > ${GENENAMES}
+```
+#### FOR
+```
+# Step 1: Extract absolute values of column 7 (ignoring header), then sort numerically
+awk 'NR > 1 { val = ($4 < 0) ? -$4 : $4; print val }' deltaAF_lrt_full.windowedavg.tsv | sort -g > deltaAF_lrt_full.windowedavg.tsv.deltaAF_abs
+
+# Step 2: Find the 99th percentile cutoff
+total=$(wc -l < deltaAF_lrt_full.windowedavg.tsv.deltaAF_abs)
+index=$(awk -v total="$total" 'BEGIN { printf("%d", (total*0.99 == int(total*0.99)) ? total*0.99 : int(total*0.99)+1) }')
+cutoff=$(awk -v idx="$index" 'NR == idx {print; exit}' deltaAF_lrt_full.windowedavg.tsv.deltaAF_abs)
+
+echo "Cutoff for top 1% (absolute value) is: $cutoff"
+
+# Cutoff: 0.0751288
+
+#### Step 3: Now filter the original file based on this cutoff
+echo -e 'chromo\twin_start\twin_end\trel_delta_af\tnSites\tposition' > deltaAF_lrt_full.windowedavg.tsv.header
+cat deltaAF_lrt_full.windowedavg.tsv >> deltaAF_lrt_full.windowedavg.tsv.header
+
+awk -v cutoff="$cutoff" 'NR==1 || (($4 < 0 ? -$4 : $4) >= cutoff)' deltaAF_lrt_full.windowedavg.tsv.header > deltaAF_lrt_full.windowedavg.1percent.tsv
+
+#### make bed file
+awk '{print $1,$2,$3}' deltaAF_lrt_full.windowedavg.1percent.tsv | tail -n +2 | awk '{$1=$1; OFS="\t"}1' > deltaAF_lrt_full.windowedavg.1percent.bed
+
+OUT_FILE="/xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/for/deltaAF_lrt_full.windowedavg.1percent.bed"
+GFF="/xdisk/mcnew/dannyjackson/cardinals/datafiles/referencegenome/ncbi_dataset/data/GCF_901933205.1/genomic.gff" # path to gff file
+GENES_FILE="/xdisk/mcnew/finches/dannyjackson/finches/analyses/genelist/genes/for.delta_af.windows.1percent.txt"
+GENENAMES="/xdisk/mcnew/finches/dannyjackson/finches/analyses/genelist/gene_names/for.delta_af.windows.1percent.genenames.txt"
+bedtools intersect -a ${GFF} -b ${OUT_FILE} -wa > ${GENES_FILE}
+
+grep 'ID\=gene' ${GENES_FILE} | awk '{OFS = "\t"} {split($9, arr, ";"); print(arr[1])}' | sed 's/ID\=gene\-//g' | sort -u > ${GENENAMES}
+
+```
+#### PAR
+```
+
+# Step 1: Extract absolute values of column 7 (ignoring header), then sort numerically
+awk 'NR > 1 { val = ($4 < 0) ? -$4 : $4; print val }' deltaAF_lrt_full.windowedavg.tsv | sort -g > deltaAF_lrt_full.windowedavg.tsv.deltaAF_abs
+
+# Step 2: Find the 99th percentile cutoff
+total=$(wc -l < deltaAF_lrt_full.windowedavg.tsv.deltaAF_abs)
+index=$(awk -v total="$total" 'BEGIN { printf("%d", (total*0.99 == int(total*0.99)) ? total*0.99 : int(total*0.99)+1) }')
+cutoff=$(awk -v idx="$index" 'NR == idx {print; exit}' deltaAF_lrt_full.windowedavg.tsv.deltaAF_abs)
+
+echo "Cutoff for top 1% (absolute value) is: $cutoff"
+
+# Cutoff: 0.0726644
+
+#### Step 3: Now filter the original file based on this cutoff
+echo -e 'chromo\twin_start\twin_end\trel_delta_af\tnSites\tposition' > deltaAF_lrt_full.windowedavg.tsv.header
+cat deltaAF_lrt_full.windowedavg.tsv >> deltaAF_lrt_full.windowedavg.tsv.header
+
+awk -v cutoff="$cutoff" 'NR==1 || (($4 < 0 ? -$4 : $4) >= cutoff)' deltaAF_lrt_full.windowedavg.tsv.header > deltaAF_lrt_full.windowedavg.1percent.tsv
+
+#### make bed file
+awk '{print $1,$2,$3}' deltaAF_lrt_full.windowedavg.1percent.tsv | tail -n +2 | awk '{$1=$1; OFS="\t"}1' > deltaAF_lrt_full.windowedavg.1percent.bed
+
+OUT_FILE="/xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/par/deltaAF_lrt_full.windowedavg.1percent.bed"
+GFF="/xdisk/mcnew/dannyjackson/cardinals/datafiles/referencegenome/ncbi_dataset/data/GCF_901933205.1/genomic.gff" # path to gff file
+GENES_FILE="/xdisk/mcnew/finches/dannyjackson/finches/analyses/genelist/genes/par.delta_af.windows.1percent.txt"
+GENENAMES="/xdisk/mcnew/finches/dannyjackson/finches/analyses/genelist/gene_names/par.delta_af.windows.1percent.genenames.txt"
+bedtools intersect -a ${GFF} -b ${OUT_FILE} -wa > ${GENES_FILE}
+
+grep 'ID\=gene' ${GENES_FILE} | awk '{OFS = "\t"} {split($9, arr, ";"); print(arr[1])}' | sed 's/ID\=gene\-//g' | sort -u > ${GENENAMES}
+```
 
 
 
@@ -279,17 +483,170 @@ done
 
 cd /xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af
 
+cd cra
+awk '{print $1, $2, $22}' deltaAF_lrt_full.tsv > deltaAF_lrt_full.forwindows.tsv
+cd ../for
+awk '{print $1, $2, $22}' deltaAF_lrt_full.tsv > deltaAF_lrt_full.forwindows.tsv
+cd ../par
+awk '{print $1, $2, $22}' deltaAF_lrt_full.tsv > deltaAF_lrt_full.forwindows.tsv
 
 
 
+# run via generalized script on puma
+sbatch --account=mcnew \
+--job-name=windowed_deltaAF_cra \
+--partition=standard \
+--mail-type=ALL \
+--output=slurm_output/output.windowed_deltaAF_cra.%j \
+--nodes=1 \
+--ntasks-per-node=94 \
+--time=40:00:00 \
+/home/u15/dannyjackson/programs/DarwinFinches/Genomics-Main/general_scripts/statavg_over_bedwindows.sh -d /xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/cra/deltaAF_lrt_full.forwindows.tsv -w /xdisk/mcnew/finches/dannyjackson/finches/datafiles/bamstats/windowed_bamfiles/50kbwin.fst.bam -a /xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/cra/deltaAF_lrt_full.windowedavg.tsv -t 1 -p ~/programs/DarwinFinches/param_files/params_base.sh
+```
+sbatch --account=mcnew \
+--job-name=windowed_deltaAF_for \
+--partition=standard \
+--mail-type=ALL \
+--output=slurm_output/output.windowed_deltaAF_for.%j \
+--nodes=1 \
+--ntasks-per-node=94 \
+--time=40:00:00 \
+/home/u15/dannyjackson/programs/DarwinFinches/Genomics-Main/general_scripts/statavg_over_bedwindows.sh -d /xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/for/deltaAF_lrt_full.forwindows.tsv -w /xdisk/mcnew/finches/dannyjackson/finches/datafiles/bamstats/windowed_bamfiles/50kbwin.fst.bam -a /xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/for/deltaAF_lrt_full.windowedavg.tsv -t 1 -p ~/programs/DarwinFinches/param_files/params_base.sh
+```
+sbatch --account=mcnew \
+--job-name=windowed_deltaAF_par \
+--partition=standard \
+--mail-type=ALL \
+--output=slurm_output/output.windowed_deltaAF_par.%j \
+--nodes=1 \
+--ntasks-per-node=94 \
+--time=40:00:00 \
+/home/u15/dannyjackson/programs/DarwinFinches/Genomics-Main/general_scripts/statavg_over_bedwindows.sh -d /xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/par/deltaAF_lrt_full.forwindows.tsv -w /xdisk/mcnew/finches/dannyjackson/finches/datafiles/bamstats/windowed_bamfiles/50kbwin.fst.bam -a /xdisk/mcnew/finches/dannyjackson/finches/analyses/delta_af/par/deltaAF_lrt_full.windowedavg.tsv -t 1 -p ~/programs/DarwinFinches/param_files/params_base.sh
+Submitted batch job 12799162
 
 
 
+# plot deltaAF_lrt_full.windowedavg.tsv.autosomes
+## CRA
+```
+source ~/programs/DarwinFinches/param_files/cra_params_fst.sh
+
+CHROM="/xdisk/mcnew/dannyjackson/cardinals/referencelists/GCF_901933205_chromconversion.txt"
+WIN_OUT="deltaAF_lrt_full.windowedavg.tsv.autosomes"
+if [ -n "$CHROM" ]; then
+    echo "Replacing chromosome names based on conversion file..."
+    while IFS=',' read -r first second; do
+        echo "Replacing $second with $first..."
+        sed -i "s/$second/$first/g" "$WIN_OUT" 
+    done < "$CHROM"
+fi
+
+echo -e 'chromo\twin_start\twin_end\trel_delta_af\tnSites\tposition\tdelta_af' > deltaAF_lrt_full.windowedavg.tsv.autosomes.header
+
+sort -n deltaAF_lrt_full.windowedavg.tsv.autosomes | awk 'BEGIN {OFS="\t"} 
+{
+    mid = int(($2 + $3)/2);
+    abs = ($4 < 0) ? -$4 : $4;
+    print $0, mid, abs
+}' >> deltaAF_lrt_full.windowedavg.tsv.autosomes.header
+
+
+WIN_OUT="deltaAF_lrt_full.windowedavg.tsv.autosomes.header"
+WIN="50000"
+# z transform windowed data
+Rscript "${SCRIPTDIR}/Genomics-Main/general_scripts/ztransform_windows.r" \
+    "${OUTDIR}" "${CUTOFF}" "${WIN_OUT}" "${WIN}" "cra"
+
+Z_OUT="${OUTDIR}/analyses/delta_af/cra/cra.delta_af.50000.Ztransformed.csv"
+
+# sed -i 's/\"//g' ${Z_OUT}
+
+# Run R script for plotting
+echo "Generating Manhattan plot from ${Z_OUT}..."
+Rscript "${SCRIPTDIR}/Genomics-Main/general_scripts/manhattanplot.r" \
+    "${OUTDIR}" "${COLOR1}" "${COLOR2}" "${CUTOFF}" "${Z_OUT}" "${WIN}" "delta_af" "cra"
+```
+## FOR
+
+```
+source ~/programs/DarwinFinches/param_files/for_params_fst.sh
+
+CHROM="/xdisk/mcnew/dannyjackson/cardinals/referencelists/GCF_901933205_chromconversion.txt"
+WIN_OUT="deltaAF_lrt_full.windowedavg.tsv.autosomes"
+if [ -n "$CHROM" ]; then
+    echo "Replacing chromosome names based on conversion file..."
+    while IFS=',' read -r first second; do
+        echo "Replacing $second with $first..."
+        sed -i "s/$second/$first/g" "$WIN_OUT" 
+    done < "$CHROM"
+fi
+
+echo -e 'chromo\twin_start\twin_end\trel_delta_af\tnSites\tposition\tdelta_af' > deltaAF_lrt_full.windowedavg.tsv.autosomes.header
+
+sort -n deltaAF_lrt_full.windowedavg.tsv.autosomes | awk 'BEGIN {OFS="\t"} 
+{
+    mid = int(($2 + $3)/2);
+    abs = ($4 < 0) ? -$4 : $4;
+    print $0, mid, abs
+}' >> deltaAF_lrt_full.windowedavg.tsv.autosomes.header
 
 
 
+WIN_OUT="deltaAF_lrt_full.windowedavg.tsv.autosomes.header"
+WIN="50000"
+# z transform windowed data
+Rscript "${SCRIPTDIR}/Genomics-Main/general_scripts/ztransform_windows.r" \
+    "${OUTDIR}" "${CUTOFF}" "${WIN_OUT}" "${WIN}" "for"
 
+Z_OUT="${OUTDIR}/analyses/delta_af/for/for.delta_af.50000.Ztransformed.csv"
 
+# sed -i 's/\"//g' ${Z_OUT}
+
+# Run R script for plotting
+echo "Generating Manhattan plot from ${Z_OUT}..."
+Rscript "${SCRIPTDIR}/Genomics-Main/general_scripts/manhattanplot.r" \
+    "${OUTDIR}" "${COLOR1}" "${COLOR2}" "${CUTOFF}" "${Z_OUT}" "${WIN}" "delta_af" "for"
+```
+## PAR
+
+```
+source ~/programs/DarwinFinches/param_files/par_params_fst.sh
+
+CHROM="/xdisk/mcnew/dannyjackson/cardinals/referencelists/GCF_901933205_chromconversion.txt"
+WIN_OUT="deltaAF_lrt_full.windowedavg.tsv.autosomes"
+if [ -n "$CHROM" ]; then
+    echo "Replacing chromosome names based on conversion file..."
+    while IFS=',' read -r first second; do
+        echo "Replacing $second with $first..."
+        sed -i "s/$second/$first/g" "$WIN_OUT" 
+    done < "$CHROM"
+fi
+
+echo -e 'chromo\twin_start\twin_end\trel_delta_af\tnSites\tposition\tdelta_af' > deltaAF_lrt_full.windowedavg.tsv.autosomes.header
+
+sort -n deltaAF_lrt_full.windowedavg.tsv.autosomes | awk 'BEGIN {OFS="\t"} 
+{
+    mid = int(($2 + $3)/2);
+    abs = ($4 < 0) ? -$4 : $4;
+    print $0, mid, abs
+}' >> deltaAF_lrt_full.windowedavg.tsv.autosomes.header
+	
+
+WIN_OUT="deltaAF_lrt_full.windowedavg.tsv.autosomes.header"
+WIN="50000"
+# z transform windowed data
+Rscript "${SCRIPTDIR}/Genomics-Main/general_scripts/ztransform_windows.r" \
+    "${OUTDIR}" "${CUTOFF}" "${WIN_OUT}" "${WIN}" "par"
+
+Z_OUT="${OUTDIR}/analyses/delta_af/par/par.delta_af.50000.Ztransformed.csv"
+
+# sed -i 's/\"//g' ${Z_OUT}
+
+# Run R script for plotting
+echo "Generating Manhattan plot from ${Z_OUT}..."
+Rscript "${SCRIPTDIR}/Genomics-Main/general_scripts/manhattanplot.r" \
+    "${OUTDIR}" "${COLOR1}" "${COLOR2}" "${CUTOFF}" "${Z_OUT}" "${WIN}" "delta_af" "par"
+```
 
 
 

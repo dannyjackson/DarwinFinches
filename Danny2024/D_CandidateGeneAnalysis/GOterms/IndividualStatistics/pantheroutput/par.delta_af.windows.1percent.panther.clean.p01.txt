@@ -1,0 +1,7 @@
+PANTHER GO-Slim Biological Process	background_genes.fst.txt - REFLIST (11890)	(327)	(expected)	(over/under)	(fold Enrichment)	P-value
+B cell differentiation (GO:0030183)	4	2	.11	+	18.18	4.36E-03
+regulation of phosphoprotein phosphatase activity (GO:0043666)	5	2	.14	+	14.54	7.14E-03
+regulation of DNA repair (GO:0006282)	15	3	.41	+	7.27	7.33E-03
+regulation of response to external stimulus (GO:0032101)	48	5	1.32	+	3.79	9.92E-03
+cellular component assembly (GO:0022607)	534	5	14.69	-	.34	6.11E-03
+cellular component biogenesis (GO:0044085)	631	5	17.35	-	.29	6.43E-04

@@ -1,0 +1,30 @@
+PANTHER GO-Slim Biological Process	background_genes.fst.txt - REFLIST (11890)	(276)	(expected)	(over/under)	(fold Enrichment)	P-value
+lipid storage (GO:0019915)	3	3	.07	+	43.08	1.24E-05
+regulation of bone remodeling (GO:0046850)	3	2	.07	+	28.72	1.59E-03
+regulation of tissue remodeling (GO:0034103)	3	2	.07	+	28.72	1.59E-03
+regulation of bone resorption (GO:0045124)	3	2	.07	+	28.72	1.59E-03
+protein quality control for misfolded or incompletely synthesized proteins (GO:0006515)	5	2	.12	+	17.23	5.13E-03
+kinetochore assembly (GO:0051382)	6	2	.14	+	14.36	7.57E-03
+regulation of myeloid cell differentiation (GO:0045637)	6	2	.14	+	14.36	7.57E-03
+negative regulation of G1/S transition of mitotic cell cycle (GO:2000134)	6	2	.14	+	14.36	7.57E-03
+aspartate transmembrane transport (GO:0015810)	9	3	.21	+	14.36	9.37E-04
+C4-dicarboxylate transport (GO:0015740)	12	3	.28	+	10.77	2.33E-03
+negative regulation of immune system process (GO:0002683)	16	3	.37	+	8.08	5.54E-03
+dicarboxylic acid transport (GO:0006835)	16	3	.37	+	8.08	5.54E-03
+regulation of G protein-coupled receptor signaling pathway (GO:0008277)	17	3	.39	+	7.60	6.61E-03
+spliceosomal complex assembly (GO:0000245)	18	3	.42	+	7.18	7.80E-03
+nucleobase metabolic process (GO:0009112)	19	3	.44	+	6.80	9.10E-03
+negative regulation of multicellular organismal process (GO:0051241)	33	4	.77	+	5.22	6.84E-03
+negative regulation of cell cycle phase transition (GO:1901988)	46	5	1.07	+	4.68	4.09E-03
+positive regulation of GTPase activity (GO:0043547)	48	5	1.11	+	4.49	4.93E-03
+negative regulation of cell cycle process (GO:0010948)	49	5	1.14	+	4.40	5.38E-03
+regulation of cell development (GO:0060284)	51	5	1.18	+	4.22	6.39E-03
+regulation of GTPase activity (GO:0043087)	69	6	1.60	+	3.75	5.23E-03
+tRNA metabolic process (GO:0006399)	85	7	1.97	+	3.55	3.55E-03
+regulation of multicellular organismal development (GO:2000026)	91	7	2.11	+	3.31	5.18E-03
+modification-dependent macromolecule catabolic process (GO:0043632)	200	12	4.64	+	2.58	2.46E-03
+ubiquitin-dependent protein catabolic process (GO:0006511)	191	11	4.43	+	2.48	5.01E-03
+modification-dependent protein catabolic process (GO:0019941)	197	11	4.57	+	2.41	6.29E-03
+negative regulation of cellular process (GO:0048523)	693	29	16.09	+	1.80	2.43E-03
+negative regulation of biological process (GO:0048519)	741	30	17.20	+	1.74	3.34E-03
+signal transduction (GO:0007165)	1121	14	26.02	-	.54	9.06E-03

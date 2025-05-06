@@ -1,0 +1,10 @@
+PANTHER.GO.Slim.Biological.Process,background_genes.fst.txt...REFLIST..11890.,X.30.,X.expected.,X.over.under.,X.fold.Enrichment.,P.value,qvals
+skeletal muscle tissue development (GO:0007519),14,3,0.04,+,84.93,5.18e-06,0.00824569
+skeletal muscle organ development (GO:0060538),16,3,0.04,+,74.31,7.94e-06,0.00824569
+mRNA splice site recognition (GO:0006376),12,2,0.03,+,66.06,4e-04,0.0939265555555556
+muscle organ development (GO:0007517),20,3,0.05,+,59.45,1.61e-05,0.0111465666666667
+muscle tissue development (GO:0060537),30,3,0.08,+,39.63,5.62e-05,0.02918185
+positive regulation of cell development (GO:0010720),33,3,0.08,+,36.03,7.51e-05,0.03119654
+regulation of cell development (GO:0060284),51,3,0.13,+,23.31,0.000278,0.0875307142857143
+positive regulation of cell differentiation (GO:0045597),52,3,0.13,+,22.87,0.000295,0.0875307142857143
+muscle structure development (GO:0061061),58,3,0.15,+,20.50,0.000407,0.0939265555555556

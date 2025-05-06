@@ -1,0 +1,23 @@
+PANTHER.GO.Slim.Biological.Process,background_genes.cra_all.raisd.txt...REFLIST..11273.,X.136.,X.expected.,X.over.under.,X.fold.Enrichment.,P.value,qvals
+platelet aggregation (GO:0070527),4,4,0.05,+,82.89,2.03e-08,4.20616e-05
+platelet activation (GO:0030168),5,4,0.06,+,66.31,1e-07,6.90666666666667e-05
+protein activation cascade (GO:0072376),5,4,0.06,+,66.31,1e-07,6.90666666666667e-05
+negative regulation of blood coagulation (GO:0030195),4,3,0.05,+,62.17,6.81e-06,0.00128275636363636
+homotypic cell-cell adhesion (GO:0034109),6,4,0.07,+,55.26,2.98e-07,0.000154364
+negative regulation of coagulation (GO:0050819),5,3,0.06,+,49.73,1.69e-05,0.00291806666666667
+regulation of response to wounding (GO:1903034),6,3,0.07,+,41.44,3.35e-05,0.004958
+hemostasis (GO:0007599),8,4,0.1,+,41.44,1.37e-06,0.00035483
+blood coagulation (GO:0007596),8,4,0.1,+,41.44,1.37e-06,0.00035483
+coagulation (GO:0050817),8,4,0.1,+,41.44,1.37e-06,0.00035483
+regulation of wound healing (GO:0061041),6,3,0.07,+,41.44,3.35e-05,0.004958
+regulation of coagulation (GO:0050818),7,3,0.08,+,35.52,5.8e-05,0.007511
+regulation of body fluid levels (GO:0050878),11,4,0.13,+,30.14,6.26e-06,0.00128275636363636
+positive regulation of cell-cell adhesion (GO:0022409),9,3,0.11,+,27.63,0.000137,0.0166978823529412
+cell activation (GO:0001775),25,6,0.3,+,19.89,4.05e-07,0.000167832
+wound healing (GO:0042060),17,4,0.21,+,19.50,4.27e-05,0.00589829333333333
+response to wounding (GO:0009611),23,5,0.28,+,18.02,6.71e-06,0.00128275636363636
+regulation of cell-cell adhesion (GO:0022407),14,3,0.17,+,17.76,0.000567,0.065268
+negative regulation of response to external stimulus (GO:0032102),15,3,0.18,+,16.58,0.000703,0.076664
+heterochromatin formation (GO:0031507),18,3,0.22,+,13.81,0.00123,0.12136
+positive regulation of cell adhesion (GO:0045785),21,3,0.25,+,11.84,0.00195,0.183654545454545
+regulation of cell adhesion (GO:0030155),38,4,0.46,+,8.73,0.00109,0.112924

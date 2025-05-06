@@ -1,0 +1,24 @@
+PANTHER GO-Slim Biological Process	background_genes.fst.txt - REFLIST (11890)	(262)	(expected)	(over/under)	(fold Enrichment)	P-value
+lipid storage (GO:0019915)	3	3	.07	+	45.38	1.06E-05
+mitotic sister chromatid cohesion (GO:0007064)	8	4	.18	+	22.69	1.50E-05
+kinetochore assembly (GO:0051382)	6	2	.13	+	15.13	6.84E-03
+negative regulation of G1/S transition of mitotic cell cycle (GO:2000134)	6	2	.13	+	15.13	6.84E-03
+mRNA splice site recognition (GO:0006376)	12	3	.26	+	11.35	2.01E-03
+sister chromatid cohesion (GO:0007062)	16	4	.35	+	11.35	3.40E-04
+skeletal muscle tissue development (GO:0007519)	14	3	.31	+	9.72	3.22E-03
+skeletal muscle organ development (GO:0060538)	16	3	.35	+	8.51	4.79E-03
+spliceosomal complex assembly (GO:0000245)	18	3	.40	+	7.56	6.76E-03
+muscle organ development (GO:0007517)	20	3	.44	+	6.81	9.14E-03
+positive regulation of canonical Wnt signaling pathway (GO:0090263)	20	3	.44	+	6.81	9.14E-03
+regulation of transmembrane receptor protein serine/threonine kinase signaling pathway (GO:0090092)	33	4	.73	+	5.50	5.70E-03
+positive regulation of cell development (GO:0010720)	33	4	.73	+	5.50	5.70E-03
+regulation of cell development (GO:0060284)	51	6	1.12	+	5.34	8.48E-04
+activation of GTPase activity (GO:0090630)	35	4	.77	+	5.19	7.05E-03
+negative regulation of cell cycle phase transition (GO:1901988)	46	5	1.01	+	4.93	3.28E-03
+regulation of Wnt signaling pathway (GO:0030111)	57	6	1.26	+	4.78	1.53E-03
+positive regulation of GTPase activity (GO:0043547)	48	5	1.06	+	4.73	3.95E-03
+negative regulation of cell cycle process (GO:0010948)	49	5	1.08	+	4.63	4.32E-03
+negative regulation of cell cycle (GO:0045786)	58	5	1.28	+	3.91	8.85E-03
+extracellular matrix organization (GO:0030198)	100	7	2.20	+	3.18	6.54E-03
+extracellular structure organization (GO:0043062)	100	7	2.20	+	3.18	6.54E-03
+external encapsulating structure organization (GO:0045229)	100	7	2.20	+	3.18	6.54E-03

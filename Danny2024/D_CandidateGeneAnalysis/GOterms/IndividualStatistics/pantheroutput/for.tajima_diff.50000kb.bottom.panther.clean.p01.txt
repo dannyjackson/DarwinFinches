@@ -1,0 +1,21 @@
+PANTHER GO-Slim Biological Process	background_genes.thetas.txt - REFLIST (11894)	(314)	(expected)	(over/under)	(fold Enrichment)	P-value
+regeneration (GO:0031099)	2	2	.05	+	37.88	6.95E-04
+tissue regeneration (GO:0042246)	2	2	.05	+	37.88	6.95E-04
+purine nucleoside catabolic process (GO:0006152)	3	2	.08	+	25.25	2.05E-03
+adenosine metabolic process (GO:0046085)	4	2	.11	+	18.94	4.02E-03
+purine nucleobase metabolic process (GO:0006144)	10	3	.26	+	11.36	1.91E-03
+mRNA splice site recognition (GO:0006376)	12	3	.32	+	9.47	3.36E-03
+skeletal muscle tissue development (GO:0007519)	14	3	.37	+	8.12	5.34E-03
+nucleobase metabolic process (GO:0009112)	19	4	.50	+	7.97	1.35E-03
+skeletal muscle organ development (GO:0060538)	16	3	.42	+	7.10	7.91E-03
+muscle contraction (GO:0006936)	31	5	.82	+	6.11	1.20E-03
+cellular component assembly involved in morphogenesis (GO:0010927)	25	4	.66	+	6.06	3.89E-03
+striated muscle cell development (GO:0055002)	25	4	.66	+	6.06	3.89E-03
+myofibril assembly (GO:0030239)	25	4	.66	+	6.06	3.89E-03
+muscle system process (GO:0003012)	32	5	.84	+	5.92	1.39E-03
+synaptic vesicle endocytosis (GO:0048488)	27	4	.71	+	5.61	5.18E-03
+synaptic vesicle recycling (GO:0036465)	28	4	.74	+	5.41	5.92E-03
+muscle structure development (GO:0061061)	58	7	1.53	+	4.57	7.92E-04
+actomyosin structure organization (GO:0031032)	50	6	1.32	+	4.55	1.93E-03
+positive regulation of GTPase activity (GO:0043547)	48	5	1.27	+	3.95	8.40E-03
+regulation of GTPase activity (GO:0043087)	69	6	1.82	+	3.29	9.60E-03

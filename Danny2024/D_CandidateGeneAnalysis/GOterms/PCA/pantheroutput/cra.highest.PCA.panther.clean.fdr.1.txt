@@ -1,0 +1,11 @@
+PANTHER.GO.Slim.Biological.Process,background_genes.fst.txt...REFLIST..11890.,X.50.,X.expected.,X.over.under.,X.fold.Enrichment.,P.value,qvals
+regulation of cell adhesion mediated by integrin (GO:0033628),5,2,0.02,+,95.12,0.000172,0.0510348571428571
+negative regulation of cell-cell adhesion (GO:0022408),7,2,0.03,+,67.94,0.000359,0.0826646
+angiogenesis (GO:0001525),32,4,0.13,+,29.73,9.12e-06,0.00764336
+blood vessel morphogenesis (GO:0048514),36,4,0.15,+,26.42,1.48e-05,0.00764336
+blood vessel development (GO:0001568),37,4,0.16,+,25.71,1.65e-05,0.00764336
+vasculature development (GO:0001944),38,4,0.16,+,25.03,1.84e-05,0.00764336
+tube morphogenesis (GO:0035239),38,4,0.16,+,25.03,1.84e-05,0.00764336
+tube development (GO:0035295),40,4,0.17,+,23.78,2.26e-05,0.00782336666666667
+cell-matrix adhesion (GO:0007160),30,3,0.13,+,23.78,0.000262,0.06802175
+anatomical structure formation involved in morphogenesis (GO:0048646),83,4,0.35,+,11.46,0.000398,0.0826646

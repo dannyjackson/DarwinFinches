@@ -1,0 +1,2 @@
+PANTHER.GO.Slim.Biological.Process,background_genes.fst.txt...REFLIST..11890.,X.383.,X.expected.,X.over.under.,X.fold.Enrichment.,P.value,qvals
+DNA conformation change (GO:0071103),15,5,0.48,+,10.35,7.77e-05,0.1613829

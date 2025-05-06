@@ -1,6 +1,0 @@
-PANTHER GO-Slim Biological Process	background_genes.for_all.raisd.txt - REFLIST (10898)	(91)	(expected)	(over/under)	(fold Enrichment)	P-value
-vesicle targeting (GO:0006903)	8	2	.07	+	29.94	1.87E-03
-membrane protein ectodomain proteolysis (GO:0006509)	9	2	.08	+	26.61	2.39E-03
-non-motile cilium assembly (GO:1905515)	13	2	.11	+	18.42	5.07E-03
-membrane protein proteolysis (GO:0033619)	14	2	.12	+	17.11	5.88E-03
-cellular process (GO:0009987)	5162	30	43.10	-	.70	5.97E-03
