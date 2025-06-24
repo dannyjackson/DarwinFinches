@@ -1,3 +1,0 @@
-PANTHER.GO.Slim.Biological.Process,background_genes.fst.txt...REFLIST..11890.,X.262.,X.expected.,X.over.under.,X.fold.Enrichment.,P.value,qvals
-lipid storage (GO:0019915),3,3,0.07,+,45.38,1.06e-05,0.0155775
-mitotic sister chromatid cohesion (GO:0007064),8,4,0.18,+,22.69,1.5e-05,0.0155775

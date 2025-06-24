@@ -1,7 +1,0 @@
-PANTHER GO-Slim Biological Process	background_genes.fst.txt - REFLIST (11890)	(52)	(expected)	(over/under)	(fold Enrichment)	P-value
-regulation of complement activation (GO:0030449)	1	1	.00	+	 > 100	4.37E-03
-heterophilic cell-cell adhesion via plasma membrane cell adhesion molecules (GO:0007157)	15	2	.07	+	30.49	1.90E-03
-synaptic vesicle endocytosis (GO:0048488)	27	2	.12	+	16.94	6.14E-03
-synaptic vesicle recycling (GO:0036465)	28	2	.12	+	16.33	6.59E-03
-synaptic vesicle cycle (GO:0099504)	49	3	.21	+	14.00	1.26E-03
-vesicle-mediated transport in synapse (GO:0099003)	49	3	.21	+	14.00	1.26E-03
