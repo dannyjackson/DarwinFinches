@@ -1,5 +1,17 @@
+# Picard Read Group Assignment – Annotated Guide
+
+This guide documents and cleans up the steps for **adding / replacing read groups** with **Picard** after indel realignment, including batch SLURM submissions and handling samples with multiple SRR runs.
+
+---
+
+## One-off example (single read group)
+
+```bash
+## One-off example (single read group)
 mv JP4481_all.realigned.bam JP4481_all.realigned.separated.bam
 
+# Add a single read group (RG) to the BAM
+module load picard
 picard AddOrReplaceReadGroups \
     I=JP4481_all.realigned.separated.bam \
     O=JP4481_all.realigned.bam \
@@ -9,7 +21,9 @@ picard AddOrReplaceReadGroups \
     RGPU=unit1 \
     RGSM=JP4481_all
 
+---
 
+## Batch over duplicated samples (single RG per sample)
 for IND in `cat duplicatedsamples.txt`;
 	do echo $IND
     mv ${IND}_all.realigned.bam ${IND}_all.realigned.separated.bam
@@ -32,29 +46,13 @@ for IND in `cat duplicatedsamples.txt`;
     RGSM=${IND}_all
 done
 
-
+```
 
 # grep 'CHROM' /xdisk/mcnew/finches/dannyjackson/finches/datafiles/vcf/lamich_PL15.NC_044571.1.vcf
 
-mv ${IND}_all.realigned.bam ${IND}_all.realigned.separated.bam
+Manually rerun for lamich samples
 
-sbatch --account=mcnew \
---job-name=readgroups_${IND} \
---partition=standard \
---mail-type=ALL \
---output=slurm_output/output.readgroups_${IND}.%j \
---nodes=1 \
---ntasks-per-node=1 \
---time=1:00:00 \
-picard AddOrReplaceReadGroups \
-I=/xdisk/mcnew/finches/dannyjackson/finches/datafiles/indelrealignment/${IND}_all.realigned.separated.bam \
-O=/xdisk/mcnew/finches/dannyjackson/finches/datafiles/indelrealignment/${IND}_all.realigned.bam \
-RGID=${IND}_round1 \
-RGLB=lib1 \
-RGPL=illumina \
-RGPU=unit1 \
-RGSM=${IND}_all
-
+```bash
 # lamich_PARV2 # SRR1607507 SRR1607506
 mv lamich_PARV2.realigned.bam lamich_PARV2.realigned.separated.bam
 
@@ -325,40 +323,11 @@ rm /xdisk/mcnew/finches/dannyjackson/finches/datafiles/indelrealignment/lamich_P
 
 
 
+---
 
+## Appendix – raw sample list for duplicated samples
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-SM079
-SM059
-SM040
-SM032
-SM031
-RHC507
-RHC097
-SM1204
-SM1200
-SM1240
-SM1266
-SM1067
-SM1204
-SM1157
-JP5410
-JP9655
-
-
-# duplicated samples
+```
 lamich_PARV2
 lamich_PARV1
 SM079_all
