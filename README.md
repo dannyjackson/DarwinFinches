@@ -66,4 +66,5 @@ D. **Gene Investigations**
 This project is a central project of my postdoctoral fellowship with **Sabrina McNew** (University of Arizona). It is a collaboration between the two of us, a co-mentored Master's student **Logan Vossler** (University of Arizona), **Leonardo Campagna** (Cornell University), **Sangeet Lamichhaney** (Kent State University), **Jessica Rick** (University of Arizona), and **Birgit** Fessl (4.	Charles Darwin Research Station).
 
 
-All sequence data will be available on the **Sequence Read Archive** upon publicaton.
+All sequence data will be available on the **Sequence Read Archive** upon publicaton, under BioProject ID PRJNA1320981.
+
