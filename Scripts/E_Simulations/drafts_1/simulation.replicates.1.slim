@@ -1,0 +1,165 @@
+// ============================================================
+// SLiM 3 WF standing-variation sweep (version-safe)
+// - Seeds focal mutation once at generation 1
+// - Ensures biallelic behavior at the focal site by deleting extra focal-site mutations
+// - Supports replicate runs via -d run_id=... and -d seed=...
+// ============================================================
+
+function (logical) focalMutationPresent(integer focalPos) {
+    muts = sim.mutationsOfType(m2);
+    if (size(muts) == 0)
+        return F;
+    return any(muts.position == focalPos);
+}
+
+// Keep at most ONE mutation at focalPos (version-safe biallelic enforcement)
+function (void) enforceSingleFocalMutation(integer focalPos) {
+    muts = sim.mutationsOfType(m2);
+    if (size(muts) == 0)
+        return;
+
+    atPos = muts[muts.position == focalPos];
+    if (size(atPos) <= 1)
+        return;
+
+    // Keep the first, remove the rest
+    keep = atPos[0];
+    extras = atPos[1:(size(atPos)-1)];
+
+    // Remove extras from all genomes in the simulation
+    // (genomes.removeMutations() accepts a mutation or vector of mutations)
+    sim.subpopulations.genomes.removeMutations(extras);
+}
+
+initialize() {
+    // ------------------------------
+    // Allow command-line overrides
+    // Example: slim -d run_id=7 -d seed=12345 simulation_replicate.slim
+    // ------------------------------
+    if (!exists("run_id")) defineConstant("RUN_ID", 1);
+    else                   defineConstant("RUN_ID", asInteger(run_id));
+
+    if (exists("seed"))
+        setSeed(asInteger(seed));
+
+    // Parameters
+    defineConstant("Ne",         25000);
+    defineConstant("L",          1000000);
+    defineConstant("MU",         2.04e-9);
+    defineConstant("R",          1.0e-8);
+    defineConstant("BURNIN",     250000);
+
+    defineConstant("FOCAL_POS",  742619);  // 0-based
+    defineConstant("SEL_S",      0.05);    // EDIT ME
+    defineConstant("DOM_H",      0.5);
+    defineConstant("SAMPLE_N",   8);
+    defineConstant("T2_OFFSET",  5);
+
+    // Unique outputs per replicate
+    defineConstant("RESTART_FILE", "restart_run" + RUN_ID + ".slimbin");
+    defineConstant("VCF_T1",       "sample_t1_run" + RUN_ID + ".vcf");
+    defineConstant("VCF_T2",       "sample_t2_run" + RUN_ID + ".vcf");
+    defineConstant("TREES_OUT",    "simulation_run" + RUN_ID + ".trees");
+
+    // Model
+    initializeSLiMModelType("WF");
+    initializeTreeSeq();
+
+    initializeMutationRate(MU);
+    initializeRecombinationRate(R);
+
+    // Mutation types
+    initializeMutationType("m1", 0.5, "f", 0.0);      // neutral background
+    initializeMutationType("m2", DOM_H, "f", 0.0);    // focal mutation; neutral until t1+1
+
+    // Genomic elements
+    initializeGenomicElementType("g1", m1, 1.0);
+    initializeGenomicElementType("g2", m2, 1.0);
+
+    // Non-overlapping layout to isolate focal base
+    if (FOCAL_POS > 0)
+        initializeGenomicElement(g1, 0, FOCAL_POS - 1);
+
+    initializeGenomicElement(g2, FOCAL_POS, FOCAL_POS);
+
+    if (FOCAL_POS < (L - 1))
+        initializeGenomicElement(g1, FOCAL_POS + 1, L - 1);
+}
+
+1 early() {
+    sim.addSubpop("p1", Ne);
+}
+
+1 late() {
+    // ---------------------------------------------------------
+    // Seed focal mutation ONCE (one copy) before burn-in
+    // ---------------------------------------------------------
+    focalMut = m2.create(FOCAL_POS);
+    g = sample(p1.genomes, 1);
+    g.addMutations(focalMut);
+
+    // Enforce single focal mutation (just in case)
+    enforceSingleFocalMutation(FOCAL_POS);
+
+    catn("RUN " + RUN_ID + ": seeded focal mutation at pos " + FOCAL_POS +
+         " in genome " + g.id + " at gen 1.");
+
+    // Save restart state after seeding
+    sim.outputFull(RESTART_FILE);
+}
+
+early() {
+    // Keep biallelic at the focal site throughout
+    enforceSingleFocalMutation(FOCAL_POS);
+
+    // --------------------
+    // t1: end of burn-in
+    // --------------------
+    if (sim.generation == BURNIN) {
+
+        if (!focalMutationPresent(FOCAL_POS)) {
+            catn("RUN " + RUN_ID + ": focal lost during burn-in at gen " +
+                 sim.generation + " -> restarting.");
+
+            // reseed so restart isn't identical (unless you want strict reproducibility)
+            if (!exists("seed"))
+                setSeed(asInteger(rdunif(1, 0, 2147483647)));
+
+            sim.readFromPopulationFile(RESTART_FILE);
+            return;
+        }
+
+        // Sample at t1
+        t1_inds  = sample(p1.individuals, SAMPLE_N);
+        t1_names = sapply(seqLen(SAMPLE_N), "i", "run" + RUN_ID + "_t1_ind" + i);
+
+        sim.outputVCF(t1_inds, filePath=VCF_T1, sampleNames=t1_names);
+        catn("RUN " + RUN_ID + ": wrote " + VCF_T1);
+    }
+
+    // --------------------
+    // t1+1: selection on
+    // --------------------
+    if (sim.generation == (BURNIN + 1)) {
+        m2.setDistribution("f", SEL_S);
+        catn("RUN " + RUN_ID + ": selection ON at gen " + sim.generation +
+             " (s=" + SEL_S + ", h=" + DOM_H + ").");
+    }
+
+    // --------------------
+    // t2: t1 + 5 gens
+    // --------------------
+    if (sim.generation == (BURNIN + T2_OFFSET)) {
+
+        t2_inds  = sample(p1.individuals, SAMPLE_N);
+        t2_names = sapply(seqLen(SAMPLE_N), "i", "run" + RUN_ID + "_t2_ind" + i);
+
+        sim.outputVCF(t2_inds, filePath=VCF_T2, sampleNames=t2_names);
+        catn("RUN " + RUN_ID + ": wrote " + VCF_T2);
+
+        sim.treeSeqOutput(TREES_OUT);
+        catn("RUN " + RUN_ID + ": wrote " + TREES_OUT);
+
+        sim.simulationFinished();
+    }
+}

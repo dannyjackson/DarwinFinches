@@ -1,0 +1,132 @@
+// ============================================================
+// SLiM 3 script: WF standing-variation sweep
+// - Focal mutation seeded once before burn-in
+// ============================================================
+
+function (logical) focalMutationPresent(integer focalPos) {
+    muts = sim.mutationsOfType(m2);
+    if (size(muts) == 0)
+        return F;
+    return any(muts.position == focalPos);
+}
+
+initialize() {
+    // Parameters
+    defineConstant("Ne",         25000);
+    defineConstant("L",          1000000);
+    defineConstant("MU",         2.04e-9);
+    defineConstant("R",          1.0e-8);
+    defineConstant("BURNIN",     250000);
+
+    defineConstant("FOCAL_POS",  742619);  // 0-based
+    defineConstant("SEL_S",      0.05);
+    defineConstant("DOM_H",      0.5);
+    defineConstant("SAMPLE_N",   8);
+    defineConstant("T2_OFFSET",  5);
+
+    defineConstant("RESTART_FILE", "restart_state.slimbin");
+    defineConstant("VCF_T1",       "sample_t1_genotypes.vcf");
+    defineConstant("VCF_T2",       "sample_t2_genotypes.vcf");
+    defineConstant("TREES_OUT",    "simulation.trees");
+
+    // Model
+    initializeSLiMModelType("WF");
+    initializeTreeSeq();
+
+    initializeMutationRate(MU);
+    initializeRecombinationRate(R);
+
+    // Mutation types
+    initializeMutationType("m1", 0.5, "f", 0.0);      // neutral background
+    initializeMutationType("m2", DOM_H, "f", 0.0);    // focal mutation; neutral until t1+1
+
+    // Enforce biallelic behavior at focal site
+    m2.mutationStackingPolicy = "l";
+    m2.mutationStackingGroup  = 1;
+
+    // Genomic elements
+    initializeGenomicElementType("g1", m1, 1.0);
+    initializeGenomicElementType("g2", m2, 1.0);
+
+    // Non-overlapping layout
+    if (FOCAL_POS > 0)
+        initializeGenomicElement(g1, 0, FOCAL_POS - 1);
+
+    initializeGenomicElement(g2, FOCAL_POS, FOCAL_POS);
+
+    if (FOCAL_POS < (L - 1))
+        initializeGenomicElement(g1, FOCAL_POS + 1, L - 1);
+}
+
+1 early() {
+    sim.addSubpop("p1", Ne);
+}
+
+1 late() {
+    // ---------------------------------------------------------
+    // SEED focal mutation ONCE before burn-in
+    // ---------------------------------------------------------
+    // Create the mutation
+    focalMut = m2.create(FOCAL_POS);
+
+    // Choose one random genome (2N total) to carry it
+    g = sample(p1.genomes, 1);
+    g.addMutations(focalMut);
+
+    catn("Seeded focal mutation at position " + FOCAL_POS +
+         " in genome " + g.id + " at generation 1.");
+
+    // Save restart state *after* seeding
+    sim.outputFull(RESTART_FILE);
+}
+
+early() {
+    // --------------------
+    // t1: end of burn-in
+    // --------------------
+    if (sim.generation == BURNIN) {
+
+        if (!focalMutationPresent(FOCAL_POS)) {
+            catn("Focal mutation lost during burn-in (gen " +
+                 sim.generation + "). Restarting...");
+
+            setSeed(asInteger(rdunif(1, 0, 2147483647)));
+            sim.readFromPopulationFile(RESTART_FILE);
+            return;
+        }
+
+        // Sample at t1
+        t1_inds  = sample(p1.individuals, SAMPLE_N);
+        t1_names = sapply(seqLen(SAMPLE_N), "i", "t1_ind" + i);
+
+        sim.outputVCF(t1_inds, filePath=VCF_T1, sampleNames=t1_names);
+        catn("Wrote t1 VCF at generation " + sim.generation);
+    }
+
+    // --------------------
+    // t1+1: selection on
+    // --------------------
+    if (sim.generation == (BURNIN + 1)) {
+        m2.setDistribution("f", SEL_S);
+        catn("Selection ON at generation " + sim.generation +
+             " (s=" + SEL_S + ", h=" + DOM_H + ").");
+    }
+
+    // --------------------
+    // t2: t1 + 5 generations
+    // --------------------
+    if (sim.generation == (BURNIN + T2_OFFSET)) {
+
+        t2_inds  = sample(p1.individuals, SAMPLE_N);
+        t2_names = sapply(seqLen(SAMPLE_N), "i", "t2_ind" + i);
+
+        sim.outputVCF(t2_inds, filePath=VCF_T2, sampleNames=t2_names);
+        catn("Wrote t2 VCF at generation " + sim.generation);
+
+        sim.treeSeqOutput(TREES_OUT);
+        catn("Wrote tree sequence.");
+
+        sim.simulationFinished();
+    }
+}
+

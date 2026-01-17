@@ -1,0 +1,132 @@
+// ============================================================
+// SLiM WF standing-variation sweep (tick-based; replicate-friendly)
+//
+// - WF diploid Ne = 25,000
+// - L = 10,000 bp; uniform recombination
+// - mu = 2.04e-9 per bp per generation
+// - Tree-sequence recording enabled
+// - Neutral burn-in for 250,000 ticks
+// - At t1 (=BURNIN): sample 8 diploid individuals (VCF), do not remove
+//                    then pick ONE random segregating mutation anywhere in genome
+//                    and begin positive selection on that allele (standing variation)
+// - At t2 (=t1+T2_OFFSET): sample 8 diploids (VCF), output .trees, finish
+//
+// Run:
+//   slim -d run_id=1 -d seed=100 n_replicates.slim
+// ============================================================
+
+
+// ------------------------------
+// initialize()
+// ------------------------------
+initialize() {
+    if (!exists("run_id")) defineConstant("RUN_ID", 1);
+    else                   defineConstant("RUN_ID", asInteger(run_id));
+
+    if (exists("seed"))
+        setSeed(asInteger(seed));
+
+    // Parameters
+    defineConstant("Ne",         1000);
+    defineConstant("L",          10000);
+    defineConstant("MU",         1e-6);
+    defineConstant("R",          1.0e-8);
+    defineConstant("BURNIN",     10000);
+
+    // Require sel_s to be provided from the command line as: -d sel_s=...
+    if (!exists("sel_s"))
+        stop("ERROR: sel_s must be provided, e.g. slim -d sel_s=0.05 ...");
+
+    defineConstant("SEL_S", asFloat(sel_s));
+
+
+    defineConstant("DOM_H",      1);
+    defineConstant("SAMPLE_N",   8);
+    defineConstant("T2_OFFSET",  1000);   // t2 = t1 + 5 ticks
+
+    // Outputs
+    defineConstant("VCF_T1",     "sample_t1_run" + RUN_ID + ".vcf");
+    defineConstant("VCF_T2",     "sample_t2_run" + RUN_ID + ".vcf");
+    defineConstant("TREES_OUT",  "simulation_run" + RUN_ID + ".trees");
+
+    // Model + tree sequence
+    initializeSLiMModelType("WF");
+    initializeTreeSeq();
+
+    // Rates
+    initializeMutationRate(MU);
+    initializeRecombinationRate(R);
+
+    // Single neutral mutation type across genome
+    initializeMutationType("m1", 0.5, "f", 0.0);
+    initializeGenomicElementType("g1", m1, 1.0);
+    initializeGenomicElement(g1, 0, L - 1);
+
+    // Globals set at t1
+    defineGlobal("SELECTION_ON", F);
+    defineGlobal("SELECTED_MUT", NULL);
+}
+
+
+// ------------------------------
+// Create the population
+// ------------------------------
+1 early() {
+    sim.addSubpop("p1", Ne);
+}
+
+early() {
+    t = community.tick;
+
+    if (t % 1000 == 0) {
+        catn("RUN " + RUN_ID + ": tick " + t + " / " + BURNIN);
+    }
+}
+
+// ------------------------------
+// Apply selection to ONE chosen segregating mutation
+// ------------------------------
+mutationEffect(m1) {
+    if (!SELECTION_ON)
+        return 1.0;
+
+    if (mut != SELECTED_MUT)
+        return 1.0;
+
+    if (homozygous)
+        return 1.0 + SEL_S;
+    else
+        return 1.0 + DOM_H * SEL_S;
+}
+
+
+// ------------------------------
+// t1: end of burn-in (sample + choose polymorphic allele; selection starts now)
+// ------------------------------
+BURNIN early() {
+    // Sample at t1 (random sample of diploid individuals; does not remove)
+    p1.outputVCFSample(SAMPLE_N, replace=F, filePath=VCF_T1, append=F);
+    catn("RUN " + RUN_ID + ": wrote " + VCF_T1);
+
+    // Pick one random segregating mutation anywhere in genome
+    muts = sim.mutations;
+    if (size(muts) == 0)
+        stop("RUN " + RUN_ID + ": no segregating mutations at t1; increase MU and/or BURNIN.");
+
+    SELECTED_MUT = sample(muts, 1);
+    SELECTION_ON = T;
+
+    catn("RUN " + RUN_ID + ": selected standing variant at pos " + SELECTED_MUT.position +
+         "; selection begins at t1 with s=" + SEL_S + ", h=" + DOM_H + ".");
+}
+
+(BURNIN + T2_OFFSET) late() {
+    p1.outputVCFSample(SAMPLE_N, replace=F, filePath=VCF_T2, append=F);
+    catn("RUN " + RUN_ID + ": wrote " + VCF_T2);
+
+    sim.treeSeqOutput(TREES_OUT);
+    catn("RUN " + RUN_ID + ": wrote " + TREES_OUT);
+
+    sim.simulationFinished();
+}
+

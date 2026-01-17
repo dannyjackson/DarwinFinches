@@ -1,0 +1,167 @@
+// ============================================================
+// SLiM 3 WF simulation: natural standing variation, condition on p~0.3 at t1
+// - WF diploid Ne = 25,000
+// - L = 1,000,000 bp, uniform recombination
+// - mu = 2.04e-9
+// - Burn-in: 250,000 gens neutral
+// - Focal site at position 742,619 (0-based); mutation type m2
+// - Accept runs only if focal allele exists at t1 and has freq ~ P_TARGET
+// - Then selection turns on at t1+1
+// - Sample 8 diploids at t1 and at t2=t1+5, write VCFs
+// - Output tree sequence
+// ============================================================
+
+
+// ------------------------------
+// Helper: return the focal Mutation object if present (else NULL)
+// ------------------------------
+function (object<Mutation>) getFocalMutation(integer focalPos) {
+    muts = sim.mutationsOfType(m2);
+    if (size(muts) == 0)
+        return NULL;
+
+    // pick mutations exactly at the focal position
+    atPos = muts[muts.position == focalPos];
+    if (size(atPos) == 0)
+        return NULL;
+
+    // If multiple exist (shouldn't with our stacking policy), just take first
+    return atPos[0];
+}
+
+initialize() {
+    // Parameters
+    defineConstant("Ne",         25000);
+    defineConstant("L",          1000000);
+    defineConstant("MU",         2.04e-9);
+    defineConstant("R",          1.0e-8);
+    defineConstant("BURNIN",     250000);
+
+    defineConstant("FOCAL_POS",  742619);   // 0-based
+    defineConstant("P_TARGET",   0.30);     // desired allele frequency at t1
+    defineConstant("P_TOL",      0.005);    // accept window: |p - P_TARGET| <= P_TOL
+
+    defineConstant("SEL_S",      0.05);     // selection coefficient after t1
+    defineConstant("DOM_H",      0.5);      // additive
+
+    defineConstant("SAMPLE_N",   8);
+    defineConstant("T2_OFFSET",  5);
+
+    defineConstant("PROG_EVERY", 20000);    // progress logging (optional)
+
+    defineConstant("RESTART_FILE", "restart_state.slimbin");
+    defineConstant("VCF_T1",       "sample_t1_genotypes.vcf");
+    defineConstant("VCF_T2",       "sample_t2_genotypes.vcf");
+    defineConstant("TREES_OUT",    "simulation.trees");
+
+    // Model
+    initializeSLiMModelType("WF");
+    initializeTreeSeq();
+
+    initializeMutationRate(MU);
+    initializeRecombinationRate(R);
+
+    // Mutation types
+    initializeMutationType("m1", 0.5, "f", 0.0);        // neutral background
+    initializeMutationType("m2", DOM_H, "f", 0.0);      // focal; neutral until t1+1
+
+    // IMPORTANT: enforce one mutation per position for biallelic behavior at focal base
+    // "l" = keep only the last mutation at a position; also disable stacking
+    // (Prevents multiple different derived alleles at FOCAL_POS.)
+    m2.mutationStackingPolicy = "l";
+    m2.mutationStackingGroup = 1;
+
+    // Element types
+    initializeGenomicElementType("g1", m1, 1.0);
+    initializeGenomicElementType("g2", m2, 1.0);
+
+    // Non-overlapping elements to isolate focal base
+    if (FOCAL_POS < 0 | FOCAL_POS >= L)
+        stop("FOCAL_POS must be within [0, L-1].");
+
+    if (FOCAL_POS > 0)
+        initializeGenomicElement(g1, 0, FOCAL_POS - 1);
+
+    initializeGenomicElement(g2, FOCAL_POS, FOCAL_POS);
+
+    if (FOCAL_POS < (L - 1))
+        initializeGenomicElement(g1, FOCAL_POS + 1, L - 1);
+}
+
+1 early() {
+    sim.addSubpop("p1", Ne);
+}
+
+1 late() {
+    // Save an early restart point; on failure at t1 we reload this and try again
+    sim.outputFull(RESTART_FILE);
+    catn("Saved restart state to: " + RESTART_FILE);
+}
+
+early() {
+    // Optional progress logging
+    if (sim.generation % PROG_EVERY == 0) {
+        fm = getFocalMutation(FOCAL_POS);
+        if (fm == NULL) {
+            catn("Gen " + sim.generation + ": focal absent");
+        } else {
+            p = sim.mutationFrequencies(p1, fm);
+            catn("Gen " + sim.generation + ": focal freq = " + p);
+        }
+    }
+
+    // --------------------
+    // t1: end of burn-in — condition on freq ~ 0.3
+    // --------------------
+    if (sim.generation == BURNIN) {
+
+        fm = getFocalMutation(FOCAL_POS);
+        if (fm == NULL) {
+            catn("t1: focal ABSENT at gen " + sim.generation + " -> restarting.");
+            setSeed(asInteger(rdunif(1, 0, 2147483647)));
+            sim.readFromPopulationFile(RESTART_FILE);
+            return;
+        }
+
+        p = sim.mutationFrequencies(p1, fm);
+
+        if (abs(p - P_TARGET) > P_TOL) {
+            catn("t1: focal freq " + p + " not within " + P_TOL +
+                 " of target " + P_TARGET + " -> restarting.");
+            setSeed(asInteger(rdunif(1, 0, 2147483647)));
+            sim.readFromPopulationFile(RESTART_FILE);
+            return;
+        }
+
+        catn("t1: ACCEPTED run. focal freq = " + p + " at gen " + sim.generation);
+
+        // Sample at t1 (does not remove individuals)
+        t1_inds  = sample(p1.individuals, SAMPLE_N);
+        t1_names = sapply(seqLen(SAMPLE_N), "i", "t1_ind" + i);
+        sim.outputVCF(t1_inds, filePath=VCF_T1, sampleNames=t1_names);
+        catn("Wrote: " + VCF_T1);
+    }
+
+    // --------------------
+    // t1+1: turn selection on
+    // --------------------
+    if (sim.generation == (BURNIN + 1)) {
+        m2.setDistribution("f", SEL_S);
+        catn("Selection ON at gen " + sim.generation + " (s=" + SEL_S + ", h=" + DOM_H + ").");
+    }
+
+    // --------------------
+    // t2: t1 + 5 gens
+    // --------------------
+    if (sim.generation == (BURNIN + T2_OFFSET)) {
+        t2_inds  = sample(p1.individuals, SAMPLE_N);
+        t2_names = sapply(seqLen(SAMPLE_N), "i", "t2_ind" + i);
+        sim.outputVCF(t2_inds, filePath=VCF_T2, sampleNames=t2_names);
+        catn("Wrote: " + VCF_T2);
+
+        sim.treeSeqOutput(TREES_OUT);
+        catn("Wrote: " + TREES_OUT);
+
+        sim.simulationFinished();
+    }
+}

@@ -1,0 +1,142 @@
+// ============================================================
+// SLiM 3 script: WF model with standing-variation sweep
+// - Ne = 25,000 diploids
+// - 1 chromosome, 1,000,000 bp
+// - Neutral burn-in (250,000 generations)
+// - One focal site at position 742,619 (0-based in SLiM)
+// - Condition on focal allele being present at end of burn-in (restart until present)
+// - Sample 8 diploids at t1 and at t2=t1+5, write VCFs
+// - Output tree sequence
+// ============================================================
+
+
+// ============================================================
+// Helper: detect whether focal mutation exists anywhere
+// ============================================================
+function (logical) focalMutationPresent(integer focalPos) {
+    muts = sim.mutationsOfType(m2);
+    if (size(muts) == 0)
+        return F;
+    return any(muts.position == focalPos);
+}
+
+
+// ============================================================
+// initialize(): model setup + parameters
+// ============================================================
+initialize() {
+    // ------------------------------
+    // Parameters (edit as needed)
+    // ------------------------------
+    defineConstant("Ne",         25000);
+    defineConstant("L",          1000000);
+    defineConstant("MU",         2.04e-9);   // per-base per-generation mutation rate
+    defineConstant("R",          1.0e-8);    // per-base per-generation recombination rate
+    defineConstant("BURNIN",     250000);
+
+    defineConstant("FOCAL_POS",  742619);   // 0-based in SLiM
+    defineConstant("SEL_S",      0.05);     // selection coefficient after t1 (EDIT ME)
+    defineConstant("DOM_H",      0.5);      // additive dominance
+    defineConstant("SAMPLE_N",   8);
+    defineConstant("T2_OFFSET",  5);
+
+    defineConstant("RESTART_FILE", "restart_state.slimbin");
+    defineConstant("VCF_T1",       "sample_t1_genotypes.vcf");
+    defineConstant("VCF_T2",       "sample_t2_genotypes.vcf");
+    defineConstant("TREES_OUT",    "simulation.trees");
+
+    // ------------------------------
+    // Model framework: WF diploid
+    // ------------------------------
+    initializeSLiMModelType("WF");
+
+    // Tree-sequence recording ON
+    initializeTreeSeq();
+
+    // Genome basics
+    initializeMutationRate(MU);
+    initializeRecombinationRate(R);
+
+    // Mutation types:
+    // m1: neutral background
+    // m2: focal-site mutation type (neutral during burn-in; becomes beneficial after t1)
+    initializeMutationType("m1", 0.5, "f", 0.0);
+    initializeMutationType("m2", DOM_H, "f", 0.0);  // starts neutral; switched to +SEL_S later
+
+    // Genomic element types:
+    initializeGenomicElementType("g1", m1, 1.0);
+    initializeGenomicElementType("g2", m2, 1.0);
+
+    // Place elements:
+    initializeGenomicElement(g1, 0, L - 1);
+    // Override just the focal base so mutations there are of type m2
+    initializeGenomicElement(g2, FOCAL_POS, FOCAL_POS);
+}
+
+
+// ============================================================
+// Generation 1: create population, and save a restart point
+// ============================================================
+1 early() {
+    sim.addSubpop("p1", Ne);
+}
+
+1 late() {
+    // Save a very-early state so we can restart on failure
+    sim.outputFull(RESTART_FILE);
+}
+
+
+// ============================================================
+// End of burn-in (t1): require focal allele present, otherwise restart
+// Also sample 8 diploids and write VCF
+// ============================================================
+BURNIN late() {
+    if (!focalMutationPresent(FOCAL_POS)) {
+        catn("Focal mutation absent at end of burn-in (gen " + sim.generation + "). Restarting...");
+
+        // Reseed so the restart isn't identical
+        setSeed(asInteger(rdunif(1, 0, 2147483647)));
+
+        // Reload early state; simulation continues from here in that reloaded state
+        sim.readFromPopulationFile(RESTART_FILE);
+        return;
+    }
+
+    // ---- t1 sampling (does NOT remove individuals) ----
+    t1_inds = sample(p1.individuals, SAMPLE_N);
+    t1_names = sapply(seqLen(SAMPLE_N), "i", "t1_ind" + i);
+
+    sim.outputVCF(t1_inds, filePath=VCF_T1, sampleNames=t1_names);
+    catn("Wrote t1 VCF at generation " + sim.generation + " to: " + VCF_T1);
+}
+
+
+// ============================================================
+// Immediately after burn-in (t1+1): turn selection on for focal mutation type
+// ============================================================
+(BURNIN + 1) early() {
+    // All existing and future m2 mutations now have selection coefficient +SEL_S
+    m2.setDistribution("f", SEL_S);
+
+    catn("Selection switched ON at generation " + sim.generation +
+         " (m2 now has s=" + SEL_S + ", h=" + DOM_H + ").");
+}
+
+
+// ============================================================
+// t2 sampling: t2 = t1 + 5 generations (t1 is generation BURNIN)
+// Sample 8 diploids, write VCF, output tree sequence, finish
+// ============================================================
+(BURNIN + T2_OFFSET) late() {
+    t2_inds = sample(p1.individuals, SAMPLE_N);
+    t2_names = sapply(seqLen(SAMPLE_N), "i", "t2_ind" + i);
+
+    sim.outputVCF(t2_inds, filePath=VCF_T2, sampleNames=t2_names);
+    catn("Wrote t2 VCF at generation " + sim.generation + " to: " + VCF_T2);
+
+    sim.treeSeqOutput(TREES_OUT);
+    catn("Wrote tree sequence to: " + TREES_OUT);
+
+    sim.simulationFinished();
+}

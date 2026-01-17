@@ -1,0 +1,200 @@
+// ============================================================
+// SLiM 5 WF seeded-standing-allele sweep (trees-only; recap+overlay-ready)
+//
+// OPTION 1: seed the selected allele at t1 at frequency f0 (no neutral burn-in)
+//
+// - WF diploid Ne = 150,000
+// - L = 50,000 bp; uniform recombination
+// - Tree-sequence recording enabled
+// - NO neutral mutations in SLiM (MU = 0.0)  <-- recapitate + overlay later in Python
+// - At t1 (=T1): sample 8 diploid individuals (remember in TS + write IDs)
+//               seed ONE mutation at freq ~= f0 and begin selection immediately
+// - After t1: apply population decline for T2_OFFSET gens
+// - At t2 (=t1+T2_OFFSET): sample 8 diploids (remember in TS + write IDs)
+//                          output .trees, finish
+//
+// Run (example):
+//   slim -d run_id=1 -d seed=100 -d sel_s=0.05 -d decline_rate=0.95 -d f0=0.10 seeded_trees_only.slim
+// ============================================================
+
+initialize() {
+    if (!exists("run_id")) defineConstant("RUN_ID", 1);
+    else                   defineConstant("RUN_ID", asInteger(run_id));
+
+    if (exists("seed"))
+        setSeed(asInteger(seed));
+
+    // ----------------------------
+    // Parameters (empirical knobs)
+    // ----------------------------
+    defineConstant("Ne",         150000);
+    defineConstant("L",          50000);
+    defineConstant("R",          1.0e-8);
+
+    // No neutral mutations during SLiM; add them later with recapitation + mutation overlay
+    defineConstant("MU",         0.0);
+
+    // Use a short pre-phase just to set up the WF population before t1
+    defineConstant("T1",         10);
+
+    if (!exists("sel_s"))
+        stop("ERROR: sel_s must be provided, e.g. slim -d sel_s=0.05 ...");
+    defineConstant("SEL_S", asFloat(sel_s));
+
+    if (!exists("decline_rate"))
+        stop("ERROR: decline_rate must be provided, e.g. slim -d decline_rate=0.95 ...");
+    defineConstant("DECLINE_RATE", asFloat(decline_rate));
+
+    if (!exists("f0"))
+        stop("ERROR: f0 must be provided, e.g. slim -d f0=0.10 ...");
+    defineConstant("F0", asFloat(f0));
+
+    defineConstant("MIN_N",      50);
+    defineConstant("DOM_H",      1.0);
+    defineConstant("SAMPLE_N",   8);
+    defineConstant("T2_OFFSET",  5);
+
+    // ----------------------------
+    // Outputs (NO VCFs)
+    // ----------------------------
+    defineConstant("SAMPLE_IDS_T1", "sample_t1_run" + RUN_ID + ".ids.txt");
+    defineConstant("SAMPLE_IDS_T2", "sample_t2_run" + RUN_ID + ".ids.txt");
+    defineConstant("TREES_OUT",     "simulation_run" + RUN_ID + ".trees");
+
+    // ----------------------------
+    // Model + tree sequence
+    // ----------------------------
+    initializeSLiMModelType("WF");
+    initializeSLiMOptions(keepPedigrees=T);   // enables ind.pedigreeID
+    initializeTreeSeq();
+
+    initializeMutationRate(MU);          // 0.0 here
+    initializeRecombinationRate(R);
+
+    // Mutation types:
+    // m1 = neutral placeholder (won't be created because MU=0)
+    // m2 = selected allele (seeded at t1)
+    initializeMutationType("m1", 0.5, "f", 0.0);
+    initializeMutationType("m2", DOM_H, "f", 0.0);          // neutral type container
+
+    initializeGenomicElementType("g1", m1, 1.0);
+    initializeGenomicElement(g1, 0, L - 1);
+
+    defineGlobal("SELECTED_MUT", NULL);
+}
+
+
+// ------------------------------
+// Create population
+// ------------------------------
+1 early() {
+    sim.addSubpop("p1", Ne);
+}
+
+
+// ------------------------------
+// Light progress logging
+// ------------------------------
+early() {
+    t = community.tick;
+    if (t == 1 | t == T1 | t == (T1 + T2_OFFSET))
+        catn("RUN " + RUN_ID + ": tick " + t);
+}
+
+
+// ------------------------------
+// Helper: write pedigree IDs
+// ------------------------------
+function (void) writePedigreeIDs(string path, object<Individual> inds) {
+    writeFile(path, "", append=F);
+    for (ind in inds)
+        writeFile(path, asString(ind.pedigreeID) + "\n", append=T);
+}
+
+
+// ------------------------------------------------------------
+// t1: sample+remember (no VCF), then seed selected allele at F0
+// ------------------------------------------------------------
+T1 late() {
+    // sample and remember for downstream stats
+    inds_t1 = p1.sampleIndividuals(SAMPLE_N);
+    sim.treeSeqRememberIndividuals(inds_t1);
+    writePedigreeIDs(SAMPLE_IDS_T1, inds_t1);
+
+    // ----------------------------
+    // SLiM 5 haplosomes update:
+    // genomes -> haplosomes
+    // ----------------------------
+    h = p1.haplosomes;                 // diploid autosomes => 2*Ne haplosomes
+    // If you ever simulate sex chromosomes / null copies, use:
+    // h = p1.haplosomesNonNull;
+
+    nH = size(h);                      // should be 2 * Ne
+    nCarriers = asInteger(round(nH * F0));
+
+    // bounds to keep it segregating
+    if (nCarriers < 1) nCarriers = 1;
+    if (nCarriers >= nH) nCarriers = nH - 1;
+
+    pos = asInteger(floor(runif(1, 0, L)));   // random position in [0, L-1]
+    carriers = sample(h, nCarriers);
+
+    // Create mutation ONCE, then add SAME mutation object to other haplosomes
+    SELECTED_MUT = carriers[0].addNewMutation(m2, SEL_S, pos);
+
+    if (nCarriers > 1) {
+        for (i in 1:(nCarriers - 1))
+            carriers[i].addMutations(SELECTED_MUT);
+    }
+
+    f0_now = sim.mutationFrequencies(p1, SELECTED_MUT);
+    catn("RUN " + RUN_ID + ": seeded m2 at pos " + pos +
+         " targetF0=" + F0 + " realizedF0=" + f0_now +
+         " s=" + SEL_S + " h=" + DOM_H);
+}
+
+
+// ------------------------------------------------------------
+// Population decline after t1 (apply for T2_OFFSET generations)
+// ------------------------------------------------------------
+(T1+1):(T1+T2_OFFSET) early() {
+    curN = p1.individualCount;
+    newN = asInteger(round(curN * DECLINE_RATE));
+    if (newN < MIN_N)
+        newN = MIN_N;
+
+    p1.setSubpopulationSize(newN);
+
+    // One line per generation (small window, cheap)
+    catn("RUN " + RUN_ID + ": tick " + community.tick + " N=" + newN);
+}
+
+
+// ------------------------------------------------------------
+// Optional tracking (small window; prints each generation)
+// ------------------------------------------------------------
+(T1+1):(T1+T2_OFFSET) late() {
+    if (!isNULL(SELECTED_MUT)) {
+        f = sim.mutationFrequencies(p1, SELECTED_MUT);
+        catn("RUN " + RUN_ID + ": tick " + community.tick + " selected freq=" + f);
+    }
+}
+
+
+// ------------------------------------------------------------
+// t2: sample+remember, output trees, finish
+// ------------------------------------------------------------
+(T1 + T2_OFFSET) late() {
+    inds_t2 = p1.sampleIndividuals(SAMPLE_N);
+    sim.treeSeqRememberIndividuals(inds_t2);
+    writePedigreeIDs(SAMPLE_IDS_T2, inds_t2);
+
+    if (!isNULL(SELECTED_MUT)) {
+        f1 = sim.mutationFrequencies(p1, SELECTED_MUT);
+        catn("RUN " + RUN_ID + ": selected freq at t2=" + f1 +
+             " s=" + SELECTED_MUT.selectionCoeff);
+    }
+
+    sim.treeSeqOutput(TREES_OUT);
+    sim.simulationFinished();
+}
