@@ -9,7 +9,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=8G
-#SBATCH --array=1-10
+#SBATCH --array=1-1000
 # set array=1-1000 for real runs
 
 set -euo pipefail
@@ -95,7 +95,7 @@ echo "[PY] recap+stats starting..."
   --trees "${TREES}" \
   --t1_ids "${T1_IDS}" \
   --t2_ids "${T2_IDS}" \
-  --Ne 150000 --mu 2.04e-9 --recomb 1e-8 --L 50000 \
+  --Ne 10000 --mu 2.04e-9 --recomb 1e-8 --L 50000 \
   --model "${MSPRIME_MODEL}" \
   --seed "${SEED}" \
   --out_trees "simulation_run${REP}.recap.mut.trees" \

@@ -20,21 +20,17 @@ SLIM_SCRIPT="/xdisk/mcnew/finches/dannyjackson/simulations/simulation_replicates
 
 
 
-# sbatch run_slim.sh -s 0.00 -r 0.95 -f 0.25 -m hudson
-# sbatch run_slim.sh -s 0.50 -r 0.95 -f 0.25 -m hudson
-# sbatch run_slim.sh -s 0.95 -r 0.95 -f 0.25 -m hudson
+sbatch run_slim.sh -s 0.00 -r 0.95 -f 0.25 -m hudson
+sbatch run_slim.sh -s 0.50 -r 0.95 -f 0.25 -m hudson
+sbatch run_slim.sh -s 0.95 -r 0.95 -f 0.25 -m hudson
 
 sbatch run_slim.sh -s 0.00 -r 0.85 -f 0.25 -m hudson
 sbatch run_slim.sh -s 0.50 -r 0.85 -f 0.25 -m hudson
 sbatch run_slim.sh -s 0.95 -r 0.85 -f 0.25 -m hudson
 
-# sbatch run_slim.sh -s 0.00 -r 0.75 -f 0.25 -m hudson
-# sbatch run_slim.sh -s 0.50 -r 0.75 -f 0.25 -m hudson
-# sbatch run_slim.sh -s 0.95 -r 0.75 -f 0.25 -m hudson
-
-sbatch run_slim.sh -s 20 -r 0.95 -f 0.25 -m hudson
-sbatch run_slim.sh -s 20 -r 0.75 -f 0.25 -m hudson
-sbatch run_slim.sh -s 5 -r 0.75 -f 0.25 -m hudson
+sbatch run_slim.sh -s 0.00 -r 0.75 -f 0.25 -m hudson
+sbatch run_slim.sh -s 0.50 -r 0.75 -f 0.25 -m hudson
+sbatch run_slim.sh -s 0.95 -r 0.75 -f 0.25 -m hudson
 
 
 module load micromamba

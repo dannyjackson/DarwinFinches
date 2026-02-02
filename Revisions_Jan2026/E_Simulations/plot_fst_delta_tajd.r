@@ -83,27 +83,25 @@ forced_types <- cols(
 )
 
 read_one <- function(file, decline_rate_path, sel_s_path) {
-  df <- read_tsv(file, col_types = forced_types, show_col_types = FALSE)
 
-  probs <- problems(df)
-  if (nrow(probs) > 0) {
-    message("\nParsing issues in: ", file)
-    print(probs)
-  }
+  # 1) Keep only lines with 14 tab-separated fields (header + good rows)
+  lines <- readLines(file, warn = FALSE)
+  good  <- vapply(strsplit(lines, "\t", fixed = TRUE), length, integer(1)) == 14
+  df <- readr::read_tsv(I(lines[good]), col_types = forced_types, show_col_types = FALSE)
 
+  # 2) sanity: required columns exist
   need <- c("fst_hudson", "delta_tajd")
   missing <- setdiff(need, names(df))
-  if (length(missing) > 0) {
-    stop("Missing required columns in ", file, ": ", paste(missing, collapse = ", "))
-  }
+  if (length(missing) > 0) stop("Missing required columns in ", file, ": ", paste(missing, collapse = ", "))
 
   df %>%
     mutate(
       file = file,
-      decline_rate = decline_rate_path,  # overwrite from directory name
-      sel_s = sel_s_path                 # overwrite from directory name
+      decline_rate = decline_rate_path,
+      sel_s = sel_s_path
     )
 }
+
 
 df_all <- pmap_dfr(meta %>% rename(decline_rate_path = decline_rate, sel_s_path = sel_s),
                    read_one)
@@ -125,6 +123,7 @@ p <- ggplot(df_all, aes(x = fst_hudson, y = delta_tajd)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "grey70") +
   geom_vline(xintercept = 0, linetype = "dashed", color = "grey70") +
   geom_point(size = 0.25, alpha = 0.8, color = "blue") +
+  coord_cartesian(xlim = c(-0.05, NA)) +
   facet_grid(
     rows = vars(decline_rate),
     cols = vars(sel_s),
