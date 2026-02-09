@@ -9,8 +9,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --mem=8G
-#SBATCH --array=1-1000
-# set array=1-1000 for real runs
+#SBATCH --array=1-100
 
 set -euo pipefail
 
@@ -27,6 +26,8 @@ while getopts "s:r:f:m:" option; do
     esac
 done
 
+AF="AF_${F0//./_}"
+
 : "${S:?ERROR: -s <sel_s> is required}"
 : "${DECLINE_RATE:?ERROR: -r <decline_rate> is required}"
 F0="${F0:-0.10}"
@@ -36,12 +37,12 @@ MSPRIME_MODEL="${MSPRIME_MODEL:-hudson}"
 # Paths
 # ----------------------------
 SLIM_BIN="/xdisk/mcnew/dannyjackson/.local/share/mamba/envs/slim5/bin/slim"
-SLIM_SCRIPT="/xdisk/mcnew/finches/dannyjackson/simulations/simulation_replicates.slim"
+SLIM_SCRIPT="/xdisk/mcnew/finches/dannyjackson/simulations/simulation_replicates.rapid_selection.slim"
 
 PY_ENV="recap_py"
 PY_SCRIPT="/xdisk/mcnew/finches/dannyjackson/simulations/recap_fst_tajd.py"
 
-OUTBASE="/xdisk/mcnew/finches/dannyjackson/simulations/output"
+OUTBASE="/xdisk/mcnew/finches/dannyjackson/simulations/rapid_selection/${AF}/output"
 mkdir -p "${OUTBASE}/logs"
 
 # One combined TSV per (decline_rate, selection coeff) combo:
@@ -95,7 +96,7 @@ echo "[PY] recap+stats starting..."
   --trees "${TREES}" \
   --t1_ids "${T1_IDS}" \
   --t2_ids "${T2_IDS}" \
-  --Ne 10000 --mu 2.04e-9 --recomb 1e-8 --L 50000 \
+  --Ne 10000 --mu 2.04e-9 --recomb 1e-8 --L 10000 \
   --model "${MSPRIME_MODEL}" \
   --seed "${SEED}" \
   --out_trees "simulation_run${REP}.recap.mut.trees" \

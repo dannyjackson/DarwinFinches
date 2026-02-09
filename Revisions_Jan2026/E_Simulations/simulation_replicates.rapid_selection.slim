@@ -4,7 +4,7 @@
 // OPTION 1: seed the selected allele at t1 at frequency f0 (no neutral burn-in)
 //
 // - WF diploid Ne = 150,000
-// - L = 50,000 bp; uniform recombination
+// - L = 500,000 bp; uniform recombination
 // - Tree-sequence recording enabled
 // - NO neutral mutations in SLiM (MU = 0.0)  <-- recapitate + overlay later in Python
 // - At t1 (=T1): sample 8 diploid individuals (remember in TS + write IDs)
@@ -28,7 +28,7 @@ initialize() {
     // Parameters (empirical knobs)
     // ----------------------------
     defineConstant("Ne",         10000);
-    defineConstant("L",          50000);
+    defineConstant("L",          10000);
     defineConstant("R",          1.0e-8);
 
     // No neutral mutations during SLiM; add them later with recapitation + mutation overlay
@@ -52,7 +52,7 @@ initialize() {
     defineConstant("MIN_N",      50);
     defineConstant("DOM_H",      1.0);
     defineConstant("SAMPLE_N",   8);
-    defineConstant("T2_OFFSET",  5);
+    defineConstant("T2_OFFSET",  10);
 
     // ----------------------------
     // Outputs (NO VCFs)
@@ -126,8 +126,6 @@ T1 late() {
     // genomes -> haplosomes
     // ----------------------------
     h = p1.haplosomes;                 // diploid autosomes => 2*Ne haplosomes
-    // If you ever simulate sex chromosomes / null copies, use:
-    // h = p1.haplosomesNonNull;
 
     nH = size(h);                      // should be 2 * Ne
     nCarriers = asInteger(round(nH * F0));

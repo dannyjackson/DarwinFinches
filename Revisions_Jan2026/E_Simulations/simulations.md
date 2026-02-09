@@ -18,28 +18,204 @@ mkdir -p /xdisk/mcnew/finches/dannyjackson/simulations/output/logs
 
 SLIM_SCRIPT="/xdisk/mcnew/finches/dannyjackson/simulations/simulation_replicates.slim"
 
+# Run with sampling after 500 generations (extended_generations)
+cd /xdisk/mcnew/finches/dannyjackson/simulations/
+## AF_0_05 
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.95 -f 0.05 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.95 -f 0.05 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.95 -f 0.05 -m hudson
+
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.85 -f 0.05 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.85 -f 0.05 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.85 -f 0.05 -m hudson
+
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.75 -f 0.05 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.75 -f 0.05 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.75 -f 0.05 -m hudson
+
+## AF 0.25
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.95 -f 0.25 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.95 -f 0.25 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.95 -f 0.25 -m hudson
+
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.85 -f 0.25 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.85 -f 0.25 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.85 -f 0.25 -m hudson
+
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.75 -f 0.25 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.75 -f 0.25 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.75 -f 0.25 -m hudson
 
 
-sbatch run_slim.sh -s 0.00 -r 0.95 -f 0.25 -m hudson
-sbatch run_slim.sh -s 0.50 -r 0.95 -f 0.25 -m hudson
-sbatch run_slim.sh -s 0.95 -r 0.95 -f 0.25 -m hudson
+## AF_0_50
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.95 -f 0.50 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.95 -f 0.50 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.95 -f 0.50 -m hudson
 
-sbatch run_slim.sh -s 0.00 -r 0.85 -f 0.25 -m hudson
-sbatch run_slim.sh -s 0.50 -r 0.85 -f 0.25 -m hudson
-sbatch run_slim.sh -s 0.95 -r 0.85 -f 0.25 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.85 -f 0.50 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.85 -f 0.50 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.85 -f 0.50 -m hudson
 
-sbatch run_slim.sh -s 0.00 -r 0.75 -f 0.25 -m hudson
-sbatch run_slim.sh -s 0.50 -r 0.75 -f 0.25 -m hudson
-sbatch run_slim.sh -s 0.95 -r 0.75 -f 0.25 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.75 -f 0.50 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.75 -f 0.50 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.75 -f 0.50 -m hudson
 
 
+## AF_0_75
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.95 -f 0.75 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.95 -f 0.75 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.95 -f 0.75 -m hudson
+
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.85 -f 0.75 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.85 -f 0.75 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.85 -f 0.75 -m hudson
+
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.75 -f 0.75 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.75 -f 0.75 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.75 -f 0.75 -m hudson
+
+## AF_0_95
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.95 -f 0.95 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.95 -f 0.95 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.95 -f 0.95 -m hudson
+
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.85 -f 0.95 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.85 -f 0.95 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.85 -f 0.95 -m hudson
+
+sbatch run_slim.extended_generations.sh -s 0.00 -r 0.75 -f 0.95 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.50 -r 0.75 -f 0.95 -m hudson
+sbatch run_slim.extended_generations.sh -s 0.95 -r 0.75 -f 0.95 -m hudson
+
+
+## Plot the results
 module load micromamba
 micromamba activate r_elgato
 
-Rscript plot_fst_delta_tajd.R
 
-/xdisk/mcnew/finches/dannyjackson/simulations
-cat output/0.95/selection_0.00/summary_stats.tsv
+cd /xdisk/mcnew/finches/dannyjackson/simulations/extended_generations/AF_0_05
+Rscript ../../plot_fst_delta_tajd.R
+cd /xdisk/mcnew/finches/dannyjackson/simulations/extended_generations/AF_0_25
+Rscript ../../plot_fst_delta_tajd.R
+cd /xdisk/mcnew/finches/dannyjackson/simulations/extended_generations/AF_0_50
+Rscript ../../plot_fst_delta_tajd.R
+cd /xdisk/mcnew/finches/dannyjackson/simulations/extended_generations/AF_0_75
+Rscript ../../plot_fst_delta_tajd.R
+cd /xdisk/mcnew/finches/dannyjackson/simulations/extended_generations/AF_0_95
+Rscript ../../plot_fst_delta_tajd.R
+
+
+
+
+# Redo with sampling over 5 generations (rapid_selection)
+cd /xdisk/mcnew/finches/dannyjackson/simulations/
+## AF_0_05 
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.95 -f 0.05 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.95 -f 0.05 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.95 -f 0.05 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.85 -f 0.05 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.85 -f 0.05 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.85 -f 0.05 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.75 -f 0.05 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.75 -f 0.05 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.75 -f 0.05 -m hudson
+
+## AF 0.25
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.95 -f 0.25 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.95 -f 0.25 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.95 -f 0.25 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.85 -f 0.25 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.85 -f 0.25 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.85 -f 0.25 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.75 -f 0.25 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.75 -f 0.25 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.75 -f 0.25 -m hudson
+
+
+## AF_0_50
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.95 -f 0.50 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.95 -f 0.50 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.95 -f 0.50 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.85 -f 0.50 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.85 -f 0.50 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.85 -f 0.50 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.75 -f 0.50 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.75 -f 0.50 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.75 -f 0.50 -m hudson
+
+
+## AF_0_75
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.95 -f 0.75 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.95 -f 0.75 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.95 -f 0.75 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.85 -f 0.75 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.85 -f 0.75 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.85 -f 0.75 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.75 -f 0.75 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.75 -f 0.75 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.75 -f 0.75 -m hudson
+
+## AF_0_95
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.95 -f 0.95 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.95 -f 0.95 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.95 -f 0.95 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.85 -f 0.95 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.85 -f 0.95 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.85 -f 0.95 -m hudson
+
+sbatch run_slim.rapid_selection.sh -s 0.00 -r 0.75 -f 0.95 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.50 -r 0.75 -f 0.95 -m hudson
+sbatch run_slim.rapid_selection.sh -s 0.95 -r 0.75 -f 0.95 -m hudson
+
+
+## Plot the results
+module load micromamba
+micromamba activate r_elgato
+
+
+cd /xdisk/mcnew/finches/dannyjackson/simulations/rapid_selection/AF_0_05
+Rscript ../../plot_fst_delta_tajd.R
+cd /xdisk/mcnew/finches/dannyjackson/simulations/rapid_selection/AF_0_25
+Rscript ../../plot_fst_delta_tajd.R
+cd /xdisk/mcnew/finches/dannyjackson/simulations/rapid_selection/AF_0_50
+Rscript ../../plot_fst_delta_tajd.R
+cd /xdisk/mcnew/finches/dannyjackson/simulations/rapid_selection/AF_0_75
+Rscript ../../plot_fst_delta_tajd.R
+cd /xdisk/mcnew/finches/dannyjackson/simulations/rapid_selection/AF_0_95
+Rscript ../../plot_fst_delta_tajd.R
+
+
+
+
+
+# Exploring all parameter space
+
+sbatch run_slim.sh -s 0.00 -r 0.85 -f 0.95 -m hudson -N 150000 -o 10 -L 500000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 cat /xdisk/mcnew/finches/dannyjackson/simulations/output/0.95/selection_0.00/replicate_1/recap_stats_run1.log | head -200
 
