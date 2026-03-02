@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=slim_sweep
-#SBATCH --output=/xdisk/mcnew/finches/dannyjackson/simulations/output/logs/%x_%j.out
-#SBATCH --error=/xdisk/mcnew/finches/dannyjackson/simulations/output/logs/%x_%j.err
+#SBATCH --output=/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/output/logs/%x_%j.out
+#SBATCH --error=/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/output/logs/%x_%j.err
 #SBATCH --time=48:00:00
 #SBATCH --cpus-per-task=2
 #SBATCH --account=mcnew
@@ -46,7 +46,7 @@ SEG_LEN="${SEG_LEN:-10000}"
 # Paths
 # ----------------------------
 SLIM_BIN="/xdisk/mcnew/dannyjackson/.local/share/mamba/envs/slim5/bin/slim"
-SLIM_SCRIPT="/xdisk/mcnew/finches/dannyjackson/simulations/all_parameter_space/simulation_replicates.all_parameter_space.slim"
+SLIM_SCRIPT="/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/simulation_replicates.power_analysis.slim"
 
 PY_SCRIPT="/xdisk/mcnew/finches/dannyjackson/simulations/all_parameter_space/recap_fst_tajd.all_parameter_space.py"
 PYTHON="/xdisk/mcnew/dannyjackson/.local/share/mamba/envs/recap_py/bin/python"
@@ -55,11 +55,11 @@ NE_TAG="Ne_${NE/000/}k"
 GEN_TAG="Gen_${OFFSET}"
 AF_TAG="AF_${F0//./_}"
 
-OUTBASE="/xdisk/mcnew/finches/dannyjackson/simulations/all_parameter_space/output/${NE_TAG}/${GEN_TAG}/${AF_TAG}"
+OUTBASE="/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/${NE_TAG}/${GEN_TAG}/"
 mkdir -p "${OUTBASE}/logs"
 
 # One combined TSV per (decline_rate, selection coeff) combo:
-STATS_TSV="${OUTBASE}/${DECLINE_RATE}/selection_${S}/summary_stats.tsv"
+STATS_TSV="${OUTBASE}/${DECLINE_RATE}.${S}.summary_stats.tsv"
 LOCKFILE="${STATS_TSV}.lock"
 mkdir -p "$(dirname "$STATS_TSV")"
 
@@ -122,8 +122,8 @@ for REP in $(seq 1 "$NREPS"); do
     --verbose \
     > "recap_stats_run${REP}.log" 2>&1
   echo "[PY] done."
-
-  rm -f "${TREES}" "simulation_run${REP}.recap.mut.trees"
 done
+
+find "${OUTBASE}/${DECLINE_RATE}/selection_${S}" -maxdepth 1 -type d -name "replicate_*" -print0 | xargs -0 rm -rf
 
 echo "ALL DONE (JOB=$SLURM_JOB_ID, NREPS=$NREPS)"
