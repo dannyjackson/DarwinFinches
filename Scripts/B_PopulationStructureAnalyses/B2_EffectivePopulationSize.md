@@ -170,7 +170,7 @@ df <- read.csv("thetas/crapre.thetas.idx.pestPG.autosomes", sep='\t')
 theta_per_site <- sum(df$tW) / sum(df$nSites)
 Ne <- theta_per_site / (4*2.04e-9)
 
-155855.2
+## 155,949
 
 
 
@@ -184,7 +184,6 @@ df <- read.csv("/xdisk/mcnew/finches/dannyjackson/finches/analyses/thetas/crapos
 tW_per_site <- sum(df$tW) / 946505819
 tW_per_site / (4 * 2.04e-9)
 ## 90,730.43
-## mean: 95354.65
 
 # for pre
 head -n 1 /xdisk/mcnew/finches/dannyjackson/finches/analyses/thetas/forpre/forpre.thetas.idx.pestPG > /xdisk/mcnew/finches/dannyjackson/finches/analyses/thetas/forpre/forpre.thetas.idx.pestPG.autosomes
@@ -236,3 +235,17 @@ tW_per_site / (4 * 2.04e-9)
 ## 178,145.6
 ## mean: 173715
 ## (169284.5 + 178145.6)/2
+
+
+# Results
+CRA
+Pre 155,949
+Post 90,730.43
+
+FOR
+Pre 206,862.1
+Post 212,173
+
+PAR
+Pre 169,284.5
+Post  173,715

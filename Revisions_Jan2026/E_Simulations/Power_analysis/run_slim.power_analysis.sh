@@ -2,7 +2,7 @@
 #SBATCH --job-name=slim_sweep
 #SBATCH --output=/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/output/logs/%x_%j.out
 #SBATCH --error=/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/output/logs/%x_%j.err
-#SBATCH --time=48:00:00
+#SBATCH --time=2:00:00
 #SBATCH --cpus-per-task=2
 #SBATCH --account=mcnew
 #SBATCH --partition=standard
@@ -59,7 +59,7 @@ OUTBASE="/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/${NE_TAG}/
 mkdir -p "${OUTBASE}/logs"
 
 # One combined TSV per (decline_rate, selection coeff) combo:
-STATS_TSV="${OUTBASE}/${DECLINE_RATE}.${S}.summary_stats.tsv"
+STATS_TSV="${OUTBASE}/d${DECLINE_RATE}_s${S}_af${F0}.summary_stats.tsv"
 LOCKFILE="${STATS_TSV}.lock"
 mkdir -p "$(dirname "$STATS_TSV")"
 
