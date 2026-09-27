@@ -52,7 +52,27 @@ done
 
 
 ## Plot the results
+```
 module load micromamba
 micromamba activate r_elgato
 
 Rscript plot.all_parameter_space.r
+```
+
+# Power analysis for GSEA
+```
+module load micromamba
+
+micromamba create -n r_puma -c conda-forge \
+  r-base \
+  r-readr \
+  r-dplyr \
+  r-stringr \
+  r-tidyr \
+  r-purrr \
+  r-ggplot2
+
+micromamba activate r_puma
+
+Rscript plot.power_analysis.gsea.R
+```

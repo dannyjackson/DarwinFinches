@@ -1,36 +1,48 @@
 # Modeling sensitivity of our sampling scheme and analytical approach
 
-cd /xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/
+cd /xdisk/mcnew/finches/dannyjackson/simulations/power_analysis_ttp
 
 ## Model neutral evolution
 ```
 # 10000 50000 100000
-F0=0.5
+
+F0=0.05
 S=0.0
 L=10000
 MODEL="hudson"
 
-
 NE_VALUES=(10000)
 DECLINES=(1.00)
-GEN_TIMES=(5 15 30)
+
+# Generations between t1 and t2
+GEN_TIMES_T1_T2=(15)
+
+# Generations between t2 and t3
+GEN_TIMES_T2_T3=(5)
 
 for NE in "${NE_VALUES[@]}"; do
   for D in "${DECLINES[@]}"; do
-    for G in "${GEN_TIMES[@]}"; do
+    for G12 in "${GEN_TIMES_T1_T2[@]}"; do
+      for G23 in "${GEN_TIMES_T2_T3[@]}"; do
 
-      echo "Submitting: Ne=${NE} decline=${D} gen_time=${G}"
+        # The SLiM script expects T3_OFFSET measured from T1,
+        # so convert the T2->T3 interval to cumulative T1->T3 time.
+        G13=$((G12 + G23))
 
-      sbatch run_slim.power_analysis.sh \
-        -s "${S}" \
-        -r "${D}" \
-        -f "${F0}" \
-        -m "${MODEL}" \
-        -N "${NE}" \
-        -o "${G}" \
-        -L "${L}" \
-        -n 9900
+        echo "Submitting: Ne=${NE} decline=${D} T1-T2=${G12} T2-T3=${G23} T1-T3=${G13}"
 
+        sbatch run_slim.power_analysis.ttp.sh \
+          -s "${S}" \
+          -r "${D}" \
+          -f "${F0}" \
+          -m "${MODEL}" \
+          -N "${NE}" \
+          -o "${G12}" \
+          -O "${G13}" \
+          -L "${L}" \
+          -n 9900
+
+      done
     done
   done
 done
@@ -43,31 +55,42 @@ F0S=(0.05 0.5)
 NES=(10000 50000 100000)
 SELS=(0.01 0.05 0.10 0.20 0.30 0.40 0.50)
 DECLINES=(1.00 0.80)
-GEN_TIMES=(5 15 30)
+
+# Generations between t1 and t2
+GEN_TIMES_T1_T2=(5 15 30)
+
+# Generations between t2 and t3
+GEN_TIMES_T2_T3=(5)
+
 LENS=(10000)
 
 for F0 in "${F0S[@]}"; do
   for NE in "${NES[@]}"; do
     for S in "${SELS[@]}"; do
       for D in "${DECLINES[@]}"; do
-        for G in "${GEN_TIMES[@]}"; do
-          for L in "${LENS[@]}"; do
+        for G12 in "${GEN_TIMES_T1_T2[@]}"; do
+          for G23 in "${GEN_TIMES_T2_T3[@]}"; do
+            for L in "${LENS[@]}"; do
 
-            echo "Submitting: f0=${F0} Ne=${NE} s=${S} decline=${D} gen=${G} L=${L}"
+              # T3_OFFSET is measured from T1
+              G13=$((G12 + G23))
 
-            sbatch run_slim.power_analysis.sh \
-              -s "${S}" \
-              -r "${D}" \
-              -f "${F0}" \
-              -m "${MODEL}" \
-              -N "${NE}" \
-              -o "${G}" \
-              -L "${L}" \
-              -n 100
+              echo "Submitting: f0=${F0} Ne=${NE} s=${S} decline=${D} T1-T2=${G12} T2-T3=${G23} T1-T3=${G13} L=${L}"
 
-            # Optional throttle to avoid scheduler spam
-            sleep 0.1
+              sbatch run_slim.power_analysis.sh \
+                -s "${S}" \
+                -r "${D}" \
+                -f "${F0}" \
+                -m "${MODEL}" \
+                -N "${NE}" \
+                -o "${G12}" \
+                -O "${G13}" \
+                -L "${L}" \
+                -n 100
 
+              sleep 0.1
+
+            done
           done
         done
       done
