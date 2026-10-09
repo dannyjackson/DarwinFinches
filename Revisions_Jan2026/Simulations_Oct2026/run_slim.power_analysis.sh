@@ -81,7 +81,20 @@ LOCKFILE="${STATS_TSV}.lock"
 
 # Temporary replicate dirs are unique to this parameter combination AND task,
 # so concurrent jobs (e.g. different f0) can never overwrite or delete each other's files.
-RUNBASE="${OUTBASE}/tmp/d${DECLINE_RATE}_s${S}_${AF_TAG}_task${TASK}_job${SLURM_JOB_ID:-local}"
+# Work on the compute node's local disk, not /xdisk: each replicate writes and
+# reads two ~15-30 MB tree files, and 100 tasks doing that on the shared
+# filesystem at once is the main slowdown. Only the one-line result row and the
+# trajectories are written to /xdisk.
+LOCAL_SCRATCH="${SLURM_TMPDIR:-${TMPDIR:-/tmp}}"
+RUNBASE="${LOCAL_SCRATCH}/${USER}/slim_d${DECLINE_RATE}_s${S}_${AF_TAG}_${NE_TAG}_${GEN_TAG}_task${TASK}_job${SLURM_JOB_ID:-local}"
+trap 'rm -rf "${RUNBASE}"' EXIT   # clean node-local disk even on timeout/failure
+
+# One thread per tool, matching --cpus-per-task=1
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+
+# Trajectories go straight to /xdisk (tiny), so they survive a timeout
+mkdir -p "${OUTBASE}/trajectories"
+TRAJ_FILE="${OUTBASE}/trajectories/d${DECLINE_RATE}_s${S}_af${F0}_task${TASK}.txt"
 
 # Seed base unique to the parameter combination (replicate ID is added below).
 # Kept < 2^32 including make_initial_state.py's per-attempt offsets.
@@ -105,7 +118,8 @@ for REP in $(seq "${REP_START}" "${REP_END}"); do
     mkdir -p "${OUTDIR}"
     cd "${OUTDIR}"
 
-    echo "---- REP=${REP} SEED=${SEED}"
+    echo "---- REP=${REP} SEED=${SEED} start=$(date +%T)"
+    t0=${SECONDS}
 
     # 1. Ancestry-aware starting population
     "${PYTHON}" "${PREP_PY}" \
@@ -114,6 +128,7 @@ for REP in $(seq "${REP_START}" "${REP_END}"); do
         --out_trees "init_run${REP}.trees" \
         --out_site  "site_run${REP}.txt" \
         > "init_run${REP}.log" 2>&1
+    t1=${SECONDS}
 
     # 2. Forward simulation
     "${SLIM_BIN}" \
@@ -128,6 +143,7 @@ for REP in $(seq "${REP_START}" "${REP_END}"); do
         -d "init_trees='init_run${REP}.trees'" \
         -d "site_file='site_run${REP}.txt'" \
         "${SLIM_SCRIPT}" > "run${REP}.log" 2>&1
+    t2=${SECONDS}
 
     for f in "simulation_run${REP}.trees" "sample_t1_run${REP}.ids.txt" "sample_t2_run${REP}.ids.txt"; do
         [[ -s "$f" ]] || { echo "ERROR: missing $f in ${OUTDIR}"; tail -20 "run${REP}.log"; exit 2; }
@@ -144,6 +160,7 @@ for REP in $(seq "${REP_START}" "${REP_END}"); do
         --rep "${REP}" --sel_s "${S}" --decline_rate "${DECLINE_RATE}" --f0 "${F0}" \
         --tsv_out "row.tsv" \
         > "stats_run${REP}.log" 2>&1
+    t3=${SECONDS}
 
     (
         flock -x 9
@@ -153,17 +170,15 @@ for REP in $(seq "${REP_START}" "${REP_END}"); do
             tail -n +2 row.tsv >> "${STATS_TSV}"
         fi
     ) 9> "${LOCKFILE}"
+    t4=${SECONDS}
+    echo "     timing_s init=$((t1-t0)) slim=$((t2-t1)) stats=$((t3-t2)) append=$((t4-t3)) $(grep -c '^attempt' "init_run${REP}.log") msprime attempt(s)"
 
     # Keep the selected-allele trajectory, drop the large files
-    grep "selected" "run${REP}.log" | sed "s/^/rep${REP}\t/" >> "${RUNBASE}/trajectories.txt" || true
+    grep "selected" "run${REP}.log" | sed "s/^/rep${REP}\t/" >> "${TRAJ_FILE}" || true
     cd "${RUNBASE}"
     rm -rf "${OUTDIR}"
 done
 
-# Keep this task's trajectories next to the stats, then remove only this task's temp dir
-mkdir -p "${OUTBASE}/trajectories"
-mv "${RUNBASE}/trajectories.txt" \
-   "${OUTBASE}/trajectories/d${DECLINE_RATE}_s${S}_af${F0}_task${TASK}.txt" 2>/dev/null || true
 rm -rf "${RUNBASE}"
 
 echo "ALL DONE (JOB=${SLURM_JOB_ID:-local}, TASK=${TASK})"
