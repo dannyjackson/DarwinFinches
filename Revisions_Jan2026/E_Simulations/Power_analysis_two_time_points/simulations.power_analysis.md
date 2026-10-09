@@ -171,7 +171,7 @@ for(i in seq_len(nrow(combos))){
 
 ## Model neutral evolution
 ```
-cd /xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/10_gene_term
+cd /xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/
 
 F0=0.5
 S=0.0

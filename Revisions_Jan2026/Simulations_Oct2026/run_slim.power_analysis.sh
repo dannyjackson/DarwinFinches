@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=slim_sweep
-#SBATCH --output=/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/output/logs/%x_%A_%a.out
-#SBATCH --error=/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis/output/logs/%x_%A_%a.err
+#SBATCH --output=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/output/logs/%x_%A_%a.out
+#SBATCH --error=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/output/logs/%x_%A_%a.err
 #SBATCH --time=12:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --account=mcnew
@@ -60,11 +60,12 @@ REP_END=$(( TASK * NREPS ))
 # ----------------------------
 # Paths
 # ----------------------------
-SIMDIR="/xdisk/mcnew/finches/dannyjackson/simulations/power_analysis"
+SIMDIR="/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis"
+SCRIPTDIR="${SIMDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/"
 SLIM_BIN="/xdisk/mcnew/dannyjackson/.local/share/mamba/envs/slim5/bin/slim"
-SLIM_SCRIPT="${SIMDIR}/simulation_replicates.power_analysis.slim"
-PREP_PY="${SIMDIR}/make_initial_state.py"
-STATS_PY="${SIMDIR}/compute_stats.power_analysis.py"
+SLIM_SCRIPT="${SCRIPTDIR}/simulation_replicates.power_analysis.slim"
+PREP_PY="${SCRIPTDIR}/make_initial_state.py"
+STATS_PY="${SCRIPTDIR}/compute_stats.power_analysis.py"
 PYTHON="/xdisk/mcnew/dannyjackson/.local/share/mamba/envs/recap_py/bin/python"
 
 NE_TAG="Ne_${NE/000/}k"
