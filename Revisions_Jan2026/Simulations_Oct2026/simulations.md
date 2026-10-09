@@ -58,7 +58,7 @@ for F0 in "${F0S[@]}"; do
 
             echo "Submitting: f0=${F0} Ne=${NE} s=${S} decline=${D} gen=${G} L=${L}"
 
-            sbatch run_slim.power_analysis.short.sh \
+            sbatch ${SCRIPTDIR}/run_slim.power_analysis.short.sh \
               -s "${S}" \
               -r "${D}" \
               -f "${F0}" \
