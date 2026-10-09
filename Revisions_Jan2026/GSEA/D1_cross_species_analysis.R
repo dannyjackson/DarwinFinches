@@ -166,7 +166,7 @@ p_mean <- ggplot(
 ggsave(
     "gsea/fst.cross_species.mean_NES.pdf",
     p_mean,
-    width = 10,
+    width = 7,
     height = 8
 )
 

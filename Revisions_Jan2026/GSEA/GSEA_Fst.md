@@ -395,3 +395,112 @@ Rscript Scripts/D1_run_fgsea.R \
     gsea/par.fst \
     pos
 ```
+# Identify gene counts within each outlier GO term
+```
+library(data.table)
+
+go <- fread("gene_sets/go_terms.tsv")
+
+go_counts <- go[
+    ,
+    .(
+        n_genes = uniqueN(gene_id)
+    ),
+    by = .(term_id)
+]
+
+go_counts <- go_counts[
+    order(-n_genes)
+]
+
+head(go_counts)
+
+# Adaptive immune response: 13
+go[
+    term_id == "GO:0002250",
+    uniqueN(gene_id)
+]
+
+# calcium ion import (GO:0070509): 13 
+go[term_id == "GO:0070509", uniqueN(gene_id)]
+
+# protein localization to nucleolus (GO:1902570): 10
+go[term_id == "GO:1902570", uniqueN(gene_id)]
+
+# chromosome organization (GO:0051276): 12
+go[term_id == "GO:0051276", uniqueN(gene_id)]
+
+# DNA recombination (GO:0006310): 23
+go[term_id == "GO:0006310", uniqueN(gene_id)]
+
+# negative regulation of G protein−coupled receptor signaling pathway (GO:0045744): 13
+go[term_id == "GO:0045744", uniqueN(gene_id)]
+
+# response to UV (GO:0009411): 12
+go[term_id == "GO:0009411", uniqueN(gene_id)]
+
+# smoothened signaling pathway (GO:0007224): 33
+go[term_id == "GO:0007224", uniqueN(gene_id)]
+
+# non−canonical Wnt signaling pathway (GO:0035567): 19
+go[term_id == "GO:0035567", uniqueN(gene_id)]
+
+# DNA metabolic process (GO:0006259): 19
+go[term_id == "GO:0006259", uniqueN(gene_id)]
+
+# vesicle fusion (GO:0006906): 15
+go[term_id == "GO:0006906", uniqueN(gene_id)]
+
+# RNA catabolic process (GO:0006401): 15
+go[term_id == "GO:0006401", uniqueN(gene_id)]
+
+# positive regulation of Wnt signaling pathway (GO:0030177): 24
+go[term_id == "GO:0030177", uniqueN(gene_id)]
+
+# protein secretion (GO:0009306): 14
+go[term_id == "GO:0009306", uniqueN(gene_id)]
+
+# attachment of mitotic spindle microtubules to kinetochore (GO:0051315): 10
+go[term_id == "GO:0051315", uniqueN(gene_id)]
+
+# regulation of DNA repair (GO:0006282): 11
+go[term_id == "GO:0006282", uniqueN(gene_id)]
+
+# regulation of ARF protein signal transduction (GO:0032012): 13
+go[term_id == "GO:0032012", uniqueN(gene_id)]
+
+# mitotic cell cycle (GO:0000278): 62
+go[term_id == "GO:0000278", uniqueN(gene_id)]
+
+# oogenesis (GO:0048477): 10
+go[term_id == "GO:0048477", uniqueN(gene_id)]
+
+# positive regulation of osteoclast differentiation (GO:0045672): 13
+go[term_id == "GO:0045672", uniqueN(gene_id)]
+
+# blood coagulation (GO:0007596): 25
+go[term_id == "GO:0007596", uniqueN(gene_id)]
+
+# sister chromatid cohesion (GO:0007062): 11
+go[term_id == "GO:0007062", uniqueN(gene_id)]
+
+# intraciliary retrograde transport (GO:0035721): 12
+go[term_id == "GO:0035721", uniqueN(gene_id)]
+
+# positive regulation of non−canonical NF−kappaB signal transduction (GO:1901224): 11
+go[term_id == "GO:1901224", uniqueN(gene_id)]
+
+# negative regulation of fibroblast growth factor receptor signaling pathway (GO:0040037): 10
+go[term_id == "GO:0040037", uniqueN(gene_id)]
+
+
+```
+Rscript goterm_heatmap.R GO:0002250
+Rscript goterm_heatmap.R GO:0040037
+Rscript goterm_heatmap.R GO:1901224
+Rscript goterm_heatmap.R GO:0035721
+Rscript goterm_heatmap.R GO:0007062
+Rscript goterm_heatmap.R GO:0007596
+Rscript goterm_heatmap.R GO:0045672
+Rscript goterm_heatmap.R GO:0048477
+
