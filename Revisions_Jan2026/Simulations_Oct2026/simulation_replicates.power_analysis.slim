@@ -1,0 +1,158 @@
+// ============================================================
+// SLiM 5 WF sweep from STANDING VARIATION with realistic ancestry
+//
+// The starting population is built by make_initial_state.py:
+//   - msprime simulates the full genealogy of all Ne diploids and overlays
+//     neutral mutations (these load into SLiM as type m0, s = 0)
+//   - it picks an existing biallelic variant at frequency ~f0 and writes
+//     its position to SITE_FILE
+//
+// This script:
+//   1 late():  load the population; sample 8 diploids (T1); convert the
+//              chosen variant to type m2 with s = SEL_S (s = 0 for neutral runs,
+//              so neutral and selected runs are treated identically)
+//   ticks 2 .. 1+OFFSET: per-generation decline (DECLINE_RATE) and selection
+//   1+OFFSET late(): sample 8 diploids (T2), write .trees, finish
+//
+// Because the selected allele is a real variant from the genealogy, its
+// carriers form a clade and it starts in LD with its neighbours, so
+// hitchhiking acts on linked neutral variation.
+//
+// No recapitation is needed downstream: the loaded genealogy is complete.
+//
+// Required -d parameters:
+//   run_id, seed, sel_s, decline_rate, f0, Ne, L, T2_OFFSET,
+//   init_trees (path from make_initial_state.py --out_trees),
+//   site_file  (path from make_initial_state.py --out_site)
+//
+// Example:
+//   slim -d run_id=1 -d seed=100 -d sel_s=0.1 -d decline_rate=1.0 -d f0=0.05 \
+//        -d Ne=100000 -d L=10000 -d T2_OFFSET=5 \
+//        -d "init_trees='init_run1.trees'" -d "site_file='site_run1.txt'" \
+//        simulation_replicates.power_analysis.slim
+// ============================================================
+
+initialize() {
+    for (p in c("run_id", "seed", "sel_s", "decline_rate", "f0", "Ne", "L",
+                "T2_OFFSET", "init_trees", "site_file"))
+        if (!exists(p))
+            stop("ERROR: -d " + p + "=... must be supplied");
+
+    defineConstant("RUN_ID",       asInteger(run_id));
+    defineConstant("NE",           asInteger(Ne));
+    defineConstant("SEG_LEN",      asInteger(L));
+    defineConstant("OFFSET",       asInteger(T2_OFFSET));
+    defineConstant("SEL_S",        asFloat(sel_s));
+    defineConstant("DECLINE_RATE", asFloat(decline_rate));
+    defineConstant("F0",           asFloat(f0));
+    defineConstant("INIT_TREES",   init_trees);
+    defineConstant("SITE_FILE",    site_file);
+    setSeed(asInteger(seed));
+
+    defineConstant("R",        1.0e-8);
+    defineConstant("MU",       0.0);   // neutral variation comes from msprime
+    defineConstant("T1",       1);     // tick at which the population is loaded and sampled
+    defineConstant("T2",       T1 + OFFSET);
+    defineConstant("MIN_N",    50);
+    defineConstant("DOM_H",    1.0);
+    defineConstant("SAMPLE_N", 8);
+
+    // Read the chosen site written by make_initial_state.py
+    site_fields = strsplit(readFile(SITE_FILE)[0], "\t");
+    defineConstant("SEL_POS",  asInteger(site_fields[0]));
+
+    defineConstant("SAMPLE_IDS_T1", "sample_t1_run" + RUN_ID + ".ids.txt");
+    defineConstant("SAMPLE_IDS_T2", "sample_t2_run" + RUN_ID + ".ids.txt");
+    defineConstant("TREES_OUT",     "simulation_run" + RUN_ID + ".trees");
+
+    initializeSLiMModelType("WF");
+    initializeSLiMOptions(keepPedigrees=T);
+    initializeTreeSeq();
+
+    initializeMutationRate(MU);
+    initializeRecombinationRate(R);
+
+    // m0 = neutral variants loaded from msprime (pyslim assigns type 0)
+    // m2 = the chosen standing variant once selection starts
+    initializeMutationType("m0", 0.5,   "f", 0.0);
+    initializeMutationType("m2", DOM_H, "f", 0.0);
+    m2.convertToSubstitution = F;   // keep it visible in the tree sequence if it fixes
+
+    initializeGenomicElementType("g1", m0, 1.0);
+    initializeGenomicElement(g1, 0, SEG_LEN - 1);
+
+    defineGlobal("SELECTED_MUT", NULL);
+}
+
+
+function (void) writePedigreeIDs(string path, object<Individual> inds) {
+    writeFile(path, paste(asString(inds.pedigreeID), sep="\n"), append=F);
+}
+
+
+// ------------------------------------------------------------
+// T1: load population, sample, start selection on the chosen variant
+// ------------------------------------------------------------
+T1 late() {
+    sim.readFromPopulationFile(INIT_TREES);
+    pop = sim.subpopulations[0];
+    if (pop.individualCount != NE)
+        stop("ERROR: loaded " + pop.individualCount + " individuals, expected Ne=" + NE);
+
+    inds_t1 = pop.sampleIndividuals(SAMPLE_N);
+    sim.treeSeqRememberIndividuals(inds_t1);
+    writePedigreeIDs(SAMPLE_IDS_T1, inds_t1);
+
+    muts = sim.mutations[sim.mutations.position == SEL_POS];
+    if (size(muts) != 1)
+        stop("ERROR: expected exactly one mutation at position " + SEL_POS +
+             ", found " + size(muts));
+
+    muts.setMutationType(m2);
+    muts.setSelectionCoeff(SEL_S);
+    defineGlobal("SELECTED_MUT", muts);   // defineGlobal: plain assignment would be local
+
+    catn("RUN " + RUN_ID + ": selected standing variant at pos " + SEL_POS +
+         " targetF0=" + F0 + " realizedF0=" + sim.mutationFrequencies(pop, SELECTED_MUT) +
+         " s=" + SEL_S + " h=" + DOM_H);
+}
+
+
+// ------------------------------------------------------------
+// Population decline (one step per generation, T1+1 .. T2)
+// ------------------------------------------------------------
+(T1 + 1):T2 early() {
+    pop = sim.subpopulations[0];
+    newN = asInteger(round(pop.individualCount * DECLINE_RATE));
+    if (newN < MIN_N) newN = MIN_N;
+    pop.setSubpopulationSize(newN);
+}
+
+
+// ------------------------------------------------------------
+// Track the selected allele each generation
+// ------------------------------------------------------------
+(T1 + 1):T2 late() {
+    pop = sim.subpopulations[0];
+    // A lost allele is removed from sim.mutations; a fixed one stays (convertToSubstitution = F)
+    f = any(sim.mutations == SELECTED_MUT) ? sim.mutationFrequencies(pop, SELECTED_MUT) else 0.0;
+    catn("RUN " + RUN_ID + ": tick " + community.tick + " N=" + pop.individualCount +
+         " selected freq=" + f);
+}
+
+
+// ------------------------------------------------------------
+// T2: sample, write trees, finish
+// ------------------------------------------------------------
+T2 late() {
+    pop = sim.subpopulations[0];
+    inds_t2 = pop.sampleIndividuals(SAMPLE_N);
+    sim.treeSeqRememberIndividuals(inds_t2);
+    writePedigreeIDs(SAMPLE_IDS_T2, inds_t2);
+
+    f = any(sim.mutations == SELECTED_MUT) ? sim.mutationFrequencies(pop, SELECTED_MUT) else 0.0;
+    catn("RUN " + RUN_ID + ": selected freq at t2=" + f + " s=" + SEL_S);
+
+    sim.treeSeqOutput(TREES_OUT);
+    sim.simulationFinished();
+}
