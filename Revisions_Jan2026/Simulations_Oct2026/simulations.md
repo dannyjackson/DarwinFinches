@@ -3,8 +3,10 @@
 ## Set up working environment
 ```
 PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/
-cd $PROJDIR
 SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/
+cd $SCRIPTDIR 
+git pull
+cd $PROJDIR
 mkdir -p /xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/output/logs
 ```
 ## Model neutral evolution
