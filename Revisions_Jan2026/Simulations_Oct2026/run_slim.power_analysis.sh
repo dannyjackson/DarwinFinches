@@ -8,7 +8,16 @@
 #SBATCH --partition=standard
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --mem=8G
+#SBATCH --mem=4G
+#
+# Measured peak memory per replicate: ~0.7 GB at Ne=200k (SLiM step).
+# Measured time per replicate on local disk: ~12 s (Ne=50k), ~30 s (100k),
+# ~50 s (200k), plus ~40 s per extra msprime attempt at 200k. With -n 100,
+# a task takes ~0.5 h (50k) to ~3 h (200k), well inside 12 h.
+#
+# RESUMABLE: replicates already in the summary TSV are skipped. If tasks time
+# out or fail, resubmit the SAME --array indices with the SAME flags; they
+# continue where they stopped and never duplicate a replicate.
 #
 # One parameter combination per submission. Replicates per task = -n.
 # Submit as an array to spread replicates over many tasks, e.g.
@@ -109,10 +118,20 @@ echo "S=${S} DECLINE_RATE=${DECLINE_RATE} F0=${F0} NE=${NE} OFFSET=${OFFSET} L=$
 echo "PARAM_KEY=${PARAM_KEY} SEED_BASE=${SEED_BASE}"
 echo "STATS_TSV=${STATS_TSV}"
 
+# Replicates already finished for this condition (column 1 of the TSV)
+declare -A DONE=()
+if [[ -s "${STATS_TSV}" ]]; then
+    while read -r r; do DONE["$r"]=1; done < <(awk -F'\t' 'NR>1{print $1}' "${STATS_TSV}")
+fi
+N_SKIP=0
+for REP in $(seq "${REP_START}" "${REP_END}"); do [[ -n "${DONE[$REP]:-}" ]] && N_SKIP=$((N_SKIP+1)); done
+echo "Already done in this task's range: ${N_SKIP} of $((REP_END-REP_START+1))"
+
 TOL_ARG=()
 [[ -n "${TOL}" ]] && TOL_ARG=(--tol "${TOL}")
 
 for REP in $(seq "${REP_START}" "${REP_END}"); do
+    if [[ -n "${DONE[$REP]:-}" ]]; then continue; fi
     SEED=$(( SEED_BASE + REP ))
     OUTDIR="${RUNBASE}/replicate_${REP}"
     mkdir -p "${OUTDIR}"

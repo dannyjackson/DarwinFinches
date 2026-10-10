@@ -47,7 +47,9 @@ for NE in "${NE_VALUES[@]}"; do
 done
 
 # topup neutral
-sbatch ${SCRIPTDIR}/topup_neutral.sh
+DRYRUN=1 bash ${SCRIPTDIR}/topup_neutral.sh   # preview: prints the sbatch line only
+
+bash ${SCRIPTDIR}/topup_neutral.sh
 
 ```
 ## Model positive selection
