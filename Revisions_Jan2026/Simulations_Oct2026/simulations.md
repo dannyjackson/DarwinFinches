@@ -46,6 +46,9 @@ for NE in "${NE_VALUES[@]}"; do
   done
 done
 
+# topup neutral
+sbatch ${SCRIPTDIR}/topup_neutral.sh
+
 ```
 ## Model positive selection
 ```
@@ -92,3 +95,6 @@ for F0 in "${F0S[@]}"; do
   done
 done 
 ```
+
+
+Rscript ${SCRIPTDIR}/plot.power_analysis.gsea.R
