@@ -26,6 +26,46 @@ NE_VALUES=(50000)
 DECLINES=(1.00)
 GEN_TIMES=(10)
 
+# second run
+# jobs:
+    # Ne=100000
+        ## d1.00
+            ### gen_time=5 : 24195962
+            ### gen_time=10 : 24195963
+        ## d0.8
+            ### gen_time=5 : 24195964
+            ### gen_time=10 : 24195965
+    # Ne=200000 
+        ## decline=1.00 
+            ### gen_time=5 : 24195966
+            ### gen_time=10 : 24195967
+        ## decline=0.8
+            ### gen_time=5 : error: QOSMaxSubmitJobPerUserLimit
+            ### gen_time=10 :  error: QOSMaxSubmitJobPerUserLimit
+
+F0=0.5
+S=0.0
+L=10000
+NE_VALUES=(100000 200000)
+DECLINES=(1.00 0.8)
+GEN_TIMES=(5 10)
+
+# third run -- jobs: (d1.00) 24195762 (d0.8) 24195763 
+F0=0.5
+S=0.0
+L=10000
+NE_VALUES=(50000)
+DECLINES=(1.00 0.8)
+GEN_TIMES=(5)
+
+# fourth run -- job: 24195662
+F0=0.5
+S=0.0
+L=10000
+NE_VALUES=(50000)
+DECLINES=(0.8)
+GEN_TIMES=(10)
+
 for NE in "${NE_VALUES[@]}"; do
   for D in "${DECLINES[@]}"; do
     for G in "${GEN_TIMES[@]}"; do
@@ -57,7 +97,7 @@ bash ${SCRIPTDIR}/topup_neutral.sh
 F0S=(0.05 0.10 0.25 0.5)
 NES=(50000 100000 200000)
 SELS=(0.01 0.05 0.10 0.2 0.25)
-DECLINES=(1.00 0.80)
+DECLINES=(1.00 0.8)
 GEN_TIMES=(5 10)
 LENS=(10000)
 
