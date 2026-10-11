@@ -2,7 +2,7 @@
 #SBATCH --job-name=slim_sweep
 #SBATCH --output=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/output/logs/%x_%A_%a.out
 #SBATCH --error=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/output/logs/%x_%A_%a.err
-#SBATCH --time=12:00:00
+#SBATCH --time=24:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --account=mcnew
 #SBATCH --partition=standard
