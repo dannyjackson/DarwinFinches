@@ -160,7 +160,7 @@ p <- ggplot(d, aes(X_selected, .data[[metric]], colour = s, group = s)) +
        title = "Power to detect a selected pathway",
        subtitle = sprintf("Ne = %s, no decline; dashed line = expectation for an all-neutral pathway",
                           base_Ne)) +
-  theme_minimal(base_size = 12) +
+  theme_minimal(base_size = 20) +
   theme(panel.grid.minor = element_blank(),
         panel.grid.major = element_line(colour = "#e6e5e0", linewidth = 0.3),
         strip.text = element_text(face = "bold", colour = "#3d3d3a"),
