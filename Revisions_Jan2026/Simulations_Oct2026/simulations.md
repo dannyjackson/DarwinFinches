@@ -53,6 +53,8 @@ bash ${SCRIPTDIR}/topup_neutral.sh
 ```
 NES=(50000 100000 200000)
 SELS=(0.01 0.02 0.05 0.1 0.2 0.5)    # 1-2-5 series
+SELS=(0.3 0.4)    # 1-2-5 series
+
 F0S=(0.05 0.1 0.2 0.4 0.6)               # doubling
 DECLINES=(1.00 0.8)
 GEN_TIMES=(5 10)
@@ -86,10 +88,13 @@ for F0 in "${F0S[@]}"; do
     done
   done
 done 
+
+
+bash ${SCRIPTDIR}/topup_selected.sh
+
 ```
 
 ## Model GSEA 
-bash ${SCRIPTDIR}/topup_selected.sh
 
 Rscript ${SCRIPTDIR}/plot.power_analysis.gsea.R
 
@@ -116,9 +121,17 @@ module load R
 
 Rscript ${SCRIPTDIR}/D1_RankPower.top5.test.R
 ```
-# Modify plots
+### Modify plots
 ```
 Rscript ${SCRIPTDIR}/plot_power_curves.R
 ```
+## Model outlier analysis
+```
+PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/
+SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/
+cd $PROJDIR
 
-Rscript ${SCRIPTDIR}/outlier_power_curves.r
+module load R
+
+Rscript ${SCRIPTDIR}/outlier_power_curves.R
+```
