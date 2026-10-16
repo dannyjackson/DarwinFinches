@@ -1,4 +1,4 @@
-# GSEA Simulations
+# Simulations
 
 ## Set up working environment
 ```
@@ -88,7 +88,7 @@ for F0 in "${F0S[@]}"; do
 done 
 ```
 
-
+## Model GSEA 
 bash ${SCRIPTDIR}/topup_selected.sh
 
 Rscript ${SCRIPTDIR}/plot.power_analysis.gsea.R
@@ -120,3 +120,5 @@ Rscript ${SCRIPTDIR}/D1_RankPower.top5.test.R
 ```
 Rscript ${SCRIPTDIR}/plot_power_curves.R
 ```
+
+Rscript ${SCRIPTDIR}/outlier_power_curves.r
