@@ -40,7 +40,7 @@ QOS_LIMIT_DEFAULT=1000
 SAFETY=10                 # leave a little headroom under the limit
 
 NES=(50000 100000 200000)
-SELS=(0.01 0.02 0.05 0.1 0.2 0.5)
+SELS=(0.01 0.02 0.05 0.1 0.2 0.3 0.4 0.5)
 F0S=(0.05 0.1 0.2 0.4 0.6)
 DECLINES=(1.00 0.8)        # same spelling as the original submissions
 GEN_TIMES=(5 10)
