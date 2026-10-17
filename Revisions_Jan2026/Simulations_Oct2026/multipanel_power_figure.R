@@ -2,10 +2,10 @@
 # ============================================================
 # Publication figure: power of four approaches (2 x 2 grid)
 #
-#                 gene level (outliers)          pathway level (GSEA)
-#   one species   A  single-species outliers     B  single-species GSEA
-#   three species C  three-species overlap       D  cross-species GSEA
-#                                                   (blood coagulation)
+#                     one species                   three species (parallel)
+#   outliers (top)    A  single-species outliers    B  three-species overlap
+#   GSEA (bottom)     C  single-species GSEA        D  cross-species GSEA
+#                                                      (blood coagulation)
 #
 # Every panel: x = selection coefficient (log), y = power, one line per
 # starting frequency f0, dashed line = expectation with no selection.
@@ -16,8 +16,8 @@
 #
 # Inputs (paths below):
 #   A  output/fst_outlier_power.nnull9900.nsel100.tsv
-#   B  output/fst_rank_by_selected_windows.nnull10000.tsv
-#   C  output/parallel_overlap.permutations.tsv
+#   B  output/parallel_overlap.permutations.tsv
+#   C  output/fst_rank_by_selected_windows.nnull10000.tsv
 #   D  gsea_empirical_power/summary.tsv
 #
 # Writes: output/figure_power_summary/power_summary.Gen_<g>.png / .pdf
@@ -40,13 +40,13 @@ out_dir <- "output/figure_power_summary"
 base_Ne      <- "100k"
 base_decline <- 1
 
-# GSEA threshold: "5" (top 5%) or "1" (top 1%) for panels B and D
+# GSEA threshold: "5" (top 5%) or "1" (top 1%) for panels C and D
 gsea_top <- "5"
 
-# Panel B: number of selected windows in the 10-window pathway
+# Panel C: number of selected windows in the 10-window pathway
 gsea1_X <- 10
 
-# Panel C: "recall" = share of the 30 parallel genes found in all three top lists
+# Panel B: "recall" = share of the 30 parallel genes found in all three top lists
 #          "any"    = P(at least one parallel gene found in all three top lists)
 overlap_metric <- "recall"
 overlap_n_parallel <- 30
@@ -71,10 +71,10 @@ base_filter <- function(d) {
 }
 
 panel_lab <- c(
-  A = "A  One species: outlier windows",
-  B = "B  One species: pathway enrichment",
-  C = "C  Three species: outlier overlap",
-  D = "D  Three species: pathway enrichment (blood coagulation)"
+  A = "A  Outliers: one species",
+  B = "B  Outliers: parallel across three species",
+  C = "C  Pathway enrichment: one species",
+  D = "D  Pathway enrichment: parallel across three species (blood coagulation)"
 )
 
 # ---------------- A: single-species outliers ----------------
@@ -82,22 +82,22 @@ A <- read.delim(file_outlier) %>% norm_keys("af") %>% base_filter() %>%
   transmute(panel = "A", Gen, sel_s, f0, power = mean_power)
 null_A <- 0.01
 
-# ---------------- B: single-species GSEA ----------------
-col_B <- paste0("prop_top_", gsea_top, "pct")
-B <- read.delim(file_gsea1) %>% norm_keys("af") %>% base_filter() %>%
-  filter(X_selected == gsea1_X) %>%
-  transmute(panel = "B", Gen, sel_s, f0, power = .data[[col_B]])
-null_B <- as.numeric(gsea_top) / 100
-
-# ---------------- C: three-species overlap ----------------
-C <- read.delim(file_overlap) %>% norm_keys("af") %>% base_filter() %>%
+# ---------------- B: three-species overlap ----------------
+B <- read.delim(file_overlap) %>% norm_keys("af") %>% base_filter() %>%
   filter(n_parallel == overlap_n_parallel) %>%
   group_by(Gen, sel_s, f0) %>%
   summarise(power = if (overlap_metric == "recall") mean(parallel_in_all_tops)
                     else mean(overlap3_parallel > 0),
             .groups = "drop") %>%
-  mutate(panel = "C")
-null_C <- 0   # chance of a gene in all three top-1% lists: 0.01^3
+  mutate(panel = "B")
+null_B <- 0   # chance of a gene in all three top-1% lists: 0.01^3
+
+# ---------------- C: single-species GSEA ----------------
+col_C <- paste0("prop_top_", gsea_top, "pct")
+C <- read.delim(file_gsea1) %>% norm_keys("af") %>% base_filter() %>%
+  filter(X_selected == gsea1_X) %>%
+  transmute(panel = "C", Gen, sel_s, f0, power = .data[[col_C]])
+null_C <- as.numeric(gsea_top) / 100
 
 # ---------------- D: cross-species GSEA, blood coagulation ----------------
 col_D <- paste0("power_cross_top", gsea_top)
@@ -139,10 +139,10 @@ defs <- tibble(
   panel = c("A", "B", "C", "D"),
   def = c(
     "Share of selected windows in the top 1% (100 of 10,000)",
-    sprintf("P(pathway with %d/10 selected windows ranks in top %s%%)", gsea1_X, gsea_top),
     if (overlap_metric == "recall")
       sprintf("Share of %d parallel genes in all three top-1%% lists", overlap_n_parallel)
     else sprintf("P(>=1 of %d parallel genes in all three top-1%% lists)", overlap_n_parallel),
+    sprintf("P(pathway with %d/10 selected windows ranks in top %s%%)", gsea1_X, gsea_top),
     sprintf("P(blood coagulation ranks in top %s%% by mean NES)", gsea_top)
   )
 ) %>% mutate(panel_label = factor(panel_lab[panel], levels = panel_lab))

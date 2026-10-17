@@ -139,3 +139,6 @@ Rscript ${SCRIPTDIR}/outlier_power_curves.R
 Rscript ${SCRIPTDIR}/plot_false_positive_curves.R
 Rscript ${SCRIPTDIR}/plot_ppv_curves.R
 ```
+## Generate multipanel plot of all analyses
+```
+Rscript ${SCRIPTDIR}/multipanel_power_figure.R
