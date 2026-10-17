@@ -184,3 +184,8 @@ Outputs in `gsea_empirical_power/`:
   - `prop_positive_all3`: proportion with NES > 0 in all three species
   - `power_sig_<SP>`, `median_pct_<SP>`: per-species results
 - `plots/<metric>.Gen_<g>.png`: power curves (x = s, facets = f0); dashed line = the s = 0 control
+
+# Power of the empirical outlier test to detect parallel selection on individual genes
+```
+Rscript ${SCRIPTDIR}/parallel_outlier_overlap.R
+```

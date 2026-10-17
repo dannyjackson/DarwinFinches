@@ -243,17 +243,52 @@ if (nrow(perm_results) == 0) stop("No conditions could be analysed.")
 
 pooled <- function(num, den) ifelse(sum(den) > 0, sum(num) / sum(den), NA_real_)
 
+# False positive = a gene in the overlap that is NOT selected in all three species.
+# Two kinds: neutral in every species, or selected in only one species
+# (species-specific). Counts per permutation:
+perm_results <- perm_results %>%
+  mutate(
+    overlap3_false           = overlap3_n - overlap3_parallel,
+    overlap3_specific        = overlap3_selected - overlap3_parallel,
+    overlap2_false           = overlap2_n - overlap2_parallel,
+    overlap2_specific        = overlap2_selected - overlap2_parallel,
+    all_parallel_found3      = n_parallel > 0 & overlap3_parallel == n_parallel
+  )
+
 results <- perm_results %>%
   group_by(Ne, Gen, decline, sel_s, af, n_parallel) %>%
   summarise(
     n_permutations         = n(),
+
+    # ---- 1. True positives (parallel genes found in all three top lists) ----
+    recall3                = mean(parallel_in_all_tops),          # mean share of parallel genes found
+    prob_all_parallel3     = mean(all_parallel_found3),           # P(every parallel gene found)
+    prob_any_parallel3     = mean(overlap3_parallel > 0),         # P(at least one found)
+
+    # ---- 2. False positives in the 3-way overlap ----
+    prob_any_false3        = mean(overlap3_false > 0),            # P(at least one false positive)
+    mean_false3            = mean(overlap3_false),                # mean number of false positives
+    mean_false3_neutral    = mean(overlap3_neutral),              #   ...neutral in all species
+    mean_false3_specific   = mean(overlap3_specific),             #   ...selected in one species only
+    fdr3                   = pooled(overlap3_false, overlap3_n),  # false share of the overlap
+
+    # ---- Totals ----
+    prob_overlap3_empty    = mean(overlap3_n == 0),
+    mean_overlap3_total    = mean(overlap3_n),
+
+    # ---- Same for genes in the top list of at least two species ----
+    prob_any_false2        = mean(overlap2_false > 0),
+    mean_false2            = mean(overlap2_false),
+    fdr2                   = pooled(overlap2_false, overlap2_n),
+    mean_overlap2_total    = mean(overlap2_n),
+
+    # ---- Kept from the first version ----
     mean_overlap3          = mean(overlap3_n),
     mean_overlap3_parallel = mean(overlap3_parallel),
     mean_overlap3_neutral  = mean(overlap3_neutral),
     prob_overlap3_nonempty = mean(overlap3_n > 0),
     precision3_parallel    = pooled(overlap3_parallel, overlap3_n),
     precision3_selected    = pooled(overlap3_selected, overlap3_n),
-    recall3                = mean(parallel_in_all_tops),
     mean_overlap2          = mean(overlap2_n),
     precision2_parallel    = pooled(overlap2_parallel, overlap2_n),
     precision2_selected    = pooled(overlap2_selected, overlap2_n),
@@ -294,11 +329,17 @@ s_vals <- sort(unique(res$sel_s))
 gens   <- sort(unique(res$Gen))
 
 metrics <- tibble::tribble(
-  ~column,               ~tag,           ~label,                                                    ~ymax,
-  "precision3_parallel", "precision3",   "Share of 3-way overlap that is parallel selected",        1,
-  "recall3",             "recall3",      "Share of parallel genes in all three top lists",          1,
-  "mean_overlap3",       "overlap3_n",   "Genes in all three top-100 lists",                        NA,
-  "precision2_parallel", "precision2",   "Share of 2+-species overlap that is parallel selected",   1
+  ~column,               ~tag,                ~label,                                                      ~ymax,
+  # true positives
+  "recall3",             "tp_recall3",        "Share of parallel genes in all three top lists",            1,
+  "prob_all_parallel3",  "tp_all_found3",     "P(all parallel genes in all three top lists)",              1,
+  # false positives
+  "prob_any_false3",     "fp_any3",           "P(at least one false positive in 3-way overlap)",           1,
+  "mean_false3",         "fp_count3",         "False positives in 3-way overlap (mean count)",             NA,
+  "prob_any_false2",     "fp_any2",           "P(at least one false positive in 2+-species overlap)",      1,
+  # totals
+  "mean_overlap3_total", "total_overlap3",    "Genes in all three top-100 lists (mean count)",             NA,
+  "prob_overlap3_empty", "empty_overlap3",    "P(3-way overlap is empty)",                                 1
 )
 
 curve_layers <- function(base_size, line_width, ylab, ymax, y_breaks = waiver()) list(
@@ -327,7 +368,7 @@ for (n_par in PARALLEL_VALUES) {
     col  <- metrics$column[m]
     ylab <- metrics$label[m]
     ymax <- metrics$ymax[m]
-    if (n_par == 0 && col %in% c("recall3", "precision3_parallel", "precision2_parallel")) next
+    if (n_par == 0 && col %in% c("recall3", "prob_all_parallel3")) next
 
     for (g in gens) {
       od <- file.path(out_root, sprintf("par%03d", n_par), metrics$tag[m], paste0("Gen_", g))
