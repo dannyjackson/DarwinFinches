@@ -173,6 +173,7 @@ Jobs are resumable: if one times out, resubmit it with the same flags.
 cd ${PROJDIR}
 module load R
 Rscript ${SCRIPTDIR}/summarize_gsea_power_empirical.R
+Rscript ${SCRIPTDIR}/plot_gsea_parallel_nsel.R
 ```
 
 Outputs in `gsea_empirical_power/`:
