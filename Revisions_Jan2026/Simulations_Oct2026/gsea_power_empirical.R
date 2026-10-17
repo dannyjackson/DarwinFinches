@@ -9,24 +9,36 @@
 #       (gene_scores/<sp>.fst.gene_scores.tsv)
 #     - give every gene an FST drawn from the matching NEUTRAL simulations
 #       (same Ne, Gen, decline)
-#     - give every gene in the focal GO term an FST drawn from the SELECTED
-#       simulations (all genes in the term are under selection)
+#     - give N genes in the focal GO term an FST drawn from the SELECTED
+#       simulations, for every N in n_sel (e.g. 0, 1, 2, ..., all)
 #     - run fgsea exactly as D1_run_fgsea.R does
 #       (scoreType = "pos", minSize = 10, maxSize = 500, eps = 0)
 #   Then combine species as D1_cross_species_analysis.R does
 #     (mean NES across the terms tested in all three species).
 #   Record the focal term's rank and percentile, per species and across species.
 #
+# Nested design over N: within an iteration, each species' neutral background,
+# the random order of its focal genes and their selected FST values are drawn
+# once. N = k selects the first k genes in that order, so N = 3 contains the
+# genes of N = 2, and differences between N reflect only the number of
+# selected genes. If a species has fewer focal genes than N, all are selected.
+#
 # Use s = 0 for a null control: focal genes then get neutral FST too, so the
 # focal term's percentile should be uniform (~5% of iterations in the top 5%).
 #
 # Usage (run from anywhere; paths are absolute or set below):
 #   Rscript gsea_power_empirical.R Ne=100k Gen=5 decline=1.00 s=0.1 f0=0.05 \
-#       [n_iter=100] [nproc=1] [term=GO:0007596] [out_dir=gsea_empirical_power]
+#       [n_iter=100] [nproc=1] [term=GO:0007596] [out_dir=gsea_empirical_power_nsel]
+#       [n_sel=0,1,2,3,4,6,8,10,13,16,20,all]
+#
+# Cost: each iteration runs 3 species x length(n_sel) fgsea analyses, so the
+# default 12 N values cost 12x the old all-genes run. Time a short test first.
 #
 # Output (one file per condition, appended one iteration at a time, so an
 # interrupted job can be resubmitted with the same arguments and continues):
-#   <out_dir>/Ne_<Ne>/Gen_<Gen>/d<decline>_s<s>_af<f0>.<term>.iterations.tsv
+#   <out_dir>/Ne_<Ne>/Gen_<Gen>/d<decline>_s<s>_af<f0>.<term>.nsel.iterations.tsv
+#   with a column n_selected (the requested N; capped per species at its
+#   number of focal genes, recorded in n_selected_actual)
 #
 # One row per iteration x species, plus one "cross_species" row per iteration:
 #   NES      = mean NES across species (cross_species row)
@@ -65,7 +77,8 @@ F0      <- as.numeric(get_opt("f0"))
 N_ITER  <- as.integer(get_opt("n_iter", "100"))
 NPROC   <- as.integer(get_opt("nproc", "1"))
 TERM    <- get_opt("term", "GO:0007596")       # blood coagulation
-OUT_DIR <- get_opt("out_dir", "gsea_empirical_power")
+OUT_DIR <- get_opt("out_dir", "gsea_empirical_power_nsel")
+N_SEL_ARG <- get_opt("n_sel", "0,1,2,3,4,6,8,10,13,16,20,all")
 
 # ============================================================
 # Paths
@@ -156,6 +169,15 @@ if (any(lengths(focal_genes) > length(selected_fst))) {
   stop("More focal genes than selected windows; cannot sample without replacement")
 }
 
+# N values: "all" = largest number of focal genes in any species
+n_focal_max <- max(lengths(focal_genes))
+n_sel_tokens <- trimws(strsplit(N_SEL_ARG, ",", fixed = TRUE)[[1]])
+N_SEL <- sort(unique(vapply(n_sel_tokens, function(x)
+  if (tolower(x) == "all") n_focal_max else as.integer(x), integer(1))))
+N_SEL <- N_SEL[N_SEL >= 0 & N_SEL <= n_focal_max]
+if (SEL_S == 0) N_SEL <- 0L    # null control: selected genes would be neutral anyway
+cat("N values (selected genes in the term):", paste(N_SEL, collapse = ", "), "\n")
+
 # ============================================================
 # Output file and resume
 # ============================================================
@@ -163,17 +185,20 @@ if (any(lengths(focal_genes) > length(selected_fst))) {
 fmt <- function(x) format(x, scientific = FALSE, drop0trailing = TRUE)
 out_sub <- file.path(OUT_DIR, paste0("Ne_", NE), paste0("Gen_", GEN))
 dir.create(out_sub, recursive = TRUE, showWarnings = FALSE)
-out_file <- file.path(out_sub, sprintf("d%s_s%s_af%s.%s.iterations.tsv",
+out_file <- file.path(out_sub, sprintf("d%s_s%s_af%s.%s.nsel.iterations.tsv",
                                        fmt(DECLINE), fmt(SEL_S), fmt(F0),
                                        gsub(":", "", TERM)))
 
-done_iters <- integer(0)
+# An (iteration, N) pair counts as done only if its cross-species row was written;
+# an iteration is skipped only when all requested N values are done.
+done_pairs <- data.table(iteration = integer(0), n_selected = integer(0))
 if (file.exists(out_file) && file.info(out_file)$size > 0) {
   prev <- fread(out_file)
-  # an iteration counts as done only if its cross-species row was written
-  done_iters <- unique(prev[species == "cross_species", iteration])
+  done_pairs <- unique(prev[species == "cross_species", .(iteration, n_selected)])
 }
-cat("Output:", out_file, "| iterations already done:", length(done_iters), "\n")
+done_iters <- done_pairs[, .(n = uniqueN(n_selected[n_selected %in% N_SEL])), by = iteration][
+  n == length(N_SEL), iteration]
+cat("Output:", out_file, "| iterations already complete:", length(done_iters), "\n")
 
 # Seed per iteration, unique to the condition, so results are reproducible
 # and a resumed job draws the same values it would have drawn originally.
@@ -184,13 +209,23 @@ seed_base <- sum(utf8ToInt(cond_key) * seq_along(utf8ToInt(cond_key))) %% 100000
 # One fgsea run on simulated scores for one species
 # ============================================================
 
-simulate_species <- function(sp) {
+# Draw once per iteration and species: neutral background, a random order of
+# the focal genes, and a selected FST for each focal gene (in that order).
+draw_species <- function(sp) {
   genes <- species_genes[[sp]]
   # neutral pool (~10,000) is smaller than the gene list, so sample with replacement
-  scores <- setNames(sample(neutral_fst, length(genes), replace = TRUE), genes)
-  # every focal gene under selection; independent draws per species
+  background <- setNames(sample(neutral_fst, length(genes), replace = TRUE), genes)
   fg <- focal_genes[[sp]]
-  scores[fg] <- sample(selected_fst, length(fg), replace = FALSE)
+  order_fg <- fg[sample.int(length(fg))]
+  sel_vals <- sample(selected_fst, length(fg), replace = FALSE)
+  list(background = background, order = order_fg, sel = sel_vals)
+}
+
+# Scores with the first n focal genes (in the drawn order) under selection
+scores_for_n <- function(draw, n) {
+  k <- min(n, length(draw$order))
+  scores <- draw$background
+  if (k > 0) scores[draw$order[seq_len(k)]] <- draw$sel[seq_len(k)]
   sort(scores, decreasing = TRUE)
 }
 
@@ -234,11 +269,18 @@ focal_row <- function(res, iteration, species) {
 # ============================================================
 
 for (it in setdiff(seq_len(N_ITER), done_iters)) {
-  t0 <- Sys.time()
   set.seed(seed_base + it)
+  draws <- lapply(names(SPECIES), draw_species)
+  names(draws) <- names(SPECIES)
+
+  todo_n <- setdiff(N_SEL, done_pairs[iteration == it, n_selected])
+
+ for (n_sel in todo_n) {
+  t0 <- Sys.time()
+  set.seed(seed_base + it * 1000 + n_sel)   # fgsea permutations; reproducible per (it, N)
 
   per_species <- lapply(names(SPECIES), function(sp) {
-    res <- run_fgsea(simulate_species(sp))
+    res <- run_fgsea(scores_for_n(draws[[sp]], n_sel))
     res[, species := sp]
     res
   })
@@ -272,16 +314,19 @@ for (it in setdiff(seq_len(N_ITER), done_iters)) {
   )
 
   out <- rbind(rows, cross)
-  out[, `:=`(Ne = NE, Gen = GEN, decline = DECLINE, sel_s = SEL_S, f0 = F0, term = TERM)]
-  setcolorder(out, c("Ne", "Gen", "decline", "sel_s", "f0", "term"))
+  out[, n_selected_actual := c(pmin(n_sel, lengths(focal_genes)[names(SPECIES)]), NA_integer_)]
+  out[, `:=`(Ne = NE, Gen = GEN, decline = DECLINE, sel_s = SEL_S, f0 = F0, term = TERM,
+             n_selected = n_sel, n_focal_max = n_focal_max)]
+  setcolorder(out, c("Ne", "Gen", "decline", "sel_s", "f0", "term", "n_selected"))
 
   fwrite(out, out_file, sep = "\t", append = file.exists(out_file) &&
            file.info(out_file)$size > 0)
 
-  cat(sprintf("iter %d: cross-species rank %s of %d (top %.2f%%); per-species pct_NES %s | %.0f s\n",
-              it, cross$rank_NES, n3, cross$pct_NES,
+  cat(sprintf("iter %d N=%d: cross-species rank %s of %d (top %.2f%%); per-species pct_NES %s | %.0f s\n",
+              it, n_sel, cross$rank_NES, n3, cross$pct_NES,
               paste(sprintf("%s=%.1f", rows$species, rows$pct_NES), collapse = " "),
               as.numeric(difftime(Sys.time(), t0, units = "secs"))))
+ }
 }
 
 cat("Done:", out_file, "\n")
