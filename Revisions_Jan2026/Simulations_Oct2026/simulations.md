@@ -129,9 +129,13 @@ Rscript ${SCRIPTDIR}/plot_power_curves.R
 ```
 PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/
 SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/
+cd $SCRIPTDIR 
+git pull
 cd $PROJDIR
 
 module load R
 
 Rscript ${SCRIPTDIR}/outlier_power_curves.R
+Rscript ${SCRIPTDIR}/plot_false_positive_curves.R
+Rscript ${SCRIPTDIR}/plot_ppv_curves.R
 ```
