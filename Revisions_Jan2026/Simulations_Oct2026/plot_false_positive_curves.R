@@ -2,7 +2,9 @@
 # ============================================================
 # False positive curves for the three-species overlap test
 #
-# Reads output/parallel_overlap.summary.tsv (from parallel_outlier_overlap.R)
+# Reads output/parallel_overlap.permutations.tsv (from parallel_outlier_overlap.R)
+# and computes the false-positive summaries itself, so it works with output
+# from both versions of that script
 # and plots, against selection strength:
 #   - P(at least one false positive) in the overlap
 #   - false discovery rate (false positives / all genes in the overlap)
@@ -29,7 +31,7 @@ suppressPackageStartupMessages({
 })
 
 # ---------------- settings (match parallel_outlier_overlap.R) ----------------
-summary_file <- "output/parallel_overlap.summary.tsv"
+perm_file    <- "output/parallel_overlap.permutations.tsv"   # works with either script version
 out_root     <- "output/power_curves_parallel"
 
 N_GENES <- 10000
@@ -61,7 +63,25 @@ cat(sprintf("Chance with no selection: P(>=1 FP) = %.3f (3-way), %.3f (2+)\n",
 ne_num <- function(x) ifelse(grepl("k$", x),
                              as.numeric(sub("k$", "", x)) * 1000, as.numeric(x))
 
-res <- read.delim(summary_file) %>%
+pooled <- function(num, den) ifelse(sum(den) > 0, sum(num) / sum(den), NA_real_)
+
+perm <- read.delim(perm_file)
+need <- c("overlap3_n", "overlap3_parallel", "overlap2_n", "overlap2_parallel")
+miss <- setdiff(need, names(perm))
+if (length(miss)) stop("Missing columns in ", perm_file, ": ", paste(miss, collapse = ", "))
+
+res <- perm %>%
+  mutate(overlap3_false = overlap3_n - overlap3_parallel,
+         overlap2_false = overlap2_n - overlap2_parallel) %>%
+  group_by(Ne, Gen, decline, sel_s, af, n_parallel) %>%
+  summarise(
+    n_permutations  = n(),
+    prob_any_false3 = mean(overlap3_false > 0),
+    prob_any_false2 = mean(overlap2_false > 0),
+    fdr3            = pooled(overlap3_false, overlap3_n),
+    fdr2            = pooled(overlap2_false, overlap2_n),
+    .groups = "drop"
+  ) %>%
   mutate(
     Ne      = as.character(Ne),
     Ne_num  = ne_num(Ne),
