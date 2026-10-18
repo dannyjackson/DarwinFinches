@@ -170,8 +170,13 @@ Jobs are resumable: if one times out, resubmit it with the same flags.
 ## Summarise and plot
 
 ```
+PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis
+SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026
+cd ${SCRIPTDIR} && git pull
 cd ${PROJDIR}
+
 module load R
+
 Rscript ${SCRIPTDIR}/summarize_gsea_power_empirical.R
 Rscript ${SCRIPTDIR}/plot_gsea_parallel_nsel.R
 ```

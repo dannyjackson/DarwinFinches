@@ -18,7 +18,7 @@
 #   A  output/fst_outlier_power.nnull9900.nsel100.tsv
 #   B  output/parallel_overlap.permutations.tsv
 #   C  output/fst_rank_by_selected_windows.nnull10000.tsv
-#   D  gsea_empirical_power/summary.tsv
+#   D  gsea_empirical_power_nsel/summary_nsel.tsv  (from plot_gsea_parallel_nsel.R)
 #
 # Writes: output/figure_power_summary/power_summary.Gen_<g>.png / .pdf
 #         output/figure_power_summary/power_summary.data.tsv  (values plotted)
@@ -33,7 +33,7 @@ suppressPackageStartupMessages({
 file_outlier <- "output/fst_outlier_power.nnull9900.nsel100.tsv"
 file_gsea1   <- "output/fst_rank_by_selected_windows.nnull10000.tsv"
 file_overlap <- "output/parallel_overlap.permutations.tsv"
-file_gsea3   <- "gsea_empirical_power/summary.tsv"
+file_gsea3   <- "gsea_empirical_power_nsel/summary_nsel.tsv"
 
 out_dir <- "output/figure_power_summary"
 
@@ -45,6 +45,11 @@ gsea_top <- "5"
 
 # Panel C: number of selected windows in the 10-window pathway
 gsea1_X <- 10
+
+# Panel D: number of blood-coagulation genes under selection.
+#   "all" = every gene in the term (same scenario as the earlier all-genes run),
+#   or a number present in the N sweep, e.g. 5. Pair with gsea1_X for panel C.
+gsea3_N <- "all"
 
 # Panel B: "recall" = share of the 30 parallel genes found in all three top lists
 #          "any"    = P(at least one parallel gene found in all three top lists)
@@ -103,14 +108,25 @@ null_C <- as.numeric(gsea_top) / 100
 col_D <- paste0("power_cross_top", gsea_top)
 D_all <- read.delim(file_gsea3) %>% norm_keys("f0") %>%
   filter(Ne == base_Ne, abs(decline - base_decline) < 1e-9)
+
+n_avail <- sort(unique(D_all$n_selected))
+D_N <- if (tolower(gsea3_N) == "all") max(n_avail) else as.integer(gsea3_N)
+if (!D_N %in% n_avail) stop("Panel D: N = ", gsea3_N, " not in the N sweep. Available: ",
+                            paste(n_avail, collapse = ", "))
+cat(sprintf("Panel D: %d of %d blood-coagulation genes under selection\n", D_N, max(n_avail)))
+
+# Observed null: N = 0 (no selected genes) is the null for every condition
+obs_null_D <- D_all %>% filter(n_selected == 0) %>%
+  group_by(Gen) %>% summarise(null = weighted.mean(.data[[paste0("power_cross_top", gsea_top)]], n_iter),
+                              .groups = "drop")
+cat("Panel D observed power with N = 0, by generation time:\n"); print(obs_null_D)
+
+D_all <- D_all %>% filter(n_selected == D_N)
 D <- D_all %>% filter(sel_s > 0) %>%
   transmute(panel = "D", Gen, sel_s, f0, power = .data[[col_D]])
-null_D <- as.numeric(gsea_top) / 100   # observed s = 0 rows printed below for comparison
+null_D <- as.numeric(gsea_top) / 100   # expectation; observed N = 0 values printed above
 
-if (any(D_all$sel_s == 0)) {
-  obs <- D_all %>% filter(sel_s == 0) %>% select(Gen, all_of(col_D))
-  cat("Panel D observed null (s = 0):\n"); print(obs)
-}
+
 
 # ---------------- combine ----------------
 dat <- bind_rows(A, B, C, D) %>%
@@ -143,7 +159,8 @@ defs <- tibble(
       sprintf("Share of %d parallel genes in all three top-1%% lists", overlap_n_parallel)
     else sprintf("P(>=1 of %d parallel genes in all three top-1%% lists)", overlap_n_parallel),
     sprintf("P(pathway with %d/10 selected windows ranks in top %s%%)", gsea1_X, gsea_top),
-    sprintf("P(blood coagulation ranks in top %s%% by mean NES)", gsea_top)
+    sprintf("P(blood coagulation ranks in top %s%% by mean NES); %d of %d genes selected",
+            gsea_top, D_N, max(n_avail))
   )
 ) %>% mutate(panel_label = factor(panel_lab[panel], levels = panel_lab))
 
