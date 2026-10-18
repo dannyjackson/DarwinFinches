@@ -10,24 +10,11 @@ Ne             = θ_W / (4 μ_gen)
 
 **Mutation rate.** From Lamichhaney et al. 2015: *"nuclear DNA, 2.04 × 10⁻⁹ per site per year estimated from the synonymous mutation rate on the Darwin's finches' lineage since the split from zebra finch."* This is a rate **per year**. θ = 4Neμ needs μ **per generation**, so the yearly rate is multiplied by the generation time: 5 years gives μ_gen = 1.02 × 10⁻⁸. The MSMC plots are scaled with μ = 1 × 10⁻⁸ and g = 4.5, which is consistent.
 
-**What changed from the previous version of this file**
-
-| Previous | Now |
-|---|---|
-| `Ne = θ / (4 × 2.04e-9)`: the yearly rate used as per-generation, so the result is Ne × generation time (≈5× too high) | `Ne = θ / (4 × 2.04e-9 × g)`, with g = 5 as the primary value plus a sensitivity table (3, 4.5, 7 yr) |
-| crapre divided by `sum(nSites)`; the other five by a hard-coded `946505819` | every population divides by its own `sum(nSites)` |
-| crapre θ came from `datafiles/safs` (the SNP-only SAFs used for FST) | all six populations come from `analyses/effective_pop/safs` (all sites, autosomes; B2_1) |
-| crapost dropped from the R loop | all six populations processed |
-| "Results" block listed the pre/post means as the FOR and PAR "post" values (the source of the wrong 171,500 and 209,518 in the manuscript) | species means are computed in the script from the per-population values |
-| no uncertainty | weighted delete-one-chromosome jackknife SE (Busing et al. 1999) |
-
-No new environment is needed: step 3 uses only the Python 3 standard library.
-
 ---
 
 ## 1. Site allele frequency likelihoods (all sites, autosomes)
 
-`B2_1_run_thetas_array.sh` (unchanged): `angsd -dosaf 1 -GL 1 -rf autosomes.txt -anc ${REF}` with `-setMinDepthInd 4 -minInd 4 -minQ 30 -minMapQ 30` and **no `-sites` or MAF filter**. Invariant sites must be included for θ per site to be meaningful.
+`B2_1_run_thetas_array.sh` uses `angsd -dosaf 1 -GL 1 -rf autosomes.txt -anc ${REF}` with `-setMinDepthInd 4 -minInd 4 -minQ 30 -minMapQ 30` and **no `-sites` or MAF filter**. Invariant sites must be included for θ per site to be meaningful.
 
 ```
 cd /xdisk/mcnew/finches/dannyjackson/finches/analyses/effective_pop
