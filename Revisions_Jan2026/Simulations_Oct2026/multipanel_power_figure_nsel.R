@@ -41,7 +41,7 @@ out_dir      <- "output/figure_power_summary_nsel"
 
 base_Ne      <- "100k"
 base_decline <- 1
-f0_fixed     <- 0.1          # one starting frequency for every panel
+f0_fixed     <- 0.2          # one starting frequency for every panel
 gsea_top     <- "5"          # GSEA cutoff for C and D: "5" or "1" (top %)
 
 text_size <- 12

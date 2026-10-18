@@ -142,3 +142,20 @@ Rscript ${SCRIPTDIR}/plot_ppv_curves.R
 ## Generate multipanel plot of all analyses
 ```
 Rscript ${SCRIPTDIR}/multipanel_power_figure.R
+
+```
+## Generate multipanel plot of all analyses using all variations of N
+```
+cd /xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis
+
+# sweeps 1-100 selected windows -> output/fst_outlier_power_nsel.tsv
+Rscript ${SCRIPTDIR}/outlier_power_nsel.R
+
+# In parallel_outlier_overlap.R change line 58 to
+# PARALLEL_VALUES <- c(1, 2, 5, 10, 20, 30, 50, 100)
+Rscript ${SCRIPTDIR}/parallel_outlier_overlap.R
+
+Rscript ${SCRIPTDIR}/plot_gsea_parallel_nsel.R      # writes summary_nsel.tsv for D
+
+Rscript ${SCRIPTDIR}/multipanel_power_figure_nsel.R
+```
