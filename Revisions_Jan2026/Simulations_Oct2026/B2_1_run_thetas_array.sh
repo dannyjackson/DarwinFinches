@@ -24,7 +24,7 @@ set -euo pipefail
 # ---------------- settings (same values as the rest of the pipeline) ----------------
 ANGSD=~/programs/angsd/angsd
 OUTDIR=/xdisk/mcnew/finches/dannyjackson/finches
-REF=/xdisk/mcnew/dannyjackson/cardinals/datafiles/referencegenome/ncbi_dataset/data/GCF_901933205.1/GCF_901933205.1_STF_HiC_genomic.fna
+REF=/xdisk/mcnew/finches/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/GCF_901933205.1_STF_HiC_genomic.fna
 CHRLEAD=NC_0          # chromosomes (drops unplaced scaffolds)
 SEXCHR=NC_044601      # Z
 MINDEPTHIND=4

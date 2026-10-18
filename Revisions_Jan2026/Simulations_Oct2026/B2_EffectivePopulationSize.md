@@ -8,7 +8,7 @@ Ne is estimated for each population (3 species × pre/post invasion) from genome
 Ne             = θ_W / (4 μ_gen)
 ```
 
-**Mutation rate.** From Lamichhaney et al. 2015: *"nuclear DNA, 2.04 × 10⁻⁹ per site per year estimated from the synonymous mutation rate on the Darwin's finches' lineage since the split from zebra finch."* This is a rate **per year**. θ = 4Neμ needs μ **per generation**, so the yearly rate is multiplied by the generation time: 5 years gives μ_gen = 1.02 × 10⁻⁸. The MSMC plots are scaled with μ = 1 × 10⁻⁸ and g = 4.5, which is consistent.
+**Mutation rate.** From Lamichhaney et al. 2015: *"nuclear DNA, 2.04 × 10⁻⁹ per site per year estimated from the synonymous mutation rate on the Darwin's finches' lineage since the split from zebra finch."* This is a rate **per year**. θ = 4Neμ needs μ **per generation**, so the yearly rate is multiplied by the generation time: 5 years gives μ_gen = 1.02 × 10⁻⁸. 
 
 ---
 
@@ -17,9 +17,16 @@ Ne             = θ_W / (4 μ_gen)
 `B2_1_run_thetas_array.sh` uses `angsd -dosaf 1 -GL 1 -rf autosomes.txt -anc ${REF}` with `-setMinDepthInd 4 -minInd 4 -minQ 30 -minMapQ 30` and **no `-sites` or MAF filter**. Invariant sites must be included for θ per site to be meaningful.
 
 ```
+
+PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/
+SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/
+cd $SCRIPTDIR 
+git pull
+cd $PROJDIR
+
 cd /xdisk/mcnew/finches/dannyjackson/finches/analyses/effective_pop
 mkdir -p slurm_output
-sbatch --array=0-5 ~/programs/DarwinFinches/Scripts/B_PopulationStructureAnalyses/B2_1_run_thetas_array.sh
+sbatch --array=0-5 ${SCRIPTDIR}/B2_1_run_thetas_array.sh
 ```
 
 Array index → population: 0 crapre, 1 crapost, 2 forpre, 3 forpost, 4 parpre, 5 parpost.
