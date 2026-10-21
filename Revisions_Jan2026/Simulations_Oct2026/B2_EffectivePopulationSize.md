@@ -17,14 +17,16 @@ Ne             = θ_W / (4 μ_gen)
 `B2_1_run_thetas_array.sh` uses `angsd -dosaf 1 -GL 1 -rf autosomes.txt -anc ${REF}` with `-setMinDepthInd 4 -minInd 4 -minQ 30 -minMapQ 30` and **no `-sites` or MAF filter**. Invariant sites must be included for θ per site to be meaningful.
 
 ```
-
-PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/
-SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/
+SCRIPTDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/
 cd $SCRIPTDIR 
 git pull
-cd $PROJDIR
 
 cd /xdisk/mcnew/finches/dannyjackson/finches/analyses/effective_pop
+REF=/xdisk/mcnew/finches/dannyjackson/finches/reference_data/ncbi_dataset/data/GCF_901933205.1/GCF_901933205.1_STF_HiC_genomic.fna
+
+module load samtools
+samtools faidx $REF
+
 mkdir -p slurm_output
 sbatch --array=0-5 ${SCRIPTDIR}/B2_1_run_thetas_array.sh
 ```
@@ -36,7 +38,7 @@ Array index → population: 0 crapre, 1 crapost, 2 forpre, 3 forpost, 4 parpre, 
 `B2_2_run_thetas_array.sh` (corrected: all six populations, `-P ${THREADS}`): `realSFS` → `realSFS saf2theta` → `thetaStat do_stat`. It writes `thetas/${POP}.thetas.idx.pestPG` with one row per chromosome.
 
 ```
-sbatch --array=0-5 ~/programs/DarwinFinches/Scripts/B_PopulationStructureAnalyses/B2_2_run_thetas_array.sh
+sbatch --array=0-5 ${SCRIPTDIR}/B2_2_run_thetas_array.sh
 ```
 
 Notes:
@@ -56,7 +58,7 @@ done
 ```
 cd /xdisk/mcnew/finches/dannyjackson/finches/analyses/effective_pop
 
-python3 ~/programs/DarwinFinches/Scripts/B_PopulationStructureAnalyses/B2_3_compute_Ne.py \
+python3 ${SCRIPTDIR}/B2_3_compute_Ne.py \
   --theta_dir thetas \
   --mu_year 2.04e-9 \
   --gen_time 5 \
@@ -84,9 +86,9 @@ Output columns in `Ne_estimates.tsv`: `pop species timepoint n_chrom n_sites the
 
 | Species | Pre Ne (± SE) | Post Ne (± SE) | Mean |
 |---|---|---|---|
-| Vegetarian finch (CRA) | | | |
-| Medium ground finch (FOR) | | | |
-| Small tree finch (PAR) | | | |
+| Vegetarian finch (CRA) | 29530 (673) | 29878 (593) | 29704 (449) |
+| Medium ground finch (FOR) | 73111 (1483) | 73480 (1279) | 73295 (979) |
+| Small tree finch (PAR) | 50639 (1016) | 48416 (987) | 49528 (708) |
 
 For orientation only, the previous values divided by 5 are:
 - CRA ≈ 31,200 (pre) / 18,100 (post)

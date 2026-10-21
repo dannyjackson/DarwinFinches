@@ -44,8 +44,8 @@ MAX_TOTAL_TASKS=${MAX_TOTAL_TASKS:-900}
 F0=0.5
 S=0.0
 L=10000
-NE_VALUES=(10000 50000 100000 200000)
-DECLINES=(1.00 0.8)      # keep the same spelling as the original runs (0.8, not 0.80)
+NE_VALUES=(25000 50000 75000)
+DECLINES=(1.00 0.9)
 GEN_TIMES=(5 10)
 
 # ------------------------------------------------------------

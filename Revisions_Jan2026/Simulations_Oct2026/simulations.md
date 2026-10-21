@@ -14,7 +14,7 @@ mkdir -p /xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/outpu
 F0=0.5
 S=0.0
 L=10000
-NE_VALUES=(100000 50000 200000)
+NE_VALUES=(50000 10000 100000 200000)
 DECLINES=(1.00 0.8)
 GEN_TIMES=(5 10)
 
@@ -52,9 +52,9 @@ bash ${SCRIPTDIR}/topup_neutral.sh
 ## Model positive selection
 ```
 NES=(50000 100000 200000)
-SELS=(0.01 0.02 0.05 0.1 0.2 0.5)    # 1-2-5 series
-SELS=(0.3 0.4)    # 1-2-5 series
+NES=(10000)
 
+SELS=(0.01 0.02 0.05 0.1 0.2 0.3 0.4 0.5)
 F0S=(0.05 0.1 0.2 0.4 0.6)               # doubling
 DECLINES=(1.00 0.8)
 GEN_TIMES=(5 10)
