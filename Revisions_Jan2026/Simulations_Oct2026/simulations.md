@@ -11,39 +11,12 @@ mkdir -p /xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/outpu
 ```
 ## Model neutral evolution
 ```
-F0=0.5
-S=0.0
-L=10000
-NE_VALUES=(50000 10000 100000 200000)
-DECLINES=(1.00 0.8)
-GEN_TIMES=(5 10)
-
-for NE in "${NE_VALUES[@]}"; do
-  for D in "${DECLINES[@]}"; do
-    for G in "${GEN_TIMES[@]}"; do
-
-      echo "Submitting: Ne=${NE} decline=${D} gen_time=${G}"
-
-      sbatch --array=1-100 \
-        ${SCRIPTDIR}/run_slim.power_analysis.sh \
-        -s "${S}" \
-        -r "${D}" \
-        -f "${F0}" \
-        -N "${NE}" \
-        -o "${G}" \
-        -L "${L}" \
-         -n 100
-
-    done
-  done
-done
-
 # topup neutral
 DRYRUN=1 bash ${SCRIPTDIR}/topup_neutral.sh   # preview: prints the sbatch line only
 
 bash ${SCRIPTDIR}/topup_neutral.sh
 
-scancel 24232089
+
 squeue -u dannyjackson          # wait until nothing slim_sweep is listed
 find Ne_* -name "*.lock" -delete
 bash ${SCRIPTDIR}/topup_neutral.sh
@@ -95,6 +68,7 @@ bash ${SCRIPTDIR}/topup_selected.sh
 ```
 
 ## Model GSEA 
+module load R
 
 Rscript ${SCRIPTDIR}/plot.power_analysis.gsea.R
 
