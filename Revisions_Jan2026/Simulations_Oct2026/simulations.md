@@ -8,18 +8,29 @@ cd $SCRIPTDIR
 git pull
 cd $PROJDIR
 mkdir -p /xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/output/logs
+
 ```
 ## Model neutral evolution
 ```
 # topup neutral
-DRYRUN=1 bash ${SCRIPTDIR}/topup_neutral.sh   # preview: prints the sbatch line only
+DRYRUN=1 FORCE=1 bash ${SCRIPTDIR}/topup_neutral.sh   # preview: prints the sbatch line only
 
 bash ${SCRIPTDIR}/topup_neutral.sh
 
+# run on windfall 
+WF="--partition=windfall --account=windfall --qos=part_qos_windfall"
+sbatch $WF --array=1-101 ${SCRIPTDIR}/run_slim.power_analysis.sh -s 0.0 -r 0.9 -f 0.5 -N 75000 -o 10 -L 10000 -n 100
+
+# check that no current runs are neutral
+squeue -u $USER -n slim_sweep -h -o "%i %T %o" | grep -- "-s 0.0 " | head
+# force it to run
+FORCE=1 bash ${SCRIPTDIR}/topup_neutral.sh
 
 squeue -u dannyjackson          # wait until nothing slim_sweep is listed
 find Ne_* -name "*.lock" -delete
 bash ${SCRIPTDIR}/topup_neutral.sh
+
+squeue -u "$USER" -h -r -o "%T" | sort | uniq -c
 
 ```
 ## Model positive selection
@@ -62,9 +73,22 @@ for F0 in "${F0S[@]}"; do
   done
 done 
 
-
+DRYRUN=1 bash ${SCRIPTDIR}/topup_selected.sh
 bash ${SCRIPTDIR}/topup_selected.sh
 
+${SCRIPTDIR}/run_slim.power_analysis.sh
+
+grep 'run_slim.power_analysis.sh' ${SCRIPTDIR}/topup_selected.sh
+sed 's/run_slim.power_analysis.sh/run_slim.power_analysis.shorttime.sh/g' ${SCRIPTDIR}/topup_selected.sh > ${SCRIPTDIR}/topup_selected.shorttime.sh
+cp ${SCRIPTDIR}/run_slim.power_analysis.sh ${SCRIPTDIR}/run_slim.power_analysis.shorttime.sh
+nano ${SCRIPTDIR}/run_slim.power_analysis.shorttime.sh
+
+
+DRYRUN=1 bash ${SCRIPTDIR}/topup_selected.shorttime.sh
+
+# After finishing:
+# Remove: run_slim.power_analysis.shorttime.sh topup_selected.shorttime.sh
+# Edit: run_slim.power_analysis.sh to change account and partition to mcnew; remove qos line
 ```
 
 ## Model GSEA 

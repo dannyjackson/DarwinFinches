@@ -1,0 +1,84 @@
+I need you to coordinate 30 independent scoring runs and compile the results into a matrix.
+Use sub-agents for the runs. Do not score any terms yourself, and do not add anything to the
+sub-agent prompt beyond filling in the file paths. Each run must be a fresh sub-agent that sees
+only the rater prompt below and its own input file.
+
+ATTACHED FILE
+- all_pathways.txt: header line, then 1,008 lines of "GO_ID term name" (separated by the first space)
+
+STEP 1: SET UP
+- Make a working folder runs/ with subfolders run_001 ... run_030.
+- In each, write input_terms.txt: the header plus all 1,008 terms in a random order, using
+  Python random.Random(1000 + run_number).shuffle(). Log the seeds in runs/run_manifest.tsv.
+- Fill the rater prompt below for each run, replacing {INPUT}, {REVIEW}, {SCORES} and {RUNDIR}
+  with that run's paths (input_terms.txt, review.md, scores.tsv, and the run folder). Save the
+  filled prompt as prompt.txt in each run folder.
+- Keep all of your own files out of the shared scratch/temp directory, so no run can come across
+  another run's work.
+
+STEP 2: RUN IN BATCHES
+- Launch sub-agents in batches of 5, each given only its filled prompt as the instruction.
+  Wait for a batch to finish before starting the next.
+- After each batch, validate every new scores.tsv: exactly 1,008 rows, every GO ID from
+  all_pathways.txt present exactly once, no extra IDs, and integer scores from 1 to 5. Re-run any
+  failed run from scratch with a fresh sub-agent, and record that it was re-run.
+- After each batch, send me a zip of runs/ (excluding the input_terms.txt files) as a backup,
+  along with the token use of each run. If you approach a usage limit, stop after the current
+  batch and tell me how many runs are complete; we will resume later from the files.
+
+RATER PROMPT (give this exactly, with only the paths filled in)
+---
+You are acting as an independent expert rater for a study of Darwin's finches and the
+invasive avian vampire fly, Philornis downsi.
+
+TASK
+The file {INPUT} lists 1,008 Gene Ontology (GO) biological-process terms (one per line:
+GO ID, a space, then the term name; the first line is a header). Score every term from
+1 to 5 for how physiologically related it is to a potential host response to P. downsi.
+The goal is an unbiased a priori list: if a term were later detected as under selection,
+would we reasonably infer it is potentially associated with a response to the fly?
+
+STEPS
+1. Review the published literature on P. downsi and its effects on Galápagos land birds
+   (Darwin's finches, mockingbirds and other passerines), using web search. Cover what the
+   larvae do to hosts, and which host defenses (resistance, tolerance, behavioral) have been
+   documented or proposed.
+2. Base your scoring on that review.
+3. Score every term.
+
+SCALE
+5 = directly captures a host mechanism documented in the Philornis literature
+4 = core component of such a mechanism, or a strong a priori prediction from it
+3 = plausible downstream or supporting process
+2 = weak, indirect or speculative link
+1 = no specific link
+
+RULES
+- Use only your literature review and general biological knowledge. Do not use memory,
+  past conversations, or any information about results from genomic studies of these birds.
+- Judge each term on its own merits; do not aim for any particular distribution of scores.
+- Score all 1,008 terms. Do not skip, merge or rename any.
+
+INDEPENDENCE (required)
+- Read only the file {INPUT}. Do not list, open or search any other file or directory on
+  this machine, and do not use any project, document, memory or artifact tools. Other raters'
+  work exists on this machine and you must not see it.
+- Write only the two output files named below. If you write a helper script, put it in
+  {RUNDIR} (never in a shared or temporary directory) and give it a name unique to this run.
+
+OUTPUT
+1. Write a brief summary of the mechanisms you identified and the key sources (with URLs)
+   to {REVIEW}.
+2. Write the scores to {SCORES} as a tab-separated file with the header "pathway<TAB>score"
+   and exactly one row per GO ID in the input, using each GO ID exactly as given. Writing a
+   short script that maps GO IDs to scores is fine, but every score must be your own judgment.
+3. Reply with only one line: "done: <number of rows written>".
+---
+
+STEP 3: COMPILE (after all 30 runs pass validation)
+- score_matrix.tsv: one row per GO ID in all_pathways.txt order, with columns pathway,
+  term_name, then run_001 ... run_030.
+- run_log.tsv: one row per run, with the run number, shuffle seed, token use, whether the run
+  was re-run, and the count of each score 1-5.
+- Do not analyze or interpret the scores. Send me one final zip containing the run folders,
+  score_matrix.tsv, run_log.tsv and the setup/compile script.
