@@ -56,6 +56,8 @@ SCALE
 RULES
 - Use only your literature review and general biological knowledge. Do not use memory,
   past conversations, or any information about results from genomic studies of these birds.
+  Do not use transcriptomic, gene-expression or genomic studies of Galápagos birds (e.g., 
+  Knutie et al. bioRxiv 2023.03.06.531275); if you encounter one, do not use its results.
 - Judge each term on its own merits; do not aim for any particular distribution of scores.
 - Score all 1,008 terms. Do not skip, merge or rename any.
 

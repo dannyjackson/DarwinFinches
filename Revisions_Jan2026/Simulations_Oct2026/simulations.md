@@ -84,7 +84,7 @@ cp ${SCRIPTDIR}/run_slim.power_analysis.sh ${SCRIPTDIR}/run_slim.power_analysis.
 nano ${SCRIPTDIR}/run_slim.power_analysis.shorttime.sh
 
 
-DRYRUN=1 bash ${SCRIPTDIR}/topup_selected.shorttime.sh
+DRYRUN=1 FORCE=1 bash ${SCRIPTDIR}/topup_selected.shorttime.sh
 
 # After finishing:
 # Remove: run_slim.power_analysis.shorttime.sh topup_selected.shorttime.sh
