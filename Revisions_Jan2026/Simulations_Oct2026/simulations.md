@@ -2,6 +2,8 @@
 
 ## Set up working environment
 ```
+interactive -a mcnew -Q qual_qos_mcnew -n 2 
+
 PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/
 SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/
 cd $SCRIPTDIR 
@@ -32,6 +34,9 @@ bash ${SCRIPTDIR}/topup_neutral.sh
 
 squeue -u "$USER" -h -r -o "%T" | sort | uniq -c
 
+RS=${SCRIPTDIR}/run_slim.power_analysis.sh
+WF="--partition=windfall --account=windfall --qos=part_qos_windfall"
+sbatch $WF --time=4:00:00 --array=1-101 $RS -s 0.0 -r 1.00 -f 0.5 -N 25000 -o 10 -L 10000 -n 100
 ```
 ## Model positive selection
 ```
@@ -84,7 +89,7 @@ cp ${SCRIPTDIR}/run_slim.power_analysis.sh ${SCRIPTDIR}/run_slim.power_analysis.
 nano ${SCRIPTDIR}/run_slim.power_analysis.shorttime.sh
 
 
-DRYRUN=1 FORCE=1 bash ${SCRIPTDIR}/topup_selected.shorttime.sh
+FORCE=1 bash ${SCRIPTDIR}/topup_selected.shorttime.sh
 
 # After finishing:
 # Remove: run_slim.power_analysis.shorttime.sh topup_selected.shorttime.sh
