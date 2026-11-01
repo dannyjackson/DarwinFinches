@@ -54,9 +54,23 @@ s_values       <- NULL   # tile rows; e.g. c(0.05, 0.1, 0.2)
 
 gsea_top    <- "5"       # GSEA cutoff for C and D: "5" or "1" (top %)
 power_goal  <- 0.8       # outline tiles at or above this power; NA = no outline
-show_values <- TRUE      # print the power value in each tile
+show_values <- FALSE     # print the power value in each tile (crowded at print size)
+show_defs   <- FALSE     # power definition + null under each block title
+                         # (FALSE for the main text: put these in the caption)
 
-text_size <- 11
+# Tick labels on the discrete axes:
+#   "ends" = first and last value only
+#   an integer k = every k-th value, always including the last (e.g. 2)
+#   "all"  = every value
+x_ticks <- "ends"        # N
+y_ticks <- "ends"        # s
+
+# Print size. Text sizes are in points AT THIS SIZE, so set the size close to
+# how the figure will appear in the paper (e.g. 7.2 in = two-column width)
+# and scale text from there. At 12 x 14 in shrunk to 7.2 in wide, 20 pt -> ~12 pt.
+fig_width  <- 12         # inches
+fig_height <- 14
+text_size  <- 20         # base size; titles, strips and ticks scale from this
 
 # light = low power, dark = high power
 fill_ramp <- c("#f7f9fc", "#b7d3f6", "#6da7ec", "#2a78d6", "#104281", "#0d366b")
@@ -65,6 +79,14 @@ fill_ramp <- c("#f7f9fc", "#b7d3f6", "#6da7ec", "#2a78d6", "#104281", "#0d366b")
 ne_num <- function(x) ifelse(grepl("k$", x),
                              as.numeric(sub("k$", "", x)) * 1000,
                              as.numeric(x))
+
+# Which levels of a discrete axis get a tick label
+thin_breaks <- function(lv, mode) {
+  n <- length(lv)
+  if (n <= 2 || identical(mode, "all")) return(lv)
+  idx <- if (identical(mode, "ends")) c(1, n) else unique(c(seq(1, n, by = as.integer(mode)), n))
+  lv[idx]
+}
 
 prep <- function(d, f0_col) {
   d %>%
@@ -140,34 +162,41 @@ N_levels <- lapply(split(dat$N, dat$panel), function(x) sort(unique(x)))
 
 # ---------------- block specs ----------------
 specs <- list(
-  A = list(title = "A  Outliers: one species",
+  A = list(title = "A  Outliers, one species",
            def   = "Power = share of selected windows in the top 1% of 10,000",
-           xlab  = "Selected windows in the genome (N)",
+           xlab  = "Selected windows (N)",
            null  = 0.01),
-  B = list(title = "B  Outliers: parallel across three species",
+  B = list(title = "B  Outliers, three species",
            def   = "Power = share of parallel genes in all three top-1% lists",
-           xlab  = "Genes selected in all three species (N)",
+           xlab  = "Parallel genes (N)",
            null  = 0),
-  C = list(title = "C  Pathway enrichment: one species",
+  C = list(title = "C  Pathway enrichment, one species",
            def   = sprintf("Power = P(10-window pathway ranks in top %s%%)", gsea_top),
-           xlab  = "Selected windows in the pathway (N, of 10)",
+           xlab  = "Selected windows in pathway (N)",
            null  = as.numeric(gsea_top) / 100),
-  D = list(title = "D  Pathway enrichment: parallel across three species",
+  D = list(title = "D  Pathway enrichment, three species",
            def   = sprintf("Power = P(blood coagulation in top %s%% by mean NES)", gsea_top),
-           xlab  = sprintf("Selected blood-coagulation genes (N, of %d)", n_term),
+           xlab  = sprintf("Selected genes in term (N, of %d)", n_term),
            null  = as.numeric(gsea_top) / 100)
 )
 
 theme_heat <- function() {
   theme_bw(base_size = text_size) +
-    theme(panel.grid       = element_blank(),
-          panel.spacing    = unit(0.5, "lines"),
-          strip.background = element_rect(fill = "grey90"),
-          strip.text       = element_text(face = "bold", colour = "#3d3d3a"),
-          axis.text        = element_text(colour = "#6b6a66", size = text_size * 0.8),
-          plot.title       = element_text(face = "bold", size = text_size),
-          plot.subtitle    = element_text(colour = "#6b6a66", size = text_size * 0.85),
-          legend.position  = "right")
+    theme(panel.grid        = element_blank(),
+          panel.spacing     = unit(0.4, "lines"),
+          strip.background  = element_rect(fill = "grey90", colour = NA),
+          strip.text        = element_text(face = "bold", colour = "#3d3d3a",
+                                           size = text_size * 0.85,
+                                           margin = margin(2, 2, 2, 2)),
+          axis.text         = element_text(colour = "#3d3d3a", size = text_size * 0.75),
+          axis.title        = element_text(size = text_size * 0.85),
+          axis.ticks        = element_line(linewidth = 0.4),
+          plot.title        = element_text(face = "bold", size = text_size),
+          plot.subtitle     = element_text(colour = "#6b6a66", size = text_size * 0.7),
+          legend.position   = "right",
+          legend.title      = element_text(size = text_size * 0.85),
+          legend.text       = element_text(size = text_size * 0.75),
+          legend.key.height = unit(text_size * 0.12, "lines"))
 }
 
 # One block of the figure: one approach, rows = Gen, columns = f0
@@ -180,23 +209,26 @@ make_block <- function(d, k) {
     facet_grid(Gen_lab ~ f0_lab, drop = FALSE) +
     scale_fill_gradientn(colours = fill_ramp, limits = c(0, 1),
                          breaks = seq(0, 1, 0.25), name = "Power") +
-    scale_x_discrete(drop = FALSE) +
-    scale_y_discrete(drop = FALSE) +
+    scale_x_discrete(drop = FALSE,
+                     breaks = thin_breaks(as.character(N_levels[[k]]), x_ticks)) +
+    scale_y_discrete(drop = FALSE,
+                     breaks = thin_breaks(as.character(s_levels), y_ticks)) +
     labs(title = sp$title,
-         subtitle = sprintf("%s. Expected with no selection: %g", sp$def, sp$null),
-         x = sp$xlab, y = "Selection coefficient (s)") +
+         subtitle = if (show_defs) sprintf("%s. Expected with no selection: %g",
+                                           sp$def, sp$null) else NULL,
+         x = sp$xlab, y = "s") +
     theme_heat()
 
   if (!is.na(power_goal)) {
     hi <- d %>% filter(power >= power_goal)
     if (nrow(hi) > 0)
-      p <- p + geom_tile(data = hi, fill = NA, colour = "#e69f00", linewidth = 0.6)
+      p <- p + geom_tile(data = hi, fill = NA, colour = "#e69f00", linewidth = 0.9)
   }
 
   if (show_values) {
     p <- p + geom_text(aes(label = sprintf("%.2f", power),
                            colour = power > 0.55),
-                       size = text_size * 0.18, show.legend = FALSE) +
+                       size = text_size * 0.2, show.legend = FALSE) +
       scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "#3d3d3a"), guide = "none")
   }
   p
@@ -230,18 +262,13 @@ for (i in seq_len(nrow(combos))) {
       subtitle = paste0("Rows: generation time. Columns: starting frequency f0. ",
                         if (!is.na(power_goal))
                           sprintf("Outlined tiles: power >= %g.", power_goal) else ""),
-      theme = theme(plot.title = element_text(face = "bold", size = text_size + 3),
-                    plot.subtitle = element_text(colour = "#6b6a66", size = text_size)))
-
-  # width grows with the widest N sweep x number of f0 columns
-  n_x <- max(lengths(N_levels))
-  w <- max(10, 0.35 * n_x * length(f0_levels) + 3)
-  h <- max(10, 0.32 * length(s_levels) * length(gen_levels) * 4 + 5)
+      theme = theme(plot.title = element_text(face = "bold", size = text_size * 1.1),
+                    plot.subtitle = element_text(colour = "#6b6a66", size = text_size * 0.75)))
 
   stem <- sprintf("power_heatmap.Ne_%s.decline_%.2f", ne, dec)
   for (ext in c("png", "pdf")) {
     ggsave(file.path(out_dir, paste0(stem, ".", ext)), fig,
-           width = w, height = h, dpi = 300, bg = "white", limitsize = FALSE)
+           width = fig_width, height = fig_height, dpi = 300, bg = "white")
   }
   message("Saved: ", file.path(out_dir, paste0(stem, ".png")))
 }
