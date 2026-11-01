@@ -8,8 +8,9 @@
 #   I   Comparison across approaches at one demography (default Ne = 25k, decline = 1)
 #         rows    = approach A-D
 #         columns = starting frequency f0
-#   II  The same approaches at the other Ne values (default 50k, 75k), same decline
-#         rows    = approach A-D, each split into one sub-row per Ne
+#   II  Selected approaches (default D only) at the other Ne values
+#       (default 50k, 75k), same decline
+#         rows    = one sub-row per Ne within each approach
 #         columns = starting frequency f0
 #
 #   Approaches  A  outliers: one species           (N = selected windows in genome)
@@ -53,6 +54,7 @@ out_dir      <- "output/figure_power_composite"
 decline_main <- 1                       # both parts
 Ne_main      <- "25k"                   # part I
 Ne_compare   <- c("50k", "75k")         # part II sub-rows (Ne_main is not repeated)
+approaches_II <- c("D")                 # approaches shown in part II, e.g. c("C", "D")
 f0_values    <- NULL                    # columns in both parts; NULL = every f0 present
 Gen_values   <- NULL                    # one figure per Gen; NULL = every Gen present
 s_values     <- NULL                    # tile rows; NULL = every s present
@@ -70,9 +72,9 @@ x_ticks <- "ends"                       # N
 y_ticks <- "ends"                       # s
 
 # Print size. Text sizes are in points AT THIS SIZE; at 14 in shrunk to a
-# 7.2 in two-column width, 15 pt -> ~7.7 pt. 14 x 18 in is close to a full page.
+# 7.2 in two-column width, 15 pt -> ~7.7 pt.
 fig_width  <- 14                        # inches
-fig_height <- 18
+fig_height <- 11
 text_size  <- 15
 
 # light = low power, dark = high power
@@ -125,7 +127,7 @@ if (!is.null(s_values))   dat <- dat %>% filter(round(sel_s, 6) %in% round(s_val
 if (!is.null(f0_values)) dat <- dat %>% filter(round(f0, 6) %in% round(f0_values, 6))
 
 dat_I  <- dat %>% filter(Ne == Ne_main)
-dat_II <- dat %>% filter(Ne %in% setdiff(Ne_compare, Ne_main))
+dat_II <- dat %>% filter(Ne %in% setdiff(Ne_compare, Ne_main), panel %in% approaches_II)
 
 if (nrow(dat_I) == 0)  stop("Part I: no data for Ne = ", Ne_main, ", decline = ", decline_main)
 if (nrow(dat_II) == 0) stop("Part II: no data for Ne = ", paste(Ne_compare, collapse = ", "),
@@ -247,15 +249,17 @@ for (g in sort(unique(c(dat_I$Gen, dat_II$Gen)))) {
   dI  <- dat_I  %>% filter(Gen == g)
   dII <- dat_II %>% filter(Gen == g)
 
-  ks <- c("A", "B", "C", "D")
+  ks    <- c("A", "B", "C", "D")
+  ks_II <- intersect(ks, approaches_II)
   cells <- c(list(numeral("I")),
-             lapply(ks, function(k) make_row(filter(dI,  panel == k), k, k == "A", "I")),
+             lapply(ks, function(k) make_row(filter(dI, panel == k), k, k == ks[1], "I")),
              list(numeral("II")),
-             lapply(ks, function(k) make_row(filter(dII, panel == k), k, k == "A", "II")))
+             lapply(ks_II, function(k) make_row(filter(dII, panel == k), k,
+                                                k == ks_II[1], "II")))
 
   n_ne <- max(1, length(Ne_levels))
   fig <- wrap_plots(cells, ncol = 1,
-                    heights = c(0.12, rep(1, 4), 0.12, rep(n_ne, 4))) +
+                    heights = c(0.12, rep(1, 4), 0.12, rep(n_ne, length(ks_II)))) +
     plot_layout(guides = "collect") &
     theme(legend.position = "right")
 
@@ -269,8 +273,8 @@ for (g in sort(unique(c(dat_I$Gen, dat_II$Gen)))) {
 
 # ---------------- caption reminder ----------------
 cat("\nFor the caption:\n")
-cat(sprintf("  I: Ne = %s. II: Ne = %s. Both %s; columns = starting frequency f0.\n",
-            Ne_main, paste(Ne_levels, collapse = ", "),
+cat(sprintf("  I: Ne = %s, approaches A-D. II: approach %s at Ne = %s. Both %s; columns = f0.\n",
+            Ne_main, paste(approaches_II, collapse = ", "), paste(Ne_levels, collapse = ", "),
             ifelse(decline_main == 1, "constant size", paste0("decline ", decline_main))))
 cat("  A: power = share of selected windows in the top 1% of 10,000 (null 0.01)\n")
 cat("  B: power = share of parallel genes in all three top-1% lists (null 0)\n")
