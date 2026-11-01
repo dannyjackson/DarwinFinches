@@ -11,7 +11,7 @@
 #   rows       = effective population size Ne
 #   columns    = starting frequency f0
 #   tile       = x: number selected (N), y: selection coefficient s, fill: power
-#   outline    = tiles with power > power_goal (default 0.95)
+#   outline    = stepped orange outlines for high power (default > 0.80, > 0.90, > 0.95)
 #
 # Companion to power_heatmap_nsel.byNe.R (same inputs, colours, tick and text
 # settings); that script puts the four approaches in one figure per Ne, this
@@ -52,7 +52,11 @@ s_values       <- NULL   # tile rows; e.g. c(0.05, 0.1, 0.2)
 approaches     <- c("A", "B", "C", "D")   # which figures to make
 
 gsea_top    <- "5"       # GSEA cutoff for C and D: "5" or "1" (top %)
-power_goal  <- 0.95      # outline tiles with power above this; NA = no outline
+# Outline levels: each tile gets the outline of the highest level it exceeds.
+# Light/thin -> dark/thick. NULL = no outlines. Up to 4 levels.
+power_levels  <- c(0.80, 0.90, 0.95)
+outline_cols  <- c("#fdc086", "#f28e2b", "#d95f02", "#8c2d04")
+outline_width <- c(0.5, 0.8, 1.1, 1.4)
 show_values <- FALSE     # print the power value in each tile (crowded at print size)
 show_defs   <- FALSE     # power definition + null under the title
                          # (FALSE for the main text: put these in the caption)
@@ -78,6 +82,30 @@ fill_ramp <- c("#f7f9fc", "#b7d3f6", "#6da7ec", "#2a78d6", "#104281", "#0d366b")
 ne_num <- function(x) ifelse(grepl("k$", x),
                              as.numeric(sub("k$", "", x)) * 1000,
                              as.numeric(x))
+
+# Stepped outlines: each tile gets the highest power level it exceeds,
+# drawn low -> high so the darkest outline sits on top
+add_outlines <- function(p, d) {
+  if (length(power_levels) == 0) return(p)
+  lv  <- sort(power_levels)
+  if (length(lv) > length(outline_cols)) stop("More power_levels than outline_cols")
+  lab <- paste0("> ", formatC(lv, format = "f", digits = 2))
+  hi <- d %>%
+    mutate(level = findInterval(power, lv, left.open = TRUE)) %>%
+    filter(level > 0) %>%
+    arrange(level) %>%
+    mutate(level_lab = factor(lab[level], levels = lab))
+  p +
+    geom_tile(data = hi, aes(colour = level_lab, linewidth = level_lab), fill = NA,
+              show.legend = TRUE) +
+    scale_colour_manual(values = setNames(outline_cols[seq_along(lv)], lab),
+                        limits = lab, drop = FALSE, name = "Outline\n(power)") +
+    scale_linewidth_manual(values = setNames(outline_width[seq_along(lv)], lab),
+                           limits = lab, drop = FALSE, name = "Outline\n(power)") +
+    guides(colour = guide_legend(order = 2, override.aes = list(fill = "white")),
+           linewidth = guide_legend(order = 2),
+           fill = guide_colourbar(order = 1))
+}
 
 # Which levels of a discrete axis get a tick label
 thin_breaks <- function(lv, mode) {
@@ -221,7 +249,7 @@ for (i in seq_len(nrow(combos))) {
   subtitle <- paste0(
     sprintf("%s, %s generations. ",
             ifelse(dec == 1, "Constant size", paste0("Decline ", dec)), g),
-    if (!is.na(power_goal)) sprintf("Outlined tiles: power > %g.", power_goal) else "",
+    if (length(power_levels) > 0) "Orange outlines: high power (see legend)." else "",
     if (show_defs) sprintf("\n%s. Expected with no selection: %g.", sp$def, sp$null) else "")
 
   p <- ggplot(d, aes(N_lab, s_lab, fill = power)) +
@@ -236,17 +264,14 @@ for (i in seq_len(nrow(combos))) {
     labs(title = sp$title, subtitle = subtitle, x = sp$xlab, y = "s") +
     theme_heat()
 
-  if (!is.na(power_goal)) {
-    hi <- d %>% filter(power > power_goal)
-    if (nrow(hi) > 0)
-      p <- p + geom_tile(data = hi, fill = NA, colour = "#e69f00", linewidth = 0.9)
-  }
+  p <- add_outlines(p, d)
 
   if (show_values) {
-    p <- p + geom_text(aes(label = sprintf("%.2f", power),
-                           colour = power > 0.55),
-                       size = text_size * 0.2, show.legend = FALSE) +
-      scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "#3d3d3a"), guide = "none")
+    p <- p +
+      geom_text(data = filter(d, power >  0.55), aes(label = sprintf("%.2f", power)),
+                colour = "white",   size = text_size * 0.2) +
+      geom_text(data = filter(d, power <= 0.55), aes(label = sprintf("%.2f", power)),
+                colour = "#3d3d3a", size = text_size * 0.2)
   }
 
   stem <- sprintf("power_heatmap.%s.decline_%.2f.Gen_%s", sp$slug, dec, g)
