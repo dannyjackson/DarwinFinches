@@ -255,7 +255,7 @@ make_row <- function(d, k, top, part) {
   add_outlines(p, d)
 }
 
-# Part header: bold numeral, then a plain-text heading after a small gap
+# Part header: bold numeral, then a bold heading after a small gap
 numeral <- function(txt, title = NULL) {
   num <- grid::textGrob(txt, x = grid::unit(0, "npc"), hjust = 0,
                         gp = grid::gpar(fontsize = text_size + 2, fontface = "bold"))
@@ -263,7 +263,7 @@ numeral <- function(txt, title = NULL) {
   ttl <- grid::textGrob(title,
                         x = grid::unit(0, "npc") + grid::grobWidth(num) + grid::unit(2, "mm"),
                         hjust = 0,
-                        gp = grid::gpar(fontsize = text_size + 1, fontface = "plain"))
+                        gp = grid::gpar(fontsize = text_size + 1, fontface = "bold"))
   wrap_elements(full = grid::grobTree(num, ttl))
 }
 
