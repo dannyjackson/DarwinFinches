@@ -55,6 +55,11 @@ decline_main <- 1                       # both parts
 Ne_main      <- "25k"                   # part I
 Ne_compare   <- c("50k", "75k")         # part II sub-rows (Ne_main is not repeated)
 approaches_II <- c("D")                 # approaches shown in part II, e.g. c("C", "D")
+
+# Headings next to the numerals (sentence case, no final period). NULL = numeral only.
+# Update the Ne in title_I if you change Ne_main.
+title_I  <- "Comparison of approaches (Ne = 25,000)"
+title_II <- "Effect of Ne on cross-species pathway enrichment"
 f0_values    <- NULL                    # columns in both parts; NULL = every f0 present
 Gen_values   <- NULL                    # one figure per Gen; NULL = every Gen present
 s_values     <- NULL                    # tile rows; NULL = every s present
@@ -250,10 +255,16 @@ make_row <- function(d, k, top, part) {
   add_outlines(p, d)
 }
 
-numeral <- function(txt) {
-  wrap_elements(full = grid::textGrob(txt, x = grid::unit(0, "npc"), hjust = 0,
-                                      gp = grid::gpar(fontsize = text_size + 2,
-                                                      fontface = "bold")))
+# Part header: bold numeral, then a plain-text heading after a small gap
+numeral <- function(txt, title = NULL) {
+  num <- grid::textGrob(txt, x = grid::unit(0, "npc"), hjust = 0,
+                        gp = grid::gpar(fontsize = text_size + 2, fontface = "bold"))
+  if (is.null(title) || !nzchar(title)) return(wrap_elements(full = num))
+  ttl <- grid::textGrob(title,
+                        x = grid::unit(0, "npc") + grid::grobWidth(num) + grid::unit(2, "mm"),
+                        hjust = 0,
+                        gp = grid::gpar(fontsize = text_size + 1, fontface = "plain"))
+  wrap_elements(full = grid::grobTree(num, ttl))
 }
 
 # ---------------- plot: one figure per Gen ----------------
@@ -263,9 +274,9 @@ for (g in sort(unique(c(dat_I$Gen, dat_II$Gen)))) {
 
   ks    <- c("A", "B", "C", "D")
   ks_II <- intersect(ks, approaches_II)
-  cells <- c(list(numeral("I")),
+  cells <- c(list(numeral("I", title_I)),
              lapply(ks, function(k) make_row(filter(dI, panel == k), k, k == ks[1], "I")),
-             list(numeral("II")),
+             list(numeral("II", title_II)),
              lapply(ks_II, function(k) make_row(filter(dII, panel == k), k,
                                                 k == ks_II[1], "II")))
 
