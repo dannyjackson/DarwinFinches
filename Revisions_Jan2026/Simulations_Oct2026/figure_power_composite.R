@@ -2,14 +2,15 @@
 # ============================================================
 # Composite main-text figure: power heatmaps
 #
-# One figure per generation time. Two parts side by side; rows line up by approach.
+# One figure per generation time. Two parts stacked, I above II; columns (f0)
+# line up between the parts.
 #
 #   I   Comparison across approaches at one demography (default Ne = 25k, decline = 1)
 #         rows    = approach A-D
 #         columns = starting frequency f0
-#   II  Comparison across Ne (default 25k, 50k, 75k) at one f0 (default 0.2), same decline
-#         rows    = approach A-D
-#         columns = Ne
+#   II  The same approaches at the other Ne values (default 50k, 75k), same decline
+#         rows    = approach A-D, each split into one sub-row per Ne
+#         columns = starting frequency f0
 #
 #   Approaches  A  outliers: one species           (N = selected windows in genome)
 #               B  outliers: three-species overlap (N = parallel genes in genome)
@@ -19,7 +20,7 @@
 #   tile    = x: number selected (N), y: selection coefficient s, fill: power
 #   outline = orange, one shade per power level (default > 0.80, > 0.90, > 0.95)
 #
-# No figure title or subtitle: Ne, decline, Gen, f0 for part II, power definitions
+# No figure title or subtitle: Ne, decline, Gen, power definitions
 # and nulls go in the caption (printed to the console at the end as a reminder).
 #
 # Inputs (same as power_heatmap_nsel.byNe.R):
@@ -51,9 +52,8 @@ out_dir      <- "output/figure_power_composite"
 
 decline_main <- 1                       # both parts
 Ne_main      <- "25k"                   # part I
-f0_main      <- NULL                    # part I columns; NULL = every f0 present
-Ne_compare   <- c("25k", "50k", "75k")  # part II columns
-f0_compare   <- 0.2                     # part II: one starting frequency
+Ne_compare   <- c("50k", "75k")         # part II sub-rows (Ne_main is not repeated)
+f0_values    <- NULL                    # columns in both parts; NULL = every f0 present
 Gen_values   <- NULL                    # one figure per Gen; NULL = every Gen present
 s_values     <- NULL                    # tile rows; NULL = every s present
 
@@ -70,9 +70,9 @@ x_ticks <- "ends"                       # N
 y_ticks <- "ends"                       # s
 
 # Print size. Text sizes are in points AT THIS SIZE; at 14 in shrunk to a
-# 7.2 in two-column width, 15 pt -> ~7.7 pt.
+# 7.2 in two-column width, 15 pt -> ~7.7 pt. 14 x 18 in is close to a full page.
 fig_width  <- 14                        # inches
-fig_height <- 10
+fig_height <- 18
 text_size  <- 15
 
 # light = low power, dark = high power
@@ -122,24 +122,27 @@ dat <- bind_rows(A, B, C, D)
 if (!is.null(Gen_values)) dat <- dat %>% filter(Gen %in% Gen_values)
 if (!is.null(s_values))   dat <- dat %>% filter(round(sel_s, 6) %in% round(s_values, 6))
 
+if (!is.null(f0_values)) dat <- dat %>% filter(round(f0, 6) %in% round(f0_values, 6))
+
 dat_I  <- dat %>% filter(Ne == Ne_main)
-if (!is.null(f0_main)) dat_I <- dat_I %>% filter(round(f0, 6) %in% round(f0_main, 6))
-dat_II <- dat %>% filter(Ne %in% Ne_compare, abs(f0 - f0_compare) < 1e-9)
+dat_II <- dat %>% filter(Ne %in% setdiff(Ne_compare, Ne_main))
 
 if (nrow(dat_I) == 0)  stop("Part I: no data for Ne = ", Ne_main, ", decline = ", decline_main)
-if (nrow(dat_II) == 0) stop("Part II: no data for f0 = ", f0_compare, ", decline = ", decline_main)
+if (nrow(dat_II) == 0) stop("Part II: no data for Ne = ", paste(Ne_compare, collapse = ", "),
+                            ", decline = ", decline_main)
 
 # Shared levels so both parts use the same tiles, columns and colours
 s_levels  <- sort(unique(c(dat_I$sel_s, dat_II$sel_s)))
-f0_levels <- sort(unique(dat_I$f0))
-Ne_levels <- Ne_compare[order(ne_num(Ne_compare))]
+f0_levels <- sort(unique(c(dat_I$f0, dat_II$f0)))
+Ne_levels <- unique(dat_II$Ne[order(ne_num(dat_II$Ne))])
 N_levels  <- lapply(split(c(dat_I$N, dat_II$N), c(dat_I$panel, dat_II$panel)),
                     function(x) sort(unique(x)))
 
-dat_I <- dat_I %>%
+lab_f0 <- function(d) d %>%
   mutate(col_lab = factor(paste0("f0 = ", f0), levels = paste0("f0 = ", f0_levels)))
-dat_II <- dat_II %>%
-  mutate(col_lab = factor(paste0("Ne = ", Ne), levels = paste0("Ne = ", Ne_levels)))
+dat_I  <- lab_f0(dat_I)
+dat_II <- lab_f0(dat_II) %>%
+  mutate(Ne_lab = factor(paste0("Ne = ", Ne), levels = paste0("Ne = ", Ne_levels)))
 
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 write.table(bind_rows(mutate(dat_I, part = "I"), mutate(dat_II, part = "II")) %>%
@@ -150,10 +153,11 @@ write.table(bind_rows(mutate(dat_I, part = "I"), mutate(dat_II, part = "II")) %>
 
 # Coverage check: every approach should be present in both parts for every Gen
 cov <- bind_rows(mutate(dat_I, part = "I"), mutate(dat_II, part = "II")) %>%
-  distinct(part, Gen, panel, col_lab)
-cat("Columns present per part x Gen x approach:\n")
+  distinct(part, Gen, panel, Ne, f0)
+cat("Coverage per part x Gen x approach:\n")
 print(cov %>% group_by(part, Gen, panel) %>%
-        summarise(columns = paste(sort(as.character(unique(col_lab))), collapse = ", "),
+        summarise(Ne = paste(unique(Ne[order(ne_num(Ne))]), collapse = ", "),
+                  f0 = paste(sort(unique(f0)), collapse = ", "),
                   .groups = "drop"), n = Inf, width = Inf)
 
 # ---------------- approach labels ----------------
@@ -204,8 +208,8 @@ add_outlines <- function(p, d) {
            fill = guide_colourbar(order = 1))
 }
 
-# One row of one part: one approach, columns = f0 (I) or Ne (II)
-make_row <- function(d, k, top, left) {
+# One row of one part: one approach, columns = f0; part II adds one sub-row per Ne
+make_row <- function(d, k, top, part) {
   sp <- specs[[k]]
   if (nrow(d) == 0) return(plot_spacer())
   d <- d %>%
@@ -214,19 +218,20 @@ make_row <- function(d, k, top, left) {
 
   p <- ggplot(d, aes(N_lab, s_lab, fill = power)) +
     geom_tile(colour = "white", linewidth = 0.3) +
-    facet_wrap(~ col_lab, nrow = 1, drop = FALSE) +
+    (if (part == "I") facet_wrap(~ col_lab, nrow = 1, drop = FALSE)
+     else facet_grid(Ne_lab ~ col_lab, drop = FALSE)) +
     scale_fill_gradientn(colours = fill_ramp, limits = c(0, 1),
                          breaks = seq(0, 1, 0.25), name = "Power") +
     scale_x_discrete(drop = FALSE,
                      breaks = thin_breaks(as.character(N_levels[[k]]), x_ticks)) +
     scale_y_discrete(drop = FALSE,
                      breaks = thin_breaks(as.character(s_levels), y_ticks)) +
-    labs(title = if (left) sp$title else " ",   # blank keeps rows aligned
-         x = sp$xlab, y = if (left) "s" else NULL) +
+    labs(title = sp$title, x = sp$xlab, y = "s") +
     theme_heat()
 
-  # column labels (f0 or Ne) on the top row only
-  if (!top) p <- p + theme(strip.text = element_blank(), strip.background = element_blank())
+  # f0 column labels on the top row of each part only; Ne row labels (II) on every row
+  if (!top) p <- p + theme(strip.text.x = element_blank(),
+                           strip.background.x = element_blank())
 
   add_outlines(p, d)
 }
@@ -242,16 +247,15 @@ for (g in sort(unique(c(dat_I$Gen, dat_II$Gen)))) {
   dI  <- dat_I  %>% filter(Gen == g)
   dII <- dat_II %>% filter(Gen == g)
 
-  cells <- list(numeral("I"), numeral("II"))
-  for (k in c("A", "B", "C", "D")) {
-    top <- k == "A"
-    cells <- c(cells, list(make_row(filter(dI,  panel == k), k, top, left = TRUE),
-                           make_row(filter(dII, panel == k), k, top, left = FALSE)))
-  }
+  ks <- c("A", "B", "C", "D")
+  cells <- c(list(numeral("I")),
+             lapply(ks, function(k) make_row(filter(dI,  panel == k), k, k == "A", "I")),
+             list(numeral("II")),
+             lapply(ks, function(k) make_row(filter(dII, panel == k), k, k == "A", "II")))
 
-  fig <- wrap_plots(cells, ncol = 2,
-                    widths  = c(length(f0_levels), length(Ne_levels)),
-                    heights = c(0.08, 1, 1, 1, 1)) +
+  n_ne <- max(1, length(Ne_levels))
+  fig <- wrap_plots(cells, ncol = 1,
+                    heights = c(0.12, rep(1, 4), 0.12, rep(n_ne, 4))) +
     plot_layout(guides = "collect") &
     theme(legend.position = "right")
 
@@ -265,9 +269,8 @@ for (g in sort(unique(c(dat_I$Gen, dat_II$Gen)))) {
 
 # ---------------- caption reminder ----------------
 cat("\nFor the caption:\n")
-cat(sprintf("  I: Ne = %s, %s. II: f0 = %g, %s.\n", Ne_main,
-            ifelse(decline_main == 1, "constant size", paste0("decline ", decline_main)),
-            f0_compare,
+cat(sprintf("  I: Ne = %s. II: Ne = %s. Both %s; columns = starting frequency f0.\n",
+            Ne_main, paste(Ne_levels, collapse = ", "),
             ifelse(decline_main == 1, "constant size", paste0("decline ", decline_main))))
 cat("  A: power = share of selected windows in the top 1% of 10,000 (null 0.01)\n")
 cat("  B: power = share of parallel genes in all three top-1% lists (null 0)\n")
