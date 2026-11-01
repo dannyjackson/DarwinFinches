@@ -55,108 +55,22 @@ Check the log for:
 
 ## Run
 
-Main set: Ne = 100k, no decline, both generation intervals, all s × f0, plus a null control per interval.
-
 ```
-##########################################
-NE=100k
-##########################################
-D=1.00
+cd ${PROJDIR}
+mkdir -p output/logs
+D=1.00 0.90
 GEN_TIMES=(5 10)
 SELS=(0.01 0.02 0.05 0.1 0.2 0.3 0.4 0.5)
 F0S=(0.05 0.1 0.2 0.4 0.6)
 
-for G in "${GEN_TIMES[@]}"; do
-  # null control
-  sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s 0.0
-
-  for S in "${SELS[@]}"; do
-    for F0 in "${F0S[@]}"; do
-      sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s ${S} -f ${F0}
-      sleep 0.1
-    done
-  done
-done
-
-D=0.80
-for G in "${GEN_TIMES[@]}"; do
-  # null control
-  sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s 0.0
-
-  for S in "${SELS[@]}"; do
-    for F0 in "${F0S[@]}"; do
-      sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s ${S} -f ${F0}
-      sleep 0.1
-    done
-  done
-done
-
-##########################################
-NE=50k
-##########################################
-D=1.00
-GEN_TIMES=(5 10)
-SELS=(0.01 0.02 0.05 0.1 0.2 0.5)
-F0S=(0.05 0.1 0.2 0.4 0.6)
-
-for G in "${GEN_TIMES[@]}"; do
-  # null control
-  sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s 0.0
-
-  for S in "${SELS[@]}"; do
-    for F0 in "${F0S[@]}"; do
-      sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s ${S} -f ${F0}
-      sleep 0.1
-    done
-  done
-done
-
-
-D=0.80
-
-for G in "${GEN_TIMES[@]}"; do
-  # null control
-  sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s 0.0
-
-  for S in "${SELS[@]}"; do
-    for F0 in "${F0S[@]}"; do
-      sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s ${S} -f ${F0}
-      sleep 0.1
-    done
-  done
-done
-
-##########################################
-NE=200k
-##########################################
-D=1.00
-GEN_TIMES=(5 10)
-SELS=(0.01 0.02 0.05 0.1 0.2 0.5)
-F0S=(0.05 0.1 0.2 0.4 0.6)
-
-for G in "${GEN_TIMES[@]}"; do
-  # null control
-  sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s 0.0
-
-  for S in "${SELS[@]}"; do
-    for F0 in "${F0S[@]}"; do
-      sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s ${S} -f ${F0}
-      sleep 0.1
-    done
-  done
-done
-
-
-D=0.80
-
-for G in "${GEN_TIMES[@]}"; do
-  # null control
-  sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s 0.0
-
-  for S in "${SELS[@]}"; do
-    for F0 in "${F0S[@]}"; do
-      sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s ${S} -f ${F0}
-      sleep 0.1
+for NE in 25k 50k 75k; do
+  for G in "${GEN_TIMES[@]}"; do
+    sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s 0.0   # null control
+    for S in "${SELS[@]}"; do
+      for F0 in "${F0S[@]}"; do
+        sbatch ${SCRIPTDIR}/run_gsea_power_empirical.sh -N ${NE} -o ${G} -r ${D} -s ${S} -f ${F0}
+        sleep 0.1
+      done
     done
   done
 done
@@ -177,7 +91,7 @@ cd ${PROJDIR}
 
 module load R
 
-Rscript ${SCRIPTDIR}/summarize_gsea_power_empirical.R
+# Rscript ${SCRIPTDIR}/summarize_gsea_power_empirical.R
 Rscript ${SCRIPTDIR}/plot_gsea_parallel_nsel.R
 ```
 

@@ -43,7 +43,7 @@ out_dir      <- "output/figure_power_summary_nsel"
 Ne_values    <- c("25k", "50k", "75k")   # one line per Ne in every panel
 base_decline <- 1
 f0_fixed     <- 0.2          # one starting frequency for every panel
-s_values     <- c(0.05, 0.1, 0.2)   # one figure per s (per Gen); NULL = every s
+s_values     <- c(0.05, 0.1, 0.2, 0.3, 0.4, 0.5)   # one figure per s (per Gen); NULL = every s
 gsea_top     <- "5"          # GSEA cutoff for C and D: "5" or "1" (top %)
 
 text_size <- 12
