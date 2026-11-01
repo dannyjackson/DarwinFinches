@@ -1,0 +1,27 @@
+# Independent a priori review and scoring rationale
+
+The ratings concern physiological relevance, not evidence that a pathway is selected, and not whether a response necessarily benefits the host. Only the supplied term list was read locally. No bird genomic, transcriptomic, or gene-expression results were used. Scores were individually assigned in input order, without a target score distribution.
+
+## Host injury and compensation
+
+Adult Philornis downsi are free living. Early larvae invade nestling nostrils and other tissues; later larvae live in nest material and feed externally, particularly at night. Tissue injury, blood loss, anemia, reduced growth and nestling death are central effects. Permanent nasal damage also makes tissue integrity and repair relevant. Fessl, Sinclair and Kleindorfer (2006), *The life-cycle of Philornis downsi ... and its impacts on nestling survival*, documents the larval shift and severe host injury: https://doi.org/10.1017/S0031182006001089
+
+Dudaniec, Kleindorfer and Fessl (2006), *Effects ... on haemoglobin level and nestling survival in Darwin's Small Ground Finch*, reports reduced hemoglobin and a reticulocyte response. This directly supports erythrocyte production and hematopoiesis as host responses. Iron homeostasis, oxygen sensing, vascular maintenance, hemostasis and metabolic adaptation are strong or supporting predictions, rather than demonstrated pathway-specific defenses: https://doi.org/10.1111/j.1442-9993.2006.01553.x
+
+## Resistance and immune responses
+
+Koop et al. (2013), *Experimental demonstration of a parasite-induced immune response in wild birds*, experimentally found fly-binding antibodies elevated in mothers from parasitized nests, with higher maternal antibody levels associated with fewer flies. Males and nestlings did not show corresponding induced defenses, and maternal responses did not rescue fledging. Thus adaptive immunity is directly relevant, with B-cell activation/differentiation and receptor signaling core components. Innate sensing, inflammation, cytokine signaling, phagocytosis and inflammatory restraint are credible predictions from tissue penetration and immune exposure, but were not treated as pathway-specific demonstrated defenses: https://pubmed.ncbi.nlm.nih.gov/24567824/ ; https://doi.org/10.1002/ece3.651
+
+## Tolerance, nutrition and behavior
+
+Knutie et al. (2016), *Galapagos mockingbirds tolerate introduced parasites that affect Darwin's finches*, experimentally found mockingbird nestlings increased begging, correlated with greater parental provisioning and apparent compensation. Finches showed no corresponding increase, and neither species showed a significant induced antibody response in that experiment. This prevents assuming immunity or tolerance is uniform among species, sexes or years. Energy and nutrient compensation are directly relevant; individual carbohydrate, lipid, amino-acid and endocrine pathways are mostly supporting rather than directly demonstrated mechanisms: https://doi.org/10.1890/15-0119.1
+
+McNew et al. (2019), *Annual environmental variation influences host tolerance to parasites*, found mockingbird tolerance decreased in dry years and implicated reduced provisioning. Food availability constrains compensation: https://pubmed.ncbi.nlm.nih.gov/30963843/ ; https://doi.org/10.1098/rspb.2019.0049
+
+McNew and Clayton (2018), *Alien Invasion: Biology of Philornis Flies Highlighting Philornis downsi*, reviews avoidance, preening, nest-related behavior and immune defenses. Females may reduce brooding and stand more in infested nests, with possible thermoregulatory costs. Preening and larval removal are limited or inconsistent, rather than universally effective. Leaf anointing with Psidium has been proposed as self-medication; fitness protection against the fly is not established. Sensation, pain, motor function, learning and circadian timing can support these behaviors, but most generic synaptic or neurodevelopmental terms remain indirect: https://doi.org/10.1146/annurev-ento-020117-043103 ; https://darwin.biology.utah.edu/PDFs/133.pdf
+
+Knutie et al. (2014), *Darwin's finches combat introduced nest parasites with fumigated cotton*, demonstrated use of supplied insecticide-treated nest material. This is assisted behavioral control, not evidence for an endogenous insecticide mechanism: https://doi.org/10.1016/j.cub.2014.03.058
+
+## Applying the scale
+
+Highest ratings identify documented response classes such as immunity, erythrocyte replacement and energy compensation. Wound repair, epithelial barriers, clotting, hypoxia responses and core immune components generally receive 4 as strong a priori predictions. Oxidative protection, tissue remodeling, migration and metabolic support receive intermediate ratings according to specificity. General housekeeping, chromosome machinery, RNA processing, unrelated reproductive development and specialized embryonic patterning receive low ratings. Viral replication or intracellular symbiont entry is not a direct mechanism for an extracellular fly larva; possible secondary infection supports only limited indirect relevance. Mammalian platelet labels are interpreted cautiously as hemostatic functions with avian thrombocyte counterparts. GO:0160240 has only an identifier as its supplied name and could not be resolved in the searches; it receives 1 because no specific physiological link can be established, rather than an invented meaning.

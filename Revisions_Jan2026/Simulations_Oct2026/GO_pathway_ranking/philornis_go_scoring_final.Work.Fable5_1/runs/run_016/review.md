@@ -1,0 +1,36 @@
+# Literature review: host responses of Galápagos land birds to Philornis downsi (run_016)
+
+## What the larvae do to hosts
+- Adult flies are free-living; females oviposit in active nests. First-instar larvae live and feed inside the nares (nostrils), ear canals and developing feather quills of nestlings; second/third instars live in the nest base and emerge at night to feed externally on blood and tissue of nestlings and, occasionally, brooding females (Fessl et al. 2006 Parasitology; Fessl, Heimpel & Causton 2018; Kleindorfer & Dudaniec 2016; Common et al. 2020).
+- Documented pathology: blood loss and anaemia (reduced haemoglobin, 14-40% in parasitized vs fumigated nests), skin wounds/lesions on abdomen, nares and ear openings, enlargement and permanent malformation of the naris and beak (loss of upper nasal cavity, keratin/bone damage), reduced mass and growth, 50-100% nestling mortality in some years; survivors have altered song (Dudaniec et al. 2006; Fessl et al. 2006; Huber 2008; Koop et al. 2011; Galligan & Kleindorfer 2009; Kleindorfer & Sulloway 2016; Kleindorfer et al. 2019; Knutie et al. 2016).
+- Larvae are nocturnal and hide in nest material by day, which limits detection and behavioural defence (Fessl et al. 2018; Pike et al. 2022).
+
+## Host defences documented or proposed
+1. Adaptive (antibody-mediated) immunity: parasite-specific IgY antibody responses to P. downsi antigens detected in medium ground finches and at least eight finch species; higher in adult females at parasitized nests. Effect on parasite load is weak/inconsistent (Huber et al. 2010 PLoS ONE; Koop et al. 2013 Ecol Evol; Knutie et al. 2016 Ecology found no significant antibody response in finches or mockingbirds).
+2. Local innate/inflammatory and wound responses: lesions at larval feeding sites imply inflammation, haemostasis/coagulation, re-epithelialization, dermal/keratin repair, and secondary bacterial exposure; inflammatory swelling may itself be a resistance mechanism against feeding larvae (as in other ectoparasite systems; reviewed in Fessl et al. 2018; Kleindorfer & Dudaniec 2016).
+3. Tolerance via haematological and energetic compensation: tolerant Galápagos mockingbirds maintain fledging success at similar parasite densities, apparently via increased parental provisioning (energy compensation) that offsets blood loss; tolerance declines in drought years. Compensatory erythropoiesis and iron handling are implied by haemoglobin recovery (Knutie et al. 2016 Ecology; McNew et al. 2019 Proc B "Annual environmental variation influences host tolerance"; Heyer et al. 2021; Green warbler-finch provisioning study 2023 J Ornithol).
+4. Growth and metabolic responses: parasitized nestlings show reduced growth/mass and poorer condition; nutrient/energy homeostasis, glucose/lipid metabolism and growth-factor signalling (IGF) are plausible tolerance axes (Huber 2008; Koop et al. 2011; O'Connor et al. 2014 begging study).
+5. Behavioural defences: nestling preening of larvae and standing on nest mates, altered begging, increased female in-nest attendance (which predicts lower parasite numbers), parental provisioning adjustments, and self-fumigation by rubbing Psidium galapageium leaves on feathers; finches also incorporate insecticide-treated cotton into nests (O'Connor et al. 2014; Kleindorfer et al. 2021 Proc B; Cimadom et al. 2016; Knutie et al. 2014). Nociception (pain/itch from feeding larvae), sensory and circadian (nocturnal feeding) processes are plausible proximate components.
+6. Tissue/skeletal repair of the naris and beak: naris malformation persists across life; craniofacial keratin, cartilage, bone and epithelial regeneration processes are plausible a priori contributors to resistance/tolerance of nasal tissue destruction (Galligan & Kleindorfer 2009; Kleindorfer & Sulloway 2016; Kleindorfer et al. 2022 Funct Ecol).
+7. Systemic stress: hypoxia from anaemia, oxidative stress, glucocorticoid stress responses, cardiovascular compensation for hypovolaemia are plausible downstream processes.
+
+## Scoring approach
+5: terms naming documented host responses (wound healing/response to wounding, inflammatory response, innate/adaptive/immune response, B cell activation, erythrocyte differentiation, haemopoiesis, blood coagulation, defense response). 4: core components (cytokine/TNF/IL-6/IL-8/IL-1/IL-17 signalling, NF-kB, TLR, complement, T/B cell processes, platelet activation/aggregation, iron homeostasis, hypoxia response, energy homeostasis, epidermis/skin/keratinocyte development, ECM/collagen organisation, fibroblast proliferation, leukocyte adhesion). 3: plausible supporting processes (angiogenesis, epithelial proliferation/migration, chemotaxis/phagocytosis, oxidative stress, glucose homeostasis, starvation/nutrient responses, MAPK/JNK/p38/JAK-STAT, TGF-beta, steroid hormone signalling, circadian rhythm, pain perception, cartilage/chondrocyte and palate development, blood pressure, IGF signalling). 2: weak/indirect links (general metabolism, bone/skeletal development, growth signalling, apoptosis, xenobiotic responses, learning/memory, antiviral terms). 1: no specific link (housekeeping, neural wiring, cell cycle, RNA processing, organogenesis of unrelated organs, etc.).
+
+## Key sources
+- Fessl B, Sinclair BJ, Kleindorfer S (2006) Parasitology 133:739-747. https://doi.org/10.1017/S0031182006001089
+- Dudaniec RY, Kleindorfer S, Fessl B (2006) Austral Ecology 31:88-94. https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1442-9993.2006.01553.x
+- Huber SK et al. (2010) PLoS ONE 5:e8605. https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0008605
+- Koop JAH et al. (2013) Ecology and Evolution 3:2514-2523. https://pmc.ncbi.nlm.nih.gov/articles/PMC3930052/
+- Knutie SA et al. (2016) Ecology 97:940-950. https://esajournals.onlinelibrary.wiley.com/doi/10.1890/15-0119.1
+- McNew SM et al. (2019) Proc R Soc B (annual variation in tolerance). https://pmc.ncbi.nlm.nih.gov/articles/PMC6408884/
+- Galligan TH, Kleindorfer S (2009) Biol J Linn Soc 98:577-585. https://academic.oup.com/biolinnean/article/98/3/577/2532299
+- Kleindorfer S, Sulloway FJ (2016) Global Ecology and Conservation 7:122-131. https://www.sciencedirect.com/science/article/pii/S2351989416300336
+- Kleindorfer S et al. (2019) Proc R Soc B 286:20190461. https://pmc.ncbi.nlm.nih.gov/articles/PMC6571467/
+- Kleindorfer S et al. (2021) Proc R Soc B (female in-nest attendance). https://pmc.ncbi.nlm.nih.gov/articles/PMC8670954/
+- Kleindorfer S et al. (2022) Functional Ecology (beak functional traits). https://besjournals.onlinelibrary.wiley.com/doi/10.1111/1365-2435.14061
+- Fessl B, Heimpel GE, Causton CE (2018) in Disease Ecology (Springer). https://link.springer.com/chapter/10.1007/978-3-319-65909-1_9
+- McNew SM, Clayton DH (2018) Annual Review of Entomology 63:369-387. https://www.annualreviews.org/content/journals/10.1146/annurev-ento-020117-043103
+- Pike CL et al. (2022) J Insect Sci (larval/adult behaviour). https://pmc.ncbi.nlm.nih.gov/articles/PMC8813692/
+- Parental provisioning in Green Warbler-Finch (2023) J Ornithol. https://link.springer.com/article/10.1007/s10336-023-02049-9
+- Nest treatment review (2025) Front Conserv Sci. https://www.frontiersin.org/journals/conservation-science/articles/10.3389/fcosc.2025.1591266/full

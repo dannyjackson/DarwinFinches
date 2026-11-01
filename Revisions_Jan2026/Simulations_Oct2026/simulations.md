@@ -153,7 +153,11 @@ Rscript ${SCRIPTDIR}/parallel_outlier_overlap.R
 
 Rscript ${SCRIPTDIR}/plot_gsea_parallel_nsel.R      # writes summary_nsel.tsv for D
 
-Rscript ${SCRIPTDIR}/multipanel_power_figure_nsel.R
+# Rscript ${SCRIPTDIR}/multipanel_power_figure_nsel.R
+
+Rscript ${SCRIPTDIR}/multipanel_power_figure.multiNe.R
+Rscript ${SCRIPTDIR}/multipanel_power_figure_nsel.multiNe.R
+
 ```
 # Outlier analyses
 ```

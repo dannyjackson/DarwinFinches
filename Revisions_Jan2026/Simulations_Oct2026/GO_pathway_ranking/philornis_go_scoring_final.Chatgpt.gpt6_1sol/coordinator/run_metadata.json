@@ -1,0 +1,242 @@
+{
+  "1": {
+    "shuffle_seed": 1001,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_001"
+  },
+  "2": {
+    "shuffle_seed": 1002,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_002"
+  },
+  "3": {
+    "shuffle_seed": 1003,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_003"
+  },
+  "4": {
+    "shuffle_seed": 1004,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_004"
+  },
+  "5": {
+    "shuffle_seed": 1005,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_005"
+  },
+  "6": {
+    "shuffle_seed": 1006,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_006"
+  },
+  "7": {
+    "shuffle_seed": 1007,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_007"
+  },
+  "8": {
+    "shuffle_seed": 1008,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_008"
+  },
+  "9": {
+    "shuffle_seed": 1009,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_009"
+  },
+  "10": {
+    "shuffle_seed": 1010,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_010"
+  },
+  "11": {
+    "shuffle_seed": 1011,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_011"
+  },
+  "12": {
+    "shuffle_seed": 1012,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_012"
+  },
+  "13": {
+    "shuffle_seed": 1013,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_013"
+  },
+  "14": {
+    "shuffle_seed": 1014,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_014"
+  },
+  "15": {
+    "shuffle_seed": 1015,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_015"
+  },
+  "16": {
+    "shuffle_seed": 1016,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_016"
+  },
+  "17": {
+    "shuffle_seed": 1017,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_017"
+  },
+  "18": {
+    "shuffle_seed": 1018,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_018"
+  },
+  "19": {
+    "shuffle_seed": 1019,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_019"
+  },
+  "20": {
+    "shuffle_seed": 1020,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_020"
+  },
+  "21": {
+    "shuffle_seed": 1021,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_021"
+  },
+  "22": {
+    "shuffle_seed": 1022,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_022"
+  },
+  "23": {
+    "shuffle_seed": 1023,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_023"
+  },
+  "24": {
+    "shuffle_seed": 1024,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_024"
+  },
+  "25": {
+    "shuffle_seed": 1025,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_025"
+  },
+  "26": {
+    "shuffle_seed": 1026,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_026"
+  },
+  "27": {
+    "shuffle_seed": 1027,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_027"
+  },
+  "28": {
+    "shuffle_seed": 1028,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_028"
+  },
+  "29": {
+    "shuffle_seed": 1029,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_029"
+  },
+  "30": {
+    "shuffle_seed": 1030,
+    "token_use": "unavailable",
+    "rerun": false,
+    "attempts": 1,
+    "status": "validated",
+    "agent_task": "/root/run_030"
+  }
+}

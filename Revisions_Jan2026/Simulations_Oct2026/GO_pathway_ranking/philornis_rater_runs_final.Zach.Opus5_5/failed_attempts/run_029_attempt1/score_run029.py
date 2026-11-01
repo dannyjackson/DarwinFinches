@@ -1,0 +1,54 @@
+import sys
+S = {}
+def s(score, *ids):
+    for i in ids: S[i]=score
+# 5: documented antibody-mediated resistance / immune response
+s(5,"GO:0002250","GO:0042113","GO:0006955")
+# 4: core components / strong predictions (blood loss, wounds, immunity)
+s(4,"GO:0006954","GO:0050727","GO:0050729","GO:0050728","GO:0009611","GO:0042060",
+  "GO:0090303","GO:0007596","GO:0030168","GO:0070527","GO:0030218","GO:0045648",
+  "GO:0030097","GO:0045087","GO:0050776","GO:0002682","GO:0006952","GO:0002376",
+  "GO:0050853","GO:0030890","GO:0030183","GO:0042110","GO:0050870","GO:0050852",
+  "GO:0030217","GO:0006956","GO:0006879")
+# 3: plausible downstream/supporting
+s(3,"GO:0002244","GO:0045089","GO:0002218","GO:0045824","GO:0050868","GO:0050860",
+  "GO:0019221","GO:0034097","GO:0071345","GO:0071347","GO:0034612","GO:0071356",
+  "GO:0033209","GO:0001817","GO:0001819","GO:0001818","GO:0032755","GO:0032715",
+  "GO:0032757","GO:0032760","GO:0032720","GO:0032722","GO:0097400","GO:0007249",
+  "GO:0043122","GO:0043123","GO:0043124","GO:1900227","GO:0006909","GO:0006911",
+  "GO:0050766","GO:0060326","GO:0007159","GO:0001525","GO:0008544","GO:0043588",
+  "GO:0030216","GO:0045618","GO:0030199","GO:0048146","GO:0010634","GO:0001666",
+  "GO:0071456","GO:0032729","GO:0071346")
+# 2: weak / indirect / speculative
+s(2,"GO:0032735","GO:0002224","GO:0034142","GO:0032496","GO:0071222","GO:0042742",
+  "GO:0050829","GO:0002753","GO:0038061","GO:1901224","GO:1901223","GO:0046427",
+  "GO:0007259","GO:0046426","GO:0097696","GO:1900745","GO:0042554","GO:0006979",
+  "GO:0034599","GO:0098869","GO:0045454","GO:2000377","GO:2000379","GO:0070301",
+  "GO:0034614","GO:0006950","GO:0033554","GO:0009410","GO:0071466","GO:0042908",
+  "GO:0042594","GO:0009267","GO:0031667","GO:0031669","GO:0042593","GO:0001678",
+  "GO:0006094","GO:0097009","GO:0008286","GO:0048009","GO:0032868","GO:0032869",
+  "GO:0009725","GO:0032870","GO:0009755","GO:0030518","GO:0019233","GO:0007218",
+  "GO:0120162","GO:0120163","GO:0008217","GO:0002027","GO:0061028","GO:0017121",
+  "GO:0001778","GO:0030198","GO:0071711","GO:0007179","GO:0071560","GO:0007173",
+  "GO:0048010","GO:0038084","GO:0035924","GO:0002040","GO:0045766","GO:0045765",
+  "GO:0043542","GO:0010595","GO:0043536","GO:0050679","GO:0030855","GO:0002009",
+  "GO:0001837","GO:0002244" if False else "GO:0048863","GO:0001938",
+  "GO:0050918","GO:0006935","GO:0034113","GO:0045055","GO:0098586")
+# keep stem cell differentiation at 1 (generic)
+S["GO:0048863"]=1
+S["GO:0007612"]=2
+S["GO:0007613"]=2
+ids=[]
+with open("/home/claude/runs/run_029/input_terms.txt") as f:
+    next(f)
+    for line in f:
+        line=line.strip()
+        if line: ids.append(line.split(" ",1)[0])
+assert len(ids)==1008, len(ids)
+missing=[k for k in S if k not in ids]
+print("unknown ids:",missing, file=sys.stderr)
+with open("/home/claude/runs/run_029/scores.tsv","w") as o:
+    o.write("pathway\tscore\n")
+    for i in ids: o.write(f"{i}\t{S.get(i,1)}\n")
+from collections import Counter
+print(Counter(S.get(i,1) for i in ids), file=sys.stderr)
