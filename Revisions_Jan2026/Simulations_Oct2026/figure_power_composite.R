@@ -54,7 +54,7 @@ out_dir      <- "output/figure_power_composite"
 decline_main <- 1                       # both parts
 Ne_main      <- "25k"                   # part I
 Ne_compare   <- c("50k", "75k")         # part II sub-rows (Ne_main is not repeated)
-approaches_II <- c("E")                 # approaches shown in part II, e.g. c("C", "D")
+approaches_II <- c("D")                 # approaches shown in part II, e.g. c("C", "D")
 
 # Headings next to the numerals (sentence case, no final period). NULL = numeral only.
 # Update the Ne in title_I if you change Ne_main.
@@ -75,7 +75,7 @@ tile_border   <- 0.1                    # white line between tiles, mm
 
 # Tick labels on the discrete axes: "ends", an integer k (every k-th), or "all"
 x_ticks <- "ends"                       # N
-y_ticks <- "ends"                       # s
+y_ticks <- "all"                        # s: every level labelled (uneven spacing)
 
 # Final print size (Science / Science Advances). Drawn at 100%, so text sizes
 # are the sizes that will appear in the journal.
