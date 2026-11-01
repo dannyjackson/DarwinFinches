@@ -55,7 +55,8 @@ root_dir <- "."
 
 N_GENES           <- 10000   # pseudo-genes per species (same names in all three)
 N_SEL_PER_SPECIES <- 100     # selected genes in each species
-PARALLEL_VALUES   <- c(30)   # selected in all three; e.g. c(0, 30, 100) to compare
+# PARALLEL_VALUES   <- c(30)   # selected in all three; e.g. c(0, 30, 100) to compare
+PARALLEL_VALUES <- c(1, 2, 5, 10, 20, 30, 50, 100)
 TOP_N             <- 100     # top list size per species (top 1%)
 N_SPECIES         <- 3
 N_PERMUTATIONS    <- 100

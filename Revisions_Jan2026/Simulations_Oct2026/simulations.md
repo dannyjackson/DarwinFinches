@@ -2,7 +2,7 @@
 
 ## Set up working environment
 ```
-interactive -a mcnew -Q qual_qos_mcnew -n 2 
+interactive -a mcnew -n 2
 
 PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/
 SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/
@@ -139,13 +139,6 @@ cd $PROJDIR
 module load R
 
 Rscript ${SCRIPTDIR}/outlier_power_curves.R
-Rscript ${SCRIPTDIR}/plot_false_positive_curves.R
-Rscript ${SCRIPTDIR}/plot_ppv_curves.R
-```
-## Generate multipanel plot of all analyses
-```
-Rscript ${SCRIPTDIR}/multipanel_power_figure.R
-
 ```
 ## Generate multipanel plot of all analyses using all variations of N
 ```
@@ -162,3 +155,11 @@ Rscript ${SCRIPTDIR}/plot_gsea_parallel_nsel.R      # writes summary_nsel.tsv fo
 
 Rscript ${SCRIPTDIR}/multipanel_power_figure_nsel.R
 ```
+# Outlier analyses
+```
+# Rscript ${SCRIPTDIR}/plot_false_positive_curves.R
+# Rscript ${SCRIPTDIR}/plot_ppv_curves.R
+```
+## Generate multipanel plot of all analyses
+```
+Rscript ${SCRIPTDIR}/multipanel_power_figure.R
