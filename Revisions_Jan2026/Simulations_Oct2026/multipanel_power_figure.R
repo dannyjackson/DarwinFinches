@@ -37,7 +37,7 @@ file_gsea3   <- "gsea_empirical_power_nsel/summary_nsel.tsv"
 
 out_dir <- "output/figure_power_summary"
 
-base_Ne      <- "100k"
+base_Ne      <- "50k"
 base_decline <- 1
 
 # GSEA threshold: "5" (top 5%) or "1" (top 1%) for panels C and D
