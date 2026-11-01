@@ -53,10 +53,10 @@ s_values       <- NULL   # tile rows; e.g. c(0.05, 0.1, 0.2)
 
 gsea_top    <- "5"       # GSEA cutoff for C and D: "5" or "1" (top %)
 # Outline levels: each tile gets the outline of the highest level it exceeds.
-# Light/thin -> dark/thick. NULL = no outlines. Up to 4 levels.
+# Light -> dark orange, all the same thickness. NULL = no outlines. Up to 4 levels.
 power_levels  <- c(0.80, 0.90, 0.95)
 outline_cols  <- c("#fdc086", "#f28e2b", "#d95f02", "#8c2d04")
-outline_width <- c(0.5, 0.8, 1.1, 1.4)
+outline_width <- 1.2     # line thickness for every level
 show_values <- FALSE     # print the power value in each tile (crowded at print size)
 show_defs   <- FALSE     # power definition + null under each block title
                          # (FALSE for the main text: put these in the caption)
@@ -84,7 +84,7 @@ ne_num <- function(x) ifelse(grepl("k$", x),
                              as.numeric(x))
 
 # Stepped outlines: each tile gets the highest power level it exceeds,
-# drawn low -> high so the darkest outline sits on top
+# drawn low -> high so the darkest outline sits on top where neighbours overlap
 add_outlines <- function(p, d) {
   if (length(power_levels) == 0) return(p)
   lv  <- sort(power_levels)
@@ -96,14 +96,11 @@ add_outlines <- function(p, d) {
     arrange(level) %>%
     mutate(level_lab = factor(lab[level], levels = lab))
   p +
-    geom_tile(data = hi, aes(colour = level_lab, linewidth = level_lab), fill = NA,
-              show.legend = TRUE) +
+    geom_tile(data = hi, aes(colour = level_lab), fill = NA,
+              linewidth = outline_width, show.legend = TRUE) +
     scale_colour_manual(values = setNames(outline_cols[seq_along(lv)], lab),
                         limits = lab, drop = FALSE, name = "Outline\n(power)") +
-    scale_linewidth_manual(values = setNames(outline_width[seq_along(lv)], lab),
-                           limits = lab, drop = FALSE, name = "Outline\n(power)") +
     guides(colour = guide_legend(order = 2, override.aes = list(fill = "white")),
-           linewidth = guide_legend(order = 2),
            fill = guide_colourbar(order = 1))
 }
 

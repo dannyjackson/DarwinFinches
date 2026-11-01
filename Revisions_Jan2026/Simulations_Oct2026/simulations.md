@@ -157,7 +157,9 @@ Rscript ${SCRIPTDIR}/plot_gsea_parallel_nsel.R      # writes summary_nsel.tsv fo
 
 Rscript ${SCRIPTDIR}/multipanel_power_figure.multiNe.R
 Rscript ${SCRIPTDIR}/multipanel_power_figure_nsel.multiNe.R
-
+Rscript ${SCRIPTDIR}/multipanel_power_matrix_nsel.byNe.R
+Rscript ${SCRIPTDIR}/power_heatmap_nsel.byNe.R
+Rscript ${SCRIPTDIR}/power_heatmap_nsel.byApproach.R
 ```
 # Outlier analyses
 ```
