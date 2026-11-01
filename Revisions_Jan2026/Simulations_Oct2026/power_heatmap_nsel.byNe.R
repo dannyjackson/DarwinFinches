@@ -1,15 +1,14 @@
 #!/usr/bin/env Rscript
 # ============================================================
-# Power heatmaps per Ne: all four approaches x generation time x f0
+# Power heatmaps per Ne: all four approaches x f0
 #
-# One figure per Ne x decline.
+# One figure per Ne x decline x generation time.
 #
-#   row blocks = approach (each block has its own N axis)
+#   rows       = approach (each row has its own N axis)
 #                  A  outliers: one species           (N = selected windows in genome)
 #                  B  outliers: three-species overlap (N = parallel genes in genome)
 #                  C  GSEA: one species               (N = selected windows in 10-window pathway)
 #                  D  GSEA: three species             (N = selected blood-coagulation genes)
-#   rows       = generation time, within each block
 #   columns    = starting frequency f0
 #   tile       = x: number selected (N), y: selection coefficient s, fill: power
 #   outline    = tiles with power >= power_goal (default 0.8)
@@ -29,7 +28,7 @@
 #   Rscript ${SCRIPTDIR}/power_heatmap_nsel.byNe.R
 #
 # Writes: output/figure_power_heatmap_nsel/
-#           power_heatmap.Ne_<Ne>.decline_<d>.png / .pdf
+#           power_heatmap.Ne_<Ne>.decline_<d>.Gen_<g>.png / .pdf
 #           power_heatmap.data.tsv   (values plotted)
 # ============================================================
 
@@ -69,7 +68,7 @@ y_ticks <- "ends"        # s
 # how the figure will appear in the paper (e.g. 7.2 in = two-column width)
 # and scale text from there. At 12 x 14 in shrunk to 7.2 in wide, 20 pt -> ~12 pt.
 fig_width  <- 12         # inches
-fig_height <- 14
+fig_height <- 11
 text_size  <- 20         # base size; titles, strips and ticks scale from this
 
 # light = low power, dark = high power
@@ -199,14 +198,14 @@ theme_heat <- function() {
           legend.key.height = unit(text_size * 0.12, "lines"))
 }
 
-# One block of the figure: one approach, rows = Gen, columns = f0
+# One row of the figure: one approach, columns = f0
 make_block <- function(d, k) {
   sp <- specs[[k]]
   d <- d %>% mutate(N_lab = factor(as.character(N), levels = as.character(N_levels[[k]])))
 
   p <- ggplot(d, aes(N_lab, s_lab, fill = power)) +
     geom_tile(colour = "white", linewidth = 0.3) +
-    facet_grid(Gen_lab ~ f0_lab, drop = FALSE) +
+    facet_wrap(~ f0_lab, nrow = 1, drop = FALSE) +
     scale_fill_gradientn(colours = fill_ramp, limits = c(0, 1),
                          breaks = seq(0, 1, 0.25), name = "Power") +
     scale_x_discrete(drop = FALSE,
@@ -240,32 +239,32 @@ empty_block <- function(k, why) {
           plot.subtitle = element_text(colour = "#6b6a66", size = text_size * 0.85))
 }
 
-# ---------------- plot: one file per Ne x decline ----------------
-combos <- dat %>% distinct(Ne, decline) %>% arrange(ne_num(Ne), desc(decline))
+# ---------------- plot: one file per Ne x decline x Gen ----------------
+combos <- dat %>% distinct(Ne, decline, Gen) %>% arrange(ne_num(Ne), desc(decline), Gen)
 
 for (i in seq_len(nrow(combos))) {
-  ne <- combos$Ne[i]; dec <- combos$decline[i]
+  ne <- combos$Ne[i]; dec <- combos$decline[i]; g <- combos$Gen[i]
 
-  dg <- dat %>% filter(Ne == ne, abs(decline - dec) < 1e-9)
+  dg <- dat %>% filter(Ne == ne, abs(decline - dec) < 1e-9, Gen == g)
 
   blocks <- lapply(c("A", "B", "C", "D"), function(k) {
     dk <- dg %>% filter(panel == k)
-    if (nrow(dk) == 0) empty_block(k, "No data for this Ne / decline")
+    if (nrow(dk) == 0) empty_block(k, "No data for this Ne / decline / generation time")
     else make_block(dk, k)
   })
 
   fig <- wrap_plots(blocks, ncol = 1) +
     plot_layout(guides = "collect") +
     plot_annotation(
-      title = sprintf("Power across parameter space: Ne = %s, %s",
-                      ne, ifelse(dec == 1, "constant size", paste0("decline ", dec))),
-      subtitle = paste0("Rows: generation time. Columns: starting frequency f0. ",
+      title = sprintf("Power across parameter space: Ne = %s, %s, %s generations",
+                      ne, ifelse(dec == 1, "constant size", paste0("decline ", dec)), g),
+      subtitle = paste0("Columns: starting frequency f0. ",
                         if (!is.na(power_goal))
                           sprintf("Outlined tiles: power >= %g.", power_goal) else ""),
       theme = theme(plot.title = element_text(face = "bold", size = text_size * 1.1),
                     plot.subtitle = element_text(colour = "#6b6a66", size = text_size * 0.75)))
 
-  stem <- sprintf("power_heatmap.Ne_%s.decline_%.2f", ne, dec)
+  stem <- sprintf("power_heatmap.Ne_%s.decline_%.2f.Gen_%s", ne, dec, g)
   for (ext in c("png", "pdf")) {
     ggsave(file.path(out_dir, paste0(stem, ".", ext)), fig,
            width = fig_width, height = fig_height, dpi = 300, bg = "white")
