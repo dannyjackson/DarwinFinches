@@ -11,7 +11,7 @@
 #                  D  GSEA: three species             (N = selected blood-coagulation genes)
 #   columns    = starting frequency f0
 #   tile       = x: number selected (N), y: selection coefficient s, fill: power
-#   outline    = tiles with power >= power_goal (default 0.8)
+#   outline    = tiles with power > power_goal (default 0.95)
 #
 # The empirical N is unknown, so every N in each sweep is kept.
 # Colour scale is fixed at 0-1 so colours mean the same thing in every file.
@@ -52,7 +52,7 @@ f0_values      <- NULL   # columns; e.g. c(0.05, 0.2, 0.6)
 s_values       <- NULL   # tile rows; e.g. c(0.05, 0.1, 0.2)
 
 gsea_top    <- "5"       # GSEA cutoff for C and D: "5" or "1" (top %)
-power_goal  <- 0.8       # outline tiles at or above this power; NA = no outline
+power_goal  <- 0.95      # outline tiles with power above this; NA = no outline
 show_values <- FALSE     # print the power value in each tile (crowded at print size)
 show_defs   <- FALSE     # power definition + null under each block title
                          # (FALSE for the main text: put these in the caption)
@@ -66,10 +66,10 @@ y_ticks <- "ends"        # s
 
 # Print size. Text sizes are in points AT THIS SIZE, so set the size close to
 # how the figure will appear in the paper (e.g. 7.2 in = two-column width)
-# and scale text from there. At 12 x 14 in shrunk to 7.2 in wide, 20 pt -> ~12 pt.
+# and scale text from there. At 12 in shrunk to 7.2 in wide, 14 pt -> ~8.5 pt.
 fig_width  <- 12         # inches
 fig_height <- 11
-text_size  <- 20         # base size; titles, strips and ticks scale from this
+text_size  <- 14         # base size; titles, strips and ticks scale from this
 
 # light = low power, dark = high power
 fill_ramp <- c("#f7f9fc", "#b7d3f6", "#6da7ec", "#2a78d6", "#104281", "#0d366b")
@@ -219,7 +219,7 @@ make_block <- function(d, k) {
     theme_heat()
 
   if (!is.na(power_goal)) {
-    hi <- d %>% filter(power >= power_goal)
+    hi <- d %>% filter(power > power_goal)
     if (nrow(hi) > 0)
       p <- p + geom_tile(data = hi, fill = NA, colour = "#e69f00", linewidth = 0.9)
   }
@@ -260,7 +260,7 @@ for (i in seq_len(nrow(combos))) {
                       ne, ifelse(dec == 1, "constant size", paste0("decline ", dec)), g),
       subtitle = paste0("Columns: starting frequency f0. ",
                         if (!is.na(power_goal))
-                          sprintf("Outlined tiles: power >= %g.", power_goal) else ""),
+                          sprintf("Outlined tiles: power > %g.", power_goal) else ""),
       theme = theme(plot.title = element_text(face = "bold", size = text_size * 1.1),
                     plot.subtitle = element_text(colour = "#6b6a66", size = text_size * 0.75)))
 
