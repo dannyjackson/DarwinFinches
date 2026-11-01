@@ -65,17 +65,22 @@ gsea_top <- "5"                         # GSEA cutoff for C and D: "5" or "1" (t
 # Light -> dark orange, all the same thickness. NULL = no outlines. Up to 4 levels.
 power_levels  <- c(0.80, 0.90, 0.95)
 outline_cols  <- c("#fdc086", "#f28e2b", "#d95f02", "#8c2d04")
-outline_width <- 1.2
+outline_width <- 0.45                   # mm, at final size
+tile_border   <- 0.1                    # white line between tiles, mm
 
 # Tick labels on the discrete axes: "ends", an integer k (every k-th), or "all"
 x_ticks <- "ends"                       # N
 y_ticks <- "ends"                       # s
 
-# Print size. Text sizes are in points AT THIS SIZE; at 14 in shrunk to a
-# 7.2 in two-column width, 15 pt -> ~7.7 pt.
-fig_width  <- 14                        # inches
-fig_height <- 11
-text_size  <- 15
+# Final print size (Science / Science Advances). Drawn at 100%, so text sizes
+# are the sizes that will appear in the journal.
+#   Science widths: 5.7 cm (1 column), 12.1 cm (2 columns), 18.4 cm (3 columns)
+#   Text ~7 pt at final size, nothing below 5 pt.
+# Height: keep within the printed page (about 22-23 cm); check the current
+# Science / Science Advances figure guide before submission.
+fig_width_cm  <- 12.1
+fig_height_cm <- 21
+text_size     <- 7                      # pt: titles; ticks and legend text are 1 pt smaller
 
 # light = low power, dark = high power
 fill_ramp <- c("#f7f9fc", "#b7d3f6", "#6da7ec", "#2a78d6", "#104281", "#0d366b")
@@ -171,24 +176,29 @@ specs <- list(
            xlab = sprintf("Selected genes in term (N, of %d)", n_term))
 )
 
+small_size <- max(5, text_size - 1)     # ticks, strips, legend text (>= 5 pt)
+
 theme_heat <- function() {
-  theme_bw(base_size = text_size) +
+  theme_bw(base_size = text_size, base_line_size = 0.25, base_rect_size = 0.25) +
     theme(panel.grid        = element_blank(),
-          panel.spacing     = unit(0.3, "lines"),
+          panel.spacing     = unit(1.2, "mm"),
           strip.background  = element_rect(fill = "grey90", colour = NA),
           strip.text        = element_text(face = "bold", colour = "#3d3d3a",
-                                           size = text_size * 0.8,
-                                           margin = margin(2, 2, 2, 2)),
-          axis.text         = element_text(colour = "#3d3d3a", size = text_size * 0.7),
-          axis.title        = element_text(size = text_size * 0.8),
-          axis.ticks        = element_line(linewidth = 0.4),
-          plot.title        = element_text(face = "bold", size = text_size * 0.85,
-                                           margin = margin(0, 0, 3, 0)),
+                                           size = small_size,
+                                           margin = margin(1, 1, 1, 1)),
+          axis.text         = element_text(colour = "#3d3d3a", size = small_size),
+          axis.title        = element_text(size = text_size),
+          axis.title.y      = element_text(margin = margin(0, 1, 0, 0)),
+          axis.title.x      = element_text(margin = margin(1, 0, 0, 0)),
+          axis.ticks        = element_line(linewidth = 0.25),
+          axis.ticks.length = unit(0.6, "mm"),
+          plot.title        = element_text(face = "bold", size = text_size,
+                                           margin = margin(0, 0, 1.5, 0)),
           plot.title.position = "plot",
-          legend.title      = element_text(size = text_size * 0.8),
-          legend.text       = element_text(size = text_size * 0.7),
-          legend.key.height = unit(text_size * 0.12, "lines"),
-          plot.margin       = margin(3, 6, 3, 3))
+          legend.title      = element_text(size = text_size),
+          legend.text       = element_text(size = small_size),
+          legend.key.size   = unit(3, "mm"),
+          plot.margin       = margin(1.5, 2, 1.5, 1.5))
 }
 
 add_outlines <- function(p, d) {
@@ -206,8 +216,10 @@ add_outlines <- function(p, d) {
               linewidth = outline_width, show.legend = TRUE) +
     scale_colour_manual(values = setNames(outline_cols[seq_along(lv)], lab),
                         limits = lab, drop = FALSE, name = "Outline\n(power)") +
-    guides(colour = guide_legend(order = 2, override.aes = list(fill = "white")),
-           fill = guide_colourbar(order = 1))
+    guides(colour = guide_legend(order = 2, nrow = 1, title.position = "left",
+                                 override.aes = list(fill = "white")),
+           fill = guide_colourbar(order = 1, title.position = "left",
+                                  barwidth = unit(30, "mm"), barheight = unit(2.5, "mm")))
 }
 
 # One row of one part: one approach, columns = f0; part II adds one sub-row per Ne
@@ -219,7 +231,7 @@ make_row <- function(d, k, top, part) {
            s_lab = factor(as.character(sel_s), levels = as.character(s_levels)))
 
   p <- ggplot(d, aes(N_lab, s_lab, fill = power)) +
-    geom_tile(colour = "white", linewidth = 0.3) +
+    geom_tile(colour = "white", linewidth = tile_border) +
     (if (part == "I") facet_wrap(~ col_lab, nrow = 1, drop = FALSE)
      else facet_grid(Ne_lab ~ col_lab, drop = FALSE)) +
     scale_fill_gradientn(colours = fill_ramp, limits = c(0, 1),
@@ -240,7 +252,7 @@ make_row <- function(d, k, top, part) {
 
 numeral <- function(txt) {
   wrap_elements(full = grid::textGrob(txt, x = grid::unit(0, "npc"), hjust = 0,
-                                      gp = grid::gpar(fontsize = text_size * 1.3,
+                                      gp = grid::gpar(fontsize = text_size + 2,
                                                       fontface = "bold")))
 }
 
@@ -259,14 +271,16 @@ for (g in sort(unique(c(dat_I$Gen, dat_II$Gen)))) {
 
   n_ne <- max(1, length(Ne_levels))
   fig <- wrap_plots(cells, ncol = 1,
-                    heights = c(0.12, rep(1, 4), 0.12, rep(n_ne, length(ks_II)))) +
+                    heights = c(0.08, rep(1, 4), 0.08, rep(n_ne, length(ks_II)))) +
     plot_layout(guides = "collect") &
-    theme(legend.position = "right")
+    theme(legend.position = "bottom", legend.box = "horizontal",
+          legend.margin = margin(0, 4, 0, 4))
 
   stem <- sprintf("power_composite.Gen_%s", g)
   for (ext in c("png", "pdf")) {
     ggsave(file.path(out_dir, paste0(stem, ".", ext)), fig,
-           width = fig_width, height = fig_height, dpi = 300, bg = "white")
+           width = fig_width_cm, height = fig_height_cm, units = "cm",
+           dpi = 600, bg = "white")
   }
   message("Saved: ", file.path(out_dir, paste0(stem, ".png")))
 }

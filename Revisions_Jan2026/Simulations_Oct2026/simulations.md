@@ -160,6 +160,7 @@ Rscript ${SCRIPTDIR}/multipanel_power_figure_nsel.multiNe.R
 Rscript ${SCRIPTDIR}/multipanel_power_matrix_nsel.byNe.R
 Rscript ${SCRIPTDIR}/power_heatmap_nsel.byNe.R
 Rscript ${SCRIPTDIR}/power_heatmap_nsel.byApproach.R
+Rscript ${SCRIPTDIR}/figure_power_composite.R
 ```
 # Outlier analyses
 ```
