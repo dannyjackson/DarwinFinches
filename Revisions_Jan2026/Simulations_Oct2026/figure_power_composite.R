@@ -54,7 +54,7 @@ out_dir      <- "output/figure_power_composite"
 decline_main <- 1                       # both parts
 Ne_main      <- "25k"                   # part I
 Ne_compare   <- c("50k", "75k")         # part II sub-rows (Ne_main is not repeated)
-approaches_II <- c("D")                 # approaches shown in part II, e.g. c("C", "D")
+approaches_II <- c("E")                 # approaches shown in part II, e.g. c("C", "D")
 
 # Headings next to the numerals (sentence case, no final period). NULL = numeral only.
 # Update the Ne in title_I if you change Ne_main.
