@@ -1,26 +1,19 @@
 #!/usr/bin/env Rscript
 # ============================================================
-# Composite figure: effect of population decline on power
+# Effect of population decline on power, paired by Ne
 #
-# Companion to figure_power_composite.R, same layout and style. One figure per
-# generation time. Two parts stacked, I above II; columns (f0) line up.
-#
-#   I   Comparison across approaches at the baseline demography
-#       (default Ne = 25k, constant size)
-#         rows    = approach A-D
-#         columns = starting frequency f0
-#   II  Selected approaches (default D only) at the same Ne, with one sub-row
-#       per demographic history (default constant size vs 10% decline per gen)
-#         rows    = one sub-row per decline value within each approach
-#         columns = starting frequency f0
+# One figure per generation time. For each approach shown (default D only),
+# a grid of heatmaps with
+#   rows    = Ne, with constant size and decline as adjacent sub-rows
+#             (Ne 25k: constant, decline; Ne 50k: constant, decline; ...)
+#   columns = starting frequency f0
+#   tile    = x: number selected (N), y: selection coefficient s, fill: power
+#   outline = orange, one shade per power level (default > 0.80, > 0.90, > 0.95)
 #
 #   Approaches  A  outliers: one species           (N = selected windows in genome)
 #               B  outliers: three-species overlap (N = parallel genes in genome)
 #               C  GSEA: one species               (N = selected windows in 10-window pathway)
 #               D  GSEA: three species             (N = selected blood-coagulation genes)
-#
-#   tile    = x: number selected (N), y: selection coefficient s, fill: power
-#   outline = orange, one shade per power level (default > 0.80, > 0.90, > 0.95)
 #
 # Inputs (same as figure_power_composite.R):
 #   A  output/fst_outlier_power_nsel.tsv                    outlier_power_nsel.R
@@ -28,15 +21,15 @@
 #   C  output/fst_rank_by_selected_windows.nnull10000.tsv   D1_RankPower.top5.test.R
 #   D  gsea_empirical_power_nsel/summary_nsel.tsv           plot_gsea_parallel_nsel.R
 #
-# The decline conditions must be present in those inputs. The script prints a
-# coverage table and stops if part II has no rows for any requested decline.
+# Every Ne x decline combination requested must be present in the inputs for
+# the approaches shown; the script prints a coverage table and stops otherwise.
 #
 # Run from the project directory (gsea_power_analysis):
 #   Rscript ${SCRIPTDIR}/figure_power_composite_decline.R
 #
 # Writes: output/figure_power_composite_decline/
-#           power_composite_decline.Gen_<g>.png / .pdf
-#           power_composite_decline.data.tsv   (values plotted)
+#           power_decline.Gen_<g>.png / .pdf
+#           power_decline.data.tsv   (values plotted)
 # ============================================================
 
 suppressPackageStartupMessages({
@@ -52,23 +45,18 @@ file_gsea1   <- "output/fst_rank_by_selected_windows.nnull10000.tsv"
 file_gsea3   <- "gsea_empirical_power_nsel/summary_nsel.tsv"
 out_dir      <- "output/figure_power_composite_decline"
 
-Ne_main         <- "25k"                # both parts
-decline_main    <- 1                    # part I
-decline_compare <- c(1, 0.9)            # part II sub-rows, in this order
-approaches_II   <- c("D")               # approaches shown in part II, e.g. c("C", "D")
+Ne_values      <- c("25k", "50k", "75k")   # row blocks, in this order
+decline_values <- c(1, 0.9)                # sub-rows within each Ne, in this order
+approaches     <- c("D")                   # one stacked block per approach, e.g. c("C", "D")
 
-# Row labels for part II, keyed by decline value
-decline_labels <- c("1"   = "Constant size",
-                    "0.9" = "Decline 10% / gen",
-                    "0.8" = "Decline 20% / gen")
-
-# Headings next to the numerals (sentence case, no final period). NULL = numeral only.
-title_I  <- "Comparison of approaches (Ne = 25,000, constant size)"
-title_II <- "Effect of population decline on cross-species pathway enrichment"
+# Sub-row labels, keyed by decline value
+decline_labels <- c("1"   = "constant",
+                    "0.9" = "decline 10%/gen",
+                    "0.8" = "decline 20%/gen")
 
 N_values_B <- c(1, 2, 5, 10, 20, 50, 100)   # parallel genes shown in panel B (drops 30)
 
-f0_values  <- NULL                      # columns in both parts; NULL = every f0 present
+f0_values  <- NULL                      # columns; NULL = every f0 present
 Gen_values <- NULL                      # one figure per Gen; NULL = every Gen present
 s_values   <- NULL                      # tile rows; NULL = every s present
 
@@ -87,7 +75,7 @@ dodge_x_over <- 8                       # stagger x labels on two rows when more
 
 # Final print size (Science / Science Advances). Text sizes are final sizes.
 fig_width_cm  <- 12.1
-fig_height_cm <- 22
+fig_height_cm <- 4 + 3.0 * length(Ne_values) * length(decline_values) * length(approaches)
 text_size     <- 7                      # pt
 
 # light = low power, dark = high power
@@ -108,21 +96,20 @@ thin_breaks <- function(lv, mode) {
 dec_lab <- function(x) {
   key <- as.character(x)
   out <- decline_labels[key]
-  out[is.na(out)] <- paste0("Decline ", key[is.na(out)])
+  out[is.na(out)] <- paste0("decline ", key[is.na(out)])
   unname(out)
 }
 
-# Keep every decline here; parts I and II filter below
+same_dec <- function(x, y) abs(x - y) < 1e-9
+in_decs  <- function(x, ys) vapply(x, function(v) any(same_dec(v, ys)), logical(1))
+
 prep <- function(d, f0_col) {
   d %>%
     mutate(Ne = as.character(Ne), Gen = as.numeric(Gen),
            decline = as.numeric(decline), sel_s = as.numeric(sel_s),
            f0 = as.numeric(.data[[f0_col]])) %>%
-    filter(sel_s > 0)
+    filter(sel_s > 0, Ne %in% Ne_values, in_decs(decline, decline_values))
 }
-
-same_dec <- function(x, y) abs(x - y) < 1e-9
-in_decs  <- function(x, ys) vapply(x, function(v) any(same_dec(v, ys)), logical(1))
 
 # ---------------- data ----------------
 A <- read.delim(file_outlier) %>% prep("af") %>%
@@ -144,47 +131,50 @@ D <- D_raw %>% prep("f0") %>%
             power = .data[[paste0("power_cross_top", gsea_top)]])
 n_term <- max(D_raw$n_selected)
 
-dat <- bind_rows(A, B, C, D) %>% filter(Ne == Ne_main)
+dat <- bind_rows(A, B, C, D) %>% filter(panel %in% approaches)
 if (!is.null(Gen_values)) dat <- dat %>% filter(Gen %in% Gen_values)
 if (!is.null(s_values))   dat <- dat %>% filter(round(sel_s, 6) %in% round(s_values, 6))
 if (!is.null(f0_values))  dat <- dat %>% filter(round(f0, 6) %in% round(f0_values, 6))
 
-dat_I  <- dat %>% filter(same_dec(decline, decline_main))
-dat_II <- dat %>% filter(in_decs(decline, decline_compare), panel %in% approaches_II)
+if (nrow(dat) == 0) stop("No data for the requested Ne / decline / approaches")
 
-if (nrow(dat_I) == 0)
-  stop("Part I: no data for Ne = ", Ne_main, ", decline = ", decline_main)
-for (dc in decline_compare)
-  if (!any(same_dec(dat_II$decline, dc)))
-    stop("Part II: no data for Ne = ", Ne_main, ", decline = ", dc,
-         " (approaches ", paste(approaches_II, collapse = ", "), ")")
+# Every Ne x decline must be present for every approach shown
+want <- expand.grid(panel = approaches, Ne = Ne_values, decline = decline_values,
+                    stringsAsFactors = FALSE)
+have <- dat %>% distinct(panel, Ne, decline)
+present <- vapply(seq_len(nrow(want)), function(i)
+  any(have$panel == want$panel[i] & have$Ne == want$Ne[i] &
+        same_dec(have$decline, want$decline[i])), logical(1))
+miss <- want[!present, ]
+if (nrow(miss) > 0) {
+  print(miss)
+  stop("Missing conditions (above). Run the simulations / GSEA jobs for them first.")
+}
 
-# Shared levels so both parts use the same tiles, columns and colours
-s_levels   <- sort(unique(c(dat_I$sel_s, dat_II$sel_s)))
-f0_levels  <- sort(unique(c(dat_I$f0, dat_II$f0)))
-dec_levels <- dec_lab(decline_compare)
-N_levels   <- lapply(split(c(dat_I$N, dat_II$N), c(dat_I$panel, dat_II$panel)),
-                     function(x) sort(unique(x)))
+# Row labels: Ne block, then decline sub-row, in the requested order
+row_levels <- as.vector(t(outer(Ne_values, decline_values,
+                                function(ne, dc) paste0("Ne = ", ne, "\n", dec_lab(dc)))))
 
-lab_f0 <- function(d) d %>%
-  mutate(col_lab = factor(paste0("f0 = ", f0), levels = paste0("f0 = ", f0_levels)))
-dat_I  <- lab_f0(dat_I)
-dat_II <- lab_f0(dat_II) %>%
-  mutate(dec_lab = factor(dec_lab(decline), levels = dec_levels))
+s_levels  <- sort(unique(dat$sel_s))
+f0_levels <- sort(unique(dat$f0))
+N_levels  <- lapply(split(dat$N, dat$panel), function(x) sort(unique(x)))
+
+dat <- dat %>%
+  mutate(col_lab = factor(paste0("f0 = ", f0), levels = paste0("f0 = ", f0_levels)),
+         row_lab = factor(paste0("Ne = ", Ne, "\n", dec_lab(decline)), levels = row_levels),
+         s_lab   = factor(as.character(sel_s), levels = as.character(s_levels)))
 
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-write.table(bind_rows(mutate(dat_I, part = "I"), mutate(dat_II, part = "II")) %>%
-              select(part, panel, Gen, Ne, decline, f0, sel_s, N, power) %>%
-              arrange(Gen, part, panel, desc(decline), f0, sel_s, N),
-            file.path(out_dir, "power_composite_decline.data.tsv"),
+write.table(dat %>% select(panel, Gen, Ne, decline, f0, sel_s, N, power) %>%
+              arrange(Gen, panel, ne_num(Ne), desc(decline), f0, sel_s, N),
+            file.path(out_dir, "power_decline.data.tsv"),
             sep = "\t", quote = FALSE, row.names = FALSE)
 
-# Coverage check
-cov <- bind_rows(mutate(dat_I, part = "I"), mutate(dat_II, part = "II")) %>%
-  distinct(part, Gen, panel, decline, f0)
-cat("Coverage per part x Gen x approach:\n")
-print(cov %>% group_by(part, Gen, panel) %>%
-        summarise(decline = paste(sort(unique(decline), decreasing = TRUE), collapse = ", "),
+cat("Coverage per Gen x approach:\n")
+print(dat %>% distinct(Gen, panel, Ne, decline, f0) %>%
+        group_by(Gen, panel) %>%
+        summarise(Ne = paste(unique(Ne[order(ne_num(Ne))]), collapse = ", "),
+                  decline = paste(sort(unique(decline), decreasing = TRUE), collapse = ", "),
                   f0 = paste(sort(unique(f0)), collapse = ", "),
                   .groups = "drop"), n = Inf, width = Inf)
 
@@ -196,17 +186,22 @@ specs <- list(
   D = list(title = "D  Pathway enrichment, three species",
            xlab = sprintf("Selected genes in term (N, of %d)", n_term))
 )
+if (length(approaches) == 1)   # single block: drop the letter
+  specs[[approaches]]$title <- sub("^[A-D]  ", "", specs[[approaches]]$title)
 
 small_size <- max(5, text_size - 1)
 
 theme_heat <- function() {
   theme_bw(base_size = text_size, base_line_size = 0.25, base_rect_size = 0.25) +
     theme(panel.grid        = element_blank(),
-          panel.spacing     = unit(1.2, "mm"),
+          panel.spacing.x   = unit(1.2, "mm"),
+          panel.spacing.y   = unit(0.8, "mm"),
           strip.background  = element_rect(fill = "grey90", colour = NA),
           strip.text        = element_text(face = "bold", colour = "#3d3d3a",
                                            size = small_size,
                                            margin = margin(1, 1, 1, 1)),
+          strip.text.y      = element_text(angle = 0, hjust = 0,
+                                           margin = margin(1, 2, 1, 2)),
           axis.text         = element_text(colour = "#3d3d3a", size = small_size),
           axis.title        = element_text(size = text_size),
           axis.title.y      = element_text(margin = margin(0, 1, 0, 0)),
@@ -216,6 +211,9 @@ theme_heat <- function() {
           plot.title        = element_text(face = "bold", size = text_size,
                                            margin = margin(0, 0, 1.5, 0)),
           plot.title.position = "plot",
+          legend.position   = "bottom",
+          legend.box        = "horizontal",
+          legend.margin     = margin(0, 4, 0, 4),
           legend.title      = element_text(size = text_size),
           legend.text       = element_text(size = small_size),
           legend.key.size   = unit(3, "mm"),
@@ -243,20 +241,15 @@ add_outlines <- function(p, d) {
                                   barwidth = unit(30, "mm"), barheight = unit(2.5, "mm")))
 }
 
-# One row of one part: one approach, columns = f0; part II adds one sub-row per decline
-make_row <- function(d, k, top, part) {
+# One block: one approach; rows = Ne x decline, columns = f0
+make_block <- function(d, k) {
   sp <- specs[[k]]
-  if (nrow(d) == 0) return(plot_spacer())
-  d <- d %>%
-    mutate(N_lab = factor(as.character(N), levels = as.character(N_levels[[k]])),
-           s_lab = factor(as.character(sel_s), levels = as.character(s_levels)))
-
+  d <- d %>% mutate(N_lab = factor(as.character(N), levels = as.character(N_levels[[k]])))
   x_guide <- if (length(N_levels[[k]]) > dodge_x_over) guide_axis(n.dodge = 2) else guide_axis()
 
   p <- ggplot(d, aes(N_lab, s_lab, fill = power)) +
     geom_tile(colour = "white", linewidth = tile_border) +
-    (if (part == "I") facet_wrap(~ col_lab, nrow = 1, drop = FALSE)
-     else facet_grid(dec_lab ~ col_lab, drop = FALSE)) +
+    facet_grid(row_lab ~ col_lab, drop = FALSE) +
     scale_fill_gradientn(colours = fill_ramp, limits = c(0, 1),
                          breaks = seq(0, 1, 0.25), name = "Power") +
     scale_x_discrete(drop = FALSE,
@@ -267,44 +260,19 @@ make_row <- function(d, k, top, part) {
     labs(title = sp$title, x = sp$xlab, y = "s") +
     theme_heat()
 
-  if (!top) p <- p + theme(strip.text.x = element_blank(),
-                           strip.background.x = element_blank())
-
   add_outlines(p, d)
 }
 
-numeral <- function(txt, title = NULL) {
-  num <- grid::textGrob(txt, x = grid::unit(0, "npc"), hjust = 0,
-                        gp = grid::gpar(fontsize = text_size + 2, fontface = "bold"))
-  if (is.null(title) || !nzchar(title)) return(wrap_elements(full = num))
-  ttl <- grid::textGrob(title,
-                        x = grid::unit(0, "npc") + grid::grobWidth(num) + grid::unit(2, "mm"),
-                        hjust = 0,
-                        gp = grid::gpar(fontsize = text_size + 1, fontface = "bold"))
-  wrap_elements(full = grid::grobTree(num, ttl))
-}
-
 # ---------------- plot: one figure per Gen ----------------
-for (g in sort(unique(c(dat_I$Gen, dat_II$Gen)))) {
-  dI  <- dat_I  %>% filter(Gen == g)
-  dII <- dat_II %>% filter(Gen == g)
+for (g in sort(unique(dat$Gen))) {
+  dg <- dat %>% filter(Gen == g)
+  blocks <- lapply(approaches, function(k) make_block(filter(dg, panel == k), k))
 
-  ks    <- c("A", "B", "C", "D")
-  ks_II <- intersect(ks, approaches_II)
-  cells <- c(list(numeral("I", title_I)),
-             lapply(ks, function(k) make_row(filter(dI, panel == k), k, k == ks[1], "I")),
-             list(numeral("II", title_II)),
-             lapply(ks_II, function(k) make_row(filter(dII, panel == k), k,
-                                                k == ks_II[1], "II")))
+  fig <- if (length(blocks) == 1) blocks[[1]] else
+    wrap_plots(blocks, ncol = 1) + plot_layout(guides = "collect") &
+    theme(legend.position = "bottom")
 
-  n_dec <- max(1, length(dec_levels))
-  fig <- wrap_plots(cells, ncol = 1,
-                    heights = c(0.08, rep(1, 4), 0.08, rep(n_dec, length(ks_II)))) +
-    plot_layout(guides = "collect") &
-    theme(legend.position = "bottom", legend.box = "horizontal",
-          legend.margin = margin(0, 4, 0, 4))
-
-  stem <- sprintf("power_composite_decline.Gen_%s", g)
+  stem <- sprintf("power_decline.Gen_%s", g)
   for (ext in c("png", "pdf")) {
     ggsave(file.path(out_dir, paste0(stem, ".", ext)), fig,
            width = fig_width_cm, height = fig_height_cm, units = "cm",
@@ -315,9 +283,9 @@ for (g in sort(unique(c(dat_I$Gen, dat_II$Gen)))) {
 
 # ---------------- caption reminder ----------------
 cat("\nFor the caption:\n")
-cat(sprintf("  I: Ne = %s, %s, approaches A-D. II: approach %s at Ne = %s, %s. Columns = f0.\n",
-            Ne_main, dec_lab(decline_main), paste(approaches_II, collapse = ", "),
-            Ne_main, paste(dec_levels, collapse = " vs ")))
+cat(sprintf("  Approach %s. Rows: Ne = %s, each at %s. Columns = f0. One figure per Gen.\n",
+            paste(approaches, collapse = ", "), paste(Ne_values, collapse = ", "),
+            paste(dec_lab(decline_values), collapse = " and ")))
 cat("  A: power = share of selected windows in the top 1% of 10,000 (null 0.01)\n")
 cat("  B: power = share of parallel genes in all three top-1% lists (null ~0)\n")
 cat(sprintf("  C: power = P(10-window pathway ranks in top %s%%) (null %g)\n",

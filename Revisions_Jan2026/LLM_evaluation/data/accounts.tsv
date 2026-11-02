@@ -1,0 +1,19 @@
+# make_figure4.py uses this to group pairs of runs in panel A (same account vs different account).
+# Lines starting with '#' are ignored. 
+source	account	
+informed.Opus5_5.run_a	author_claude_1	
+informed.Opus5_5.run_b	author_claude_1	
+informed.Fable5_1.run_a	author_claude_1	
+informed.Fable5_1.run_b	author_claude_2	
+informed.ChatGPT.gpt6_1sol.run_a	author_chatgpt	
+informed.ChatGPT.gpt6_1sol.run_b	author_chatgpt	
+informed.ChatGPT.gpt6astra.run_a	author_chatgpt	
+informed.ChatGPT.gpt6astra.run2	author_chatgpt	
+naive.Opus5_5.N1	naive_claude_1	
+naive.Opus5_5.N2	naive_claude_2	
+naive.Fable5_1.N1	naive_claude_1
+naive.Fable5_1.N2	naive_claude_2	
+naive.ChatGPT.gpt6_1sol.N1	naive_chatgpt_1
+naive.ChatGPT.gpt6_1sol.N2	naive_chatgpt_2	
+naive.Chatgpt.gpt6astra.N1	naive_chatgpt_1	
+naive.ChatGPT.gpt6astra.N2	naive_chatgpt_2	
