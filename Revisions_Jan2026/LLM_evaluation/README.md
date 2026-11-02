@@ -3,32 +3,26 @@
 Scripts and prompts to reproduce the LLM a priori relevance scores of GO terms and Figure 4.
 
 ## Folder layout
-Inputs live in this repository (`${SCRIPTDIR}`). Runs and results are written to `${PROJDIR}/LLM_evaluation/`,
+Inputs live in this repository (`${SCRIPTDIR}`). Results are written to `${PROJDIR}/LLM_evaluation/results/`,
 outside the repository. Run everything from `${PROJDIR}`.
 ```
 ${SCRIPTDIR} = ${PROJDIR}/DarwinFinches/Revisions_Jan2026/LLM_evaluation/
   README.md
   prompts/
-    apriori_GO_Ranking_Prompt.txt   coordinating prompt; the rater prompt is the text between its two '---' lines
+    apriori_GO_Ranking_Prompt.txt   prompt given to each source's coordinating conversation
     all_pathways.txt                the 1,008 GO terms given to the raters (GO ID and term name)
   data/
     cra.fst.gsea.tsv  for.fst.gsea.tsv  par.fst.gsea.tsv   fgsea tables
     matrices/score_matrix.<source>.tsv                      one per source (30 runs each)
+    accounts.tsv                                            which account each source ran on (for panel B)
   scripts/
-    make_term_list.py   1. build all_pathways.txt from the fgsea tables, or check the existing one matches
-    setup_runs.py       2. make the run folders: shuffled term list and filled rater prompt per run
-    validate_runs.py    3. check every run's scores.tsv
-    compile_matrix.py   4. combine a source's runs into data/matrices/score_matrix.<source>.tsv
-    make_figure4.py     5. Figure 4, its source data and the top-terms table
+    make_term_list.py   1. check that all_pathways.txt matches the fgsea tables (writes it only if missing)
+    make_figure4.py     2. Figure 4, its source data and the top-terms table
+    plot_top_NES_LLM.py 3. the top-NES plots from D1_run_fgsea.R, with the terms all models scored ≥4 in colour
 
-${PROJDIR}/LLM_evaluation/
-  runs/<source>/run_NNN/   written by setup_runs.py and the raters
-  results/                 written by make_figure4.py
+${PROJDIR}/LLM_evaluation/results/   written by make_figure4.py
 ```
-The scripts only write inside the repository in two cases. `make_term_list.py` writes `prompts/all_pathways.txt`
-only if that file is missing (otherwise it checks that the file matches the fgsea tables). `compile_matrix.py`
-writes new score matrices to `data/matrices/` and will not overwrite one without `--force`. Every path can be changed
-with each script's options (`--help`).
+Every path can be changed with each script's options (`--help`).
 
 ## Requirements
 Python 3 with numpy, pandas and matplotlib, plus Pillow for the TIFF. Font: Arial or Helvetica if installed,
@@ -47,34 +41,62 @@ python3 $SCRIPTDIR/scripts/make_term_list.py
 
 # 2. Figure 4 from all score matrices in data/matrices/
 python3 $SCRIPTDIR/scripts/make_figure4.py
+
+# 3. <species>.fst.top_NES.LLM.pdf: top 20 terms by NES, terms scored >=4 by every kept model coloured
+python3 $SCRIPTDIR/scripts/plot_top_NES_LLM.py
 ```
+`make_figure4.py` checks every matrix before using it: the same 1,008 GO IDs as the others, no missing values, and
+scores from 1 to 5. It prints the number of sources and runs it read, and skips (with a warning) any matrix that is
+byte-identical to another.
 
 ## Source names
-Each source is named `<informed|naive>.[Provider.]<model>.<batch|account holder>`:
-- **informed** sources ran on the first author's accounts. The last part is the batch (`run_a` or `run_b`), shown as Ia and Ib.
-- **naive** sources ran on accounts of people unfamiliar with the study. The last part is the account holder's name, which the figure replaces with a code (`--codes Lexi=N1 Zach=N2 Rebecca=N3 Nora=N4`, the default; an unlisted holder gets the next free N number).
+Each matrix is named `score_matrix.<informed|naive>.[Provider.]<model>.<batch|account>.tsv`:
+- **informed** matrices were run on the first author's accounts. The last part is the batch (`run_a`, or `run_b`/`run2`), shown as Ia and Ib.
+- **naive** matrices were run on accounts of people unfamiliar with the study. The last part is the account code (`N1` or `N2`), used as the label. N1 and N2 are numbered separately for each model, so N1 is not the same person across models.
 - Models: `Opus5_5` (Claude Opus 5.5), `Fable5_1` (Claude Fable 5.1), `gpt6_1sol` (GPT 6.1 Sol), `gpt6astra` (GPT 6 Astra). The optional provider part (e.g. `ChatGPT`) is ignored.
 
-Examples: `informed.Opus5_5.run_a`, `naive.Fable5_1.Rebecca`, `naive.ChatGPT.gpt6astra.Rebecca`.
+Examples: `score_matrix.informed.Opus5_5.run_a.tsv`, `score_matrix.naive.ChatGPT.gpt6_1sol.N1.tsv`.
 
-Each model ran in two informed batches (Ia and Ib) and on naive accounts: Opus 5.5 on N1 and N2; Fable 5.1 and GPT 6.1 Sol on N3 and N4; GPT 6 Astra on N3. `make_figure4.py` prints the number of sources and runs it read, and skips (with a warning) any matrix that is byte-identical to another.
+`make_figure4.py` stops if two matrices have the same model and account code.
 
-## Generating runs
-Each run is one independent rating of all 1,008 terms by a rater that sees only `prompt.txt` and its own
-`input_terms.txt`. Term order is shuffled per run with `random.Random(1000 + run)`, and the seeds are logged in
-`runs/<source>/run_manifest.tsv`.
+## Accounts (`data/accounts.tsv`)
+Panel B groups pairs of runs by whether they share a model and an account, and the file names don't say which
+sources ran on the same account. `data/accounts.tsv` has one row per source (`source`, `account`, `note`). Sources that ran
+on the same account share an account ID, for example both GPT models on the first author's ChatGPT account, or one
+naive person's ChatGPT account used for both GPT models. Source names are matched ignoring case. The script stops if
+a source has no row. Lines starting with `#` are comments.
 
-For Claude, each source was run in one new conversation with no project attached: it received
-`prompts/apriori_GO_Ranking_Prompt.txt` and `prompts/all_pathways.txt`, and launched one sub-agent per run in batches
-of five. STEPS 1–3 of that prompt do the same thing as `setup_runs.py`, `validate_runs.py` and `compile_matrix.py`.
-Rename the matrix it returns to `score_matrix.<source>.tsv` and put it in `data/matrices/`.
+## How the score matrices were generated
+Each source's runs were generated by its account holder, outside these scripts. For each source, a new conversation
+with no project attached received `prompts/apriori_GO_Ranking_Prompt.txt` and `prompts/all_pathways.txt`. That
+conversation set up 30 runs, each with the full term list in a different random order
+(`random.Random(1000 + run)`). It gave each run to a fresh, independent sub-agent that saw only the rater prompt (the
+text between the two `---` lines) and its own term list. It then checked every run (all 1,008 GO IDs once, integer
+scores 1–5), re-ran any that failed, and compiled the 30 runs into one score matrix. Each matrix was renamed
+`score_matrix.<source>.tsv` and placed in `data/matrices/`.
 
 [If the ChatGPT runs used a different procedure or coordinating prompt, describe it here.]
 
 ## Figure 4 (`make_figure4.py`)
-- **A** Mean quadratic-weighted Cohen's κ between runs of each pair of sources. The diagonal is the mean over pairs of different runs within one source.
-- **B** Distribution of scores for two focal terms (`--focal GO:0007596 GO:0002250`) in each source, with the mean score and the term's rank among all 1,008 terms by mean score.
-- **C** Consensus terms: median score ≥4 across all runs pooled (`--consensus-score 4`). The panel shows those whose NES averaged across the three species is in the top 10% of all tested terms (`--nes-top 0.10`). For each term it shows the NES in each species, the mean NES, the rank by mean NES, the mean score and the gene-set size.
+Agreement is measured with the intraclass correlation coefficient: two-way random effects, absolute agreement
+(Shrout & Fleiss 1979), with the 1,008 GO terms as targets and runs as raters.
+- Within each source: ICC(2,1), the reliability of a single run, and ICC(2,30), the reliability of the mean of its 30 runs (`table_ICC_within_sources.tsv`).
+- Between sources: ICC(2,1) (and ICC(2,k)) with each source's per-term mean score as a rater (`table_ICC_between_sources.tsv`).
+- **A** Heatmap of the mean ICC(2,1) between the runs of every pair of sources. The diagonal is the mean over pairs of runs within one source.
+- **B** ICC(2,1) for every pair of runs, grouped by how the two runs differ: same source; same account and model, different batch; same model, different account; same account, different model; different model and account (same provider); different AI provider. Each group's mean is over all pairs of runs in it. Grey points show the mean for each pair of sources.
+- **C** Distribution of scores for two focal terms (`--focal GO:0007596 GO:0002250`) in each source, with the mean score and the term's rank among all 1,008 terms by mean score.
+- **D** Consensus terms: median score ≥4 across all runs of the kept models pooled (`--consensus-score 4`). The panel shows those whose NES averaged across the three species is in the top 10% of all tested terms (`--nes-top 0.10`). For each term it shows the NES in each species, the mean NES, the rank by mean NES, the mean score and the gene-set size.
+- **E**, **F** Venn diagrams of the terms whose median score across all runs of each kept model is ≥4 (E) or 5 (F).
+
+Panels C–F, the consensus terms and the t-test leave out the models listed in `--drop-models` (default `gpt6_1sol`, GPT 6.1 Sol, which has the lowest within-source ICC). Panels A and B always show every source. `--drop-models` with no value keeps every model; the Venn diagrams need two or three models.
+
+`table_ttest_term_sets_NES.tsv` has one-sided Welch's t-tests of NES (the set has higher NES than all other tested terms), for each species and for the mean NES across species, for two a priori term sets:
+- `shared_ge4`: terms with a median score ≥4 within each kept model's runs, in every kept model (the centre of panel E);
+- `pooled_ge4`: terms with a median score ≥4 across all runs of the kept models pooled (the consensus terms of panel D).
+
+Sets defined by a score of 5 are too small to test (2 terms shared by all models; 7 pooled) and are only shown in panel F.
+
+The table also lists the terms in each set.
 
 Species are labelled VF (vegetarian finch, `cra`), MGF (medium ground finch, `for`) and STF (small tree finch,
 `par`). Change the names with `--names` and the fgsea tables with `--gsea VF=path MGF=path STF=path`.
@@ -82,6 +104,12 @@ Species are labelled VF (vegetarian finch, `cra`), MGF (medium ground finch, `fo
 Outputs in `${PROJDIR}/LLM_evaluation/results/`:
 - `Fig4_LLM_consistency.pdf` (vector, fonts embedded), `.png` and `.tiff` (600 dpi). The figure is 18.3 cm wide (Science full width).
 - `Fig4_LLM_consistency_caption.md` and `.txt`: caption with the current counts.
-- `panelA_kappa_matrix.tsv`, `panelB_focal_terms.tsv` and `panelC_consensus_terms_NES.tsv`: the data behind each panel. The last lists all consensus terms with their NES, ranks, scores and fgsea padj; `high_NES` marks the terms shown.
+- `panelB_ICC_groups.tsv` (each group's mean ICC, numbers of run pairs and source pairs, range of source-pair means), `panelB_ICC_source_pairs.tsv` (mean ICC and group for each pair of sources), `panelA_ICC_matrix.tsv`, `panelC_focal_terms.tsv` and `panelD_consensus_terms_NES.tsv`: the data behind each panel. The last lists all consensus terms with their NES, ranks, scores and fgsea padj; `high_NES` marks the terms shown.
 - `table_top_terms.tsv`: the 10 terms with the highest mean NES (`--top-n 10`), with their rank in each species, median and mean score, percentage of runs scoring ≥4, and whether each is a consensus term. This is the table behind the results text.
-- `sources.tsv` and `account_codes.tsv`: the sources and the account-code key.
+- `table_ICC_within_sources.tsv` and `table_ICC_between_sources.tsv`: the within-source and between-source ICCs.
+- `table_venn_terms.tsv`: one row per term in the Venn diagrams, with the models that scored it ≥4 (and 5), each model's median score, and the term's gene-set size, NES, P, adjusted P and NES rank in each species and for the mean NES. Terms are sorted by the number of models, then by mean-NES rank.
+- `table_ttest_term_sets_NES.tsv`: the t-tests above.
+- `sources.tsv`: the sources read, with model, provider, account code, account ID, label and number of runs.
+
+## Top-NES plots (`plot_top_NES_LLM.py`)
+Remakes the `<species>.fst.top_NES.pdf` plots from `Revisions_Jan2026/GSEA/D1_run_fgsea.R`. Each shows the 20 GO terms with the highest NES, with point size for gene-set size and triangles for nominal P < 0.05. The terms that every kept model scored ≥4 (the centre of Fig. 4E, read from `table_venn_terms.tsv`) are coloured. Run `make_figure4.py` first. Outputs are `<species>.fst.top_NES.LLM.pdf` and `.png` in `${PROJDIR}/LLM_evaluation/results/`.
