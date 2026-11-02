@@ -76,7 +76,7 @@ A <- read.delim(file_outlier) %>% prep("af") %>%
 
 # ---------------- B: three-species overlap vs. N parallel genes ----------------
 B <- read.delim(file_overlap) %>% prep("af") %>%
-  filter(n_parallel > 0) %>%
+  filter(n_parallel > 0, n_parallel != 30) %>%
   group_by(Ne, decline, Gen, sel_s, f0, N = n_parallel) %>%
   summarise(power = mean(parallel_in_all_tops), .groups = "drop") %>%
   mutate(panel = "B")
