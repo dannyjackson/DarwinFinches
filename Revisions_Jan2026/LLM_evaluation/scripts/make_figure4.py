@@ -9,23 +9,25 @@ enrichment.
      top 10% of all tested terms
 Also writes table_top_terms.tsv: the --top-n terms with the highest mean NES and their LLM scores (results text).
 
-Inputs (defaults are relative to ${PROJDIR}/LLM_evaluation; every path can be overridden):
-  data/score_matrices/score_matrix.<informed|naive>.[Provider.]<model>.<batch|holder>.tsv
-        e.g. score_matrix.informed.Opus5_5.run_a.tsv, score_matrix.naive.ChatGPT.gpt6_1sol.Rebecca.tsv
-        columns: pathway, term_name, run_001 ... run_N  (scores 1-5), as written by compile_matrix.py
-        informed batches run_a / run_b (or run2) are coded Ia / Ib; naive holders are coded via --codes
-  data/gsea/{cra,for,par}.fst.gsea.tsv  fgsea tables (columns pathway, NES, padj, size, ...),
+Inputs (defaults are in the repository, ${SCRIPTDIR}; every path can be overridden):
+  ${SCRIPTDIR}/data/matrices/score_matrix.<informed|naive>.[Provider.]<model>.<batch|account>.tsv
+        e.g. score_matrix.informed.Opus5_5.run_a.tsv, score_matrix.naive.ChatGPT.gpt6_1sol.N1.tsv
+        columns: pathway, term_name, run_001 ... run_N  (scores 1-5), one matrix per source
+        informed batches run_a / run_b (or run2) are labelled Ia / Ib; naive accounts are labelled with the code in
+        the file name (N1, N2). N1 and N2 are the naive accounts for that model, not the same people across models.
+  ${SCRIPTDIR}/data/{cra,for,par}.fst.gsea.tsv  fgsea tables (columns pathway, NES, padj, size, ...),
         shown as VF (vegetarian finch), MGF (medium ground finch), STF (small tree finch)
 
 Usage:
-  export PROJDIR=/path/to/project
-  python3 ${PROJDIR}/LLM_evaluation/scripts/make_figure4.py
-  python3 ${PROJDIR}/LLM_evaluation/scripts/make_figure4.py --codes Lexi=N1 Zach=N2 Rebecca=N3 NewPerson=N4
+  export PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis
+  export SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/LLM_evaluation/
+  cd $PROJDIR
+  python3 $SCRIPTDIR/scripts/make_figure4.py
 
 Outputs (in --out, default ${PROJDIR}/LLM_evaluation/results):
   Fig4_LLM_consistency.pdf (vector, fonts embedded), .png and .tiff (600 dpi), caption (.md, .txt)
   panelA_kappa_matrix.tsv, panelB_focal_terms.tsv, panelC_consensus_terms_NES.tsv, table_top_terms.tsv,
-  sources.tsv, account_codes.tsv
+  sources.tsv
 
 Requires: Python 3, numpy, pandas, matplotlib (Pillow for TIFF).
 """
@@ -37,16 +39,17 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 warnings.filterwarnings("ignore")
 
-ROOT = os.path.join(os.environ["PROJDIR"], "LLM_evaluation") if "PROJDIR" in os.environ else \
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Repository (${SCRIPTDIR}): scripts/, prompts/ (rater prompt, term list), data/ (fgsea tables), data/matrices/.
+# Results are written outside the repository, to ${PROJDIR}/LLM_evaluation/results/.
+CODE = os.environ.get("SCRIPTDIR") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROMPTS, DATA = os.path.join(CODE, "prompts"), os.path.join(CODE, "data")
+WORK = os.path.join(os.environ.get("PROJDIR", os.getcwd()), "LLM_evaluation")
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-ap.add_argument("--matrices", default=os.path.join(ROOT, "data", "score_matrices"))
-ap.add_argument("--gsea", nargs="+", default=[f"{lab}={os.path.join(ROOT, 'data', 'gsea', f + '.fst.gsea.tsv')}"
+ap.add_argument("--matrices", default=os.path.join(DATA, "matrices"))
+ap.add_argument("--gsea", nargs="+", default=[f"{lab}={os.path.join(DATA, f + '.fst.gsea.tsv')}"
                                                for lab, f in (("VF", "cra"), ("MGF", "for"), ("STF", "par"))],
                 help="LABEL=path for each species; the label is what the figure shows")
-ap.add_argument("--out", default=os.path.join(ROOT, "results"))
-ap.add_argument("--codes", nargs="*", default=["Lexi=N1", "Zach=N2", "Rebecca=N3"],
-                help="codes for naive account holders (named in the file name); unlisted ones get the next free N number")
+ap.add_argument("--out", default=os.path.join(WORK, "results"))
 ap.add_argument("--focal", nargs="+", default=["GO:0007596", "GO:0002250"])
 ap.add_argument("--names", nargs="*", default=[], help="LABEL=full name overrides for the species legend, e.g. VF='Vegetarian finch'")
 ap.add_argument("--consensus-score", type=int, default=4, help="main panel C: score threshold for consensus terms (all runs pooled)")
@@ -58,9 +61,9 @@ os.makedirs(A.out, exist_ok=True)
 # ------------------------------------------------------------------ load matrices
 files = sorted(glob.glob(os.path.join(A.matrices, "score_matrix.*.tsv")))
 if not files: sys.exit(f"No score_matrix.*.tsv files in {A.matrices}")
-# File names: score_matrix.<informed|naive>.[Provider.]<model>.<batch or account holder>.tsv
+# File names: score_matrix.<informed|naive>.[Provider.]<model>.<batch or naive account code>.tsv
 #   informed: last token = run_a / run_b / run2 (batch a or b on the first author's accounts)
-#   naive:    last token = the account holder's name (coded N1, N2 ... in the figure)
+#   naive:    last token = the naive account code for that model (N1, N2), used as the label
 MODEL_NAMES = {"opus5_5": "Opus 5.5", "fable5_1": "Fable 5.1", "gpt6_1sol": "GPT 6.1 Sol", "gpt6astra": "GPT 6 Astra"}
 MODEL_SHORT = {"opus5_5": "Opus", "fable5_1": "Fable", "gpt6_1sol": "Sol", "gpt6astra": "Astra"}
 MODEL_ORDER = ["opus5_5", "fable5_1", "gpt6_1sol", "gpt6astra"]
@@ -83,7 +86,8 @@ for f in files:
         sys.exit(f"{b}: expected score_matrix.<informed|naive>.[Provider.]<model>.<batch|name>.tsv")
     kind, model, last = tok[0].lower(), tok[-2], tok[-1]
     if h in seen:
-        print(f"skip {b}: identical to {seen[h]}"); continue
+        print(f"WARNING: {b} is byte-identical to {seen[h]}; skipping it (check that the right file was copied)")
+        continue
     seen[h] = b
     d = pd.read_csv(f, sep="\t", dtype={"pathway": str}).set_index("pathway")
     if ids is None:
@@ -94,21 +98,16 @@ for f in files:
         sys.exit(f"{b}: GO IDs differ from the first matrix or values are missing")
     if not X.stack().between(1, 5).all(): sys.exit(f"{b}: scores outside 1-5")
     naive = kind == "naive"
-    meta.append(dict(source=b, model=model.lower(), naive=naive, holder=last if naive else "first author",
+    meta.append(dict(source=b, model=model.lower(), naive=naive, account=last if naive else "first author",
                      batch="" if naive else batch_letter(last), n_runs=len(runs)))
     mats[b] = X.to_numpy(float)
 meta = pd.DataFrame(meta)
-CODES = dict(c.split("=", 1) for c in A.codes)
-for hld in meta[meta.naive].holder.unique():        # auto-code naive holders not given in --codes
-    if hld in CODES: continue
-    used = [int(v[1:]) for v in CODES.values() if v[1:].isdigit()]
-    CODES[hld] = f"N{max(used, default=0) + 1}"
-meta["code"] = [CODES[h] if n else f"I{bt}" for h, n, bt in zip(meta.holder, meta.naive, meta.batch)]
+meta["code"] = [h if n else f"I{bt}" for h, n, bt in zip(meta.account, meta.naive, meta.batch)]
+dup = meta[meta.duplicated(["model", "code"], keep=False)]
+if len(dup): sys.exit("two matrices have the same model and account code:\n" + "\n".join(dup.source))
 meta["label"] = [f"{pretty_model(m)} · {c}" for m, c in zip(meta.model, meta.code)]
 meta["order"] = [(model_rank(m), n, c) for m, n, c in zip(meta.model, meta.naive, meta.code)]
 meta = meta.sort_values("order").drop(columns="order").reset_index(drop=True)
-pd.DataFrame({"account_holder": ["first author"] + list(CODES), "code": ["Ia / Ib (two batches)"] + list(CODES.values())}
-             ).to_csv(os.path.join(A.out, "account_codes.tsv"), sep="\t", index=False)
 SRC = meta.source.tolist(); LAB = dict(zip(meta.source, meta.label))
 meta.to_csv(os.path.join(A.out, "sources.tsv"), sep="\t", index=False)
 print(f"{len(SRC)} sources, {meta.n_runs.sum()} runs")
@@ -318,7 +317,7 @@ save(fig, base); plt.close(fig)
 focal_txt = " and ".join(names.get(g, g) for g in A.focal)
 cap = f"""**Fig. 4. Independent LLM raters agree on which GO terms are relevant to a response to *Philornis downsi*.** \
 (**A**) Mean weighted κ between runs. Runs are labeled with the model followed by account type (I, informed account; \
-N, naive account; a and b, independent runs on the same account and model). (**B**) Scores given to {focal_txt}; \
+N1 and N2, naive accounts, numbered separately for each model; a and b, independent runs on the same account and model). (**B**) Scores given to {focal_txt}; \
 numbers show mean score followed by rank among {len(ids):,} terms in parentheses. (**C**) Consensus terms (median score \
 ≥{A.consensus_score} across all {int(meta.n_runs.sum())} runs; {len(Cdf)} terms) whose NES averaged across species is in \
 the top {A.nes_top:.0%} of all {len(ids):,} tested terms ({len(TOP)} terms). Symbols, NES in each species; black ticks, \

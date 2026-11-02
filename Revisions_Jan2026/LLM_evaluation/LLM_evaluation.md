@@ -31,10 +31,13 @@ otherwise Liberation Sans.
 ## Steps
 ```
 export PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis
-SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/LLM_evaluation/
+export SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/LLM_evaluation/
+cd $SCRIPTDIR
+git pull
+cd $PROJDIR
 
 # 1. term list given to the raters (GO ID and term name only)
-python3 $SCRIPTDIR/make_term_list.py
+python3 $SCRIPTDIR/scripts/make_term_list.py
 
 # 2-4. for each source (one model on one account), e.g. Claude Opus 5.5 on the first author's account, batch a
 SRC=informed.Opus5_5.run_a
