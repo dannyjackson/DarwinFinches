@@ -242,7 +242,8 @@ make_row <- function(d, k, top, part) {
     scale_fill_gradientn(colours = fill_ramp, limits = c(0, 1),
                          breaks = seq(0, 1, 0.25), name = "Power") +
     scale_x_discrete(drop = FALSE,
-                     breaks = thin_breaks(as.character(N_levels[[k]]), x_ticks)) +
+                     breaks = thin_breaks(as.character(N_levels[[k]]), x_ticks),
+                     guide  = guide_axis(n.dodge = 2)) +
     scale_y_discrete(drop = FALSE,
                      breaks = thin_breaks(as.character(s_levels), y_ticks)) +
     labs(title = sp$title, x = sp$xlab, y = "s") +
