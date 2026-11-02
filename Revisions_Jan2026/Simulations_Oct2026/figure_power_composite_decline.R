@@ -75,7 +75,7 @@ dodge_x_over <- 8                       # stagger x labels on two rows when more
 
 # Final print size (Science / Science Advances). Text sizes are final sizes.
 fig_width_cm  <- 12.1
-fig_height_cm <- 4 + 3.0 * length(Ne_values) * length(decline_values) * length(approaches)
+fig_height_cm <- 4 + 1.7 * length(Ne_values) * length(decline_values) * length(approaches)
 text_size     <- 7                      # pt
 
 # light = low power, dark = high power
