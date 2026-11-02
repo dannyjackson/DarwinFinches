@@ -1,0 +1,30 @@
+# A priori review and scoring basis
+
+The scores assess potential biological relevance to a host response, not evidence of selection or proof that a response improves survival. Only the supplied term list, the non-genomic literature below, and general biological knowledge informed the judgments. Genomic, transcriptomic, gene-expression, and epigenomic studies of Galápagos birds encountered in search results were excluded from the evidence used.
+
+## Mechanisms identified
+
+**Blood loss and tolerance.** Early Philornis downsi larvae invade the nares and other tissues; later instars shelter in nest material and feed externally, principally at night. Blood removal and tissue injury can cause severe anemia, impaired development, and nestling death [1, 4]. In small ground finches, greater infestation was associated with lower hemoglobin and more immature red blood cells [2]. Thus red-cell replacement is directly supported without molecular evidence. Iron handling, oxygen limitation, circulatory compensation, and hemostasis are strong physiological predictions; their individual molecular pathways were not assumed to have been demonstrated. Avian thrombocytes provide the relevant physiological analogy for platelet-related terms.
+
+**Immune resistance and its limits.** Experimental parasite removal showed a fly-specific antibody response in adult female medium ground finches. Higher maternal antibody levels tended to accompany fewer parasites, but this did not rescue offspring survival; adult males and nestlings did not show the same induced response [3]. Adaptive immunity is therefore directly relevant, while B-cell and T-cell support, inflammatory signaling, complement, and leukocyte recruitment are mechanistic predictions of varying specificity. Inflammation and antibody-assisted interference with feeding were proposed in that paper, rather than established as effective defenses in all hosts. Antiviral processes received little weight merely because they are immune processes: this fly is a tissue- and blood-feeding ectoparasite, not an intracellular virus. Antibacterial processes are plausible chiefly through damaged barriers and secondary infection, not demonstrated bacterial transmission.
+
+**Tissue damage, repair, and stress.** Nasal and skin damage motivates wound responses, epithelial restoration, extracellular-matrix repair, fibroblast activity, and angiogenesis [1, 4]. Repair pathways were generally treated as strong predictions, not direct measurements of successful healing. Redox balance, metabolic stress, autophagy, and cell survival are supporting responses to injury and resource shortage. Endocrine stress is not uniformly demonstrated: an experimental study found no significant parasite-treatment effect on adult female corticosterone, hematocrit, or body condition [8].
+
+**Behavior and nutritional compensation.** Video observations documented self-preening, consumption of larvae, avoidance by standing on nestmates, and maternal probing of nest material or nestling nares [4]. These observations establish responses, not adequate protection. Mockingbird nestlings increased begging and received more parental provisioning, consistent with energy compensation and tolerance; medium ground finches did not show equivalent compensation [5]. Mockingbird tolerance declined in dry years and was associated with provisioning differences [6]. Energy homeostasis is consequently directly relevant; nutrient sensing and fuel mobilization are strong or supporting predictions. Sensory, motor, learning, and circadian processes have more indirect links unless their terms specify the behavior itself. Leaf-anointing was observed in finches, and plant extracts repelled adult flies and inhibited larval growth in experiments; protection of wild birds remained a hypothesis [7].
+
+## Scoring interpretation
+
+Each term was judged separately using the requested five levels. Generic RNA processing, transcription machinery, embryonic patterning, and reproduction were not promoted simply because all defenses require living cells. General signaling, trafficking, growth, and metabolism received credit only in proportion to a defensible supporting connection. Positive and negative regulation were judged by their relevance to response control, not by assuming that activation is always beneficial. There was no target score distribution.
+
+GO:0160240 appeared with its identifier in place of a name. The official ontology identifies it as RNA polymerase II transcription initiation surveillance; it was scored on that definition, while its input identifier was preserved: https://amigo.geneontology.org/amigo/term/GO%3A0160240
+
+## Key sources
+
+1. Fessl, Sinclair & Kleindorfer (2006). *The life-cycle of Philornis downsi ... and its impacts on nestling survival.* https://pubmed.ncbi.nlm.nih.gov/16899139/
+2. Dudaniec, Kleindorfer & Fessl (2006). *Effects of the introduced ectoparasite Philornis downsi on haemoglobin level and nestling survival in Darwin's Small Ground Finch.* https://doi.org/10.1111/j.1442-9993.2006.01553.x
+3. Koop et al. (2013). *Experimental demonstration of a parasite-induced immune response in wild birds: Darwin's finches and introduced nest flies.* https://doi.org/10.1002/ece3.651
+4. O'Connor, Robertson & Kleindorfer (2010). *Video analysis of host–parasite interactions in nests of Darwin's finches.* https://doi.org/10.1017/S0030605310000086
+5. Knutie et al. (2016). *Galápagos mockingbirds tolerate introduced parasites that affect Darwin's finches.* https://pubmed.ncbi.nlm.nih.gov/28792593/
+6. McNew et al. (2019). *Annual environmental variation influences host tolerance to parasites.* https://pmc.ncbi.nlm.nih.gov/articles/PMC6408884/
+7. Cimadom et al. (2016). *Darwin's finches treat their feathers with a natural repellent.* https://pmc.ncbi.nlm.nih.gov/articles/PMC5056383/
+8. *Experimental test of the effect of introduced hematophagous flies on corticosterone levels of breeding Darwin's finches* (2013). https://pmc.ncbi.nlm.nih.gov/articles/PMC4383185/

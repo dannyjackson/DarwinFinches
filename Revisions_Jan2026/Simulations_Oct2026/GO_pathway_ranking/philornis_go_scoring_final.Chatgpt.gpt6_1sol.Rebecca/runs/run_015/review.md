@@ -1,0 +1,32 @@
+# Independent a priori review: Philornis downsi host responses
+
+## Evidence and mechanisms
+
+Philornis downsi adults are free-living; larvae parasitize birds. Early instars invade nares and other tissues; later instars shelter in nest material and feed externally on blood, mainly at night. Tissue injury, anemia, impaired growth and mortality are well established. Nasal injury can persist into adulthood and affect song. These observations support injury responses, red-cell replacement and oxygen-stress compensation; they do not establish every molecular pathway involved.
+
+* Fessl, Sinclair & Kleindorfer (2006), *The life-cycle of Philornis downsi ... and its impacts on nestling survival*: https://pubmed.ncbi.nlm.nih.gov/16899139/
+* Koop et al. (2011), *Experimental Demonstration of the Fitness Consequences of an Introduced Parasite of Darwin's Finches*: https://pmc.ncbi.nlm.nih.gov/articles/PMC3092749/
+* Kleindorfer et al. (2019), *Introduced parasite changes host phenotype, mating signal and hybridization risk: Philornis downsi effects on Darwin's finch song*: https://pmc.ncbi.nlm.nih.gov/articles/PMC6571467/
+
+Resistance includes an experimentally demonstrated parasite-binding antibody response in adult female medium ground finches. The association with lower parasite abundance was suggestive rather than conclusive, and antibodies did not prevent reproductive failure in that experiment. Young nestlings and males did not show the same induced response. The paper proposes inflammation and immune-mediated disruption of feeding as possible effects, not demonstrated cellular mechanisms. Adaptive immunity and B-cell processes therefore have a stronger specific rationale than antiviral pathways. Innate signaling and cytokines are defensible predictions, but particular cytokines are generally supporting rather than directly demonstrated mechanisms.
+
+* Koop et al. (2013), *Experimental demonstration of a parasite-induced immune response in wild birds: Darwin's finches and introduced nest flies*: https://pmc.ncbi.nlm.nih.gov/articles/PMC3930052/
+
+Behavioral resistance includes nestling preening, consuming larvae and climbing onto nestmates, and maternal probing of nares and nest material. These behaviors are documented, but efficacy and age dependence differ. Finches also rub Psidium galapageium leaves on feathers; extract repellency supports an antiparasite hypothesis without establishing protection of nestlings in nature. Incorporation of experimentally supplied insecticide-treated cotton reduces parasites; this is assisted self-fumigation, not evidence for an evolved insecticide-detoxification mechanism. Perception of bites and motor control are relevant supporting functions, whereas generic synapse formation or embryonic neural patterning has little specific connection.
+
+* O'Connor, Robertson & Kleindorfer (2010), *Video analysis of host-parasite interactions in nests of Darwin's finches*: https://doi.org/10.1017/S0030605310000086
+* Cimadom et al. (2016), *Darwin's finches treat their feathers with a natural repellent*: https://pmc.ncbi.nlm.nih.gov/articles/PMC5056383/
+* Knutie et al. (2014), *Darwin's finches combat introduced nest parasites with fumigated cotton*: https://pubmed.ncbi.nlm.nih.gov/24801182/
+
+Tolerance can preserve fitness without reducing parasites. Galapagos mockingbirds can increase begging and parental food delivery; tolerance varies with rainfall and resource availability and breaks down under drought. Larger nestling body size and associated energetic advantages are proposed contributors. This motivates energy balance, nutrient acquisition, growth and metabolic support, without elevating all metabolism to direct evidence. Blood coagulation, epithelial repair, extracellular matrix restoration, vascular repair and iron handling are strong physiological predictions from bleeding and tissue consumption. Oxidant defenses, autophagy and endocrine signaling are plausible supporting responses rather than demonstrated fly-specific mechanisms. Secondary bacterial defense is plausible through damaged barriers, but bacterial infection is not assumed to be the primary parasite effect.
+
+* Knutie et al. (2016), *Galapagos mockingbirds tolerate introduced parasites that affect Darwin's finches*: https://pubmed.ncbi.nlm.nih.gov/28792593/
+* McNew et al. (2019), *Annual environmental variation influences host tolerance to parasites*: https://pmc.ncbi.nlm.nih.gov/articles/PMC6408884/
+
+## Scoring approach and limits
+
+Each supplied term was considered as a host process, never as a fly process. Scores use the requested 1-5 scale, with no target distribution. Direct immune and injury-response umbrella terms receive the strongest scores; core antibody signaling, erythrocyte compensation, hemostasis and oxygen-stress mechanisms receive high predictive scores. Specific repair and metabolic processes generally receive supporting scores. Generic cellular maintenance and signal transduction usually have a weak indirect connection (2). Highly specialized embryogenesis, gametogenesis, unrelated organogenesis, many neural-development terms, and narrowly specified nucleic-acid housekeeping processes lack a specific link (1). A broad molecular process is not upgraded merely because all responses require living cells. Antiviral processes remain weak at most: the fly is not a virus, and a shared immune component is not direct antiviral evidence. Directional regulation can be relevant to balancing defense and damage; a negative regulator is not automatically irrelevant.
+
+Avian thrombocytes provide a physiological counterpart for platelet-related annotations; these terms are predictive, not claims of mammalian platelets in birds. Neural and sensory terms distinguish adult behavioral function from developmental anatomy. The supplied GO:0160240 has no descriptive name; a web lookup did not establish its meaning, so it receives 1 for lack of an interpretable specific link rather than a guessed function. No GO ID or supplied name was changed.
+
+Only the specified input file was read on the machine. The review used published ecological, behavioral, parasitological and immunological evidence plus general biology. No Galapagos-bird genomic, transcriptomic or gene-expression results, previous conversations or other raters' files were used. Scores are hypotheses of physiological relevance, not evidence of selection, a demonstrated molecular response, or benefit to the host.

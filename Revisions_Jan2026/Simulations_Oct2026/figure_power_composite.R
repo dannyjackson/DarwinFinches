@@ -74,7 +74,7 @@ outline_width <- 0.45                   # mm, at final size
 tile_border   <- 0.1                    # white line between tiles, mm
 
 # Tick labels on the discrete axes: "ends", an integer k (every k-th), or "all"
-x_ticks <- "ends"                       # N
+x_ticks <- "all"                       # N
 y_ticks <- "all"                        # s: every level labelled (uneven spacing)
 
 # Final print size (Science / Science Advances). Drawn at 100%, so text sizes
@@ -115,7 +115,7 @@ A <- read.delim(file_outlier) %>% prep("af") %>%
   transmute(panel = "A", Ne, Gen, sel_s, f0, N = n_selected, power = recall)
 
 B <- read.delim(file_overlap) %>% prep("af") %>%
-  filter(n_parallel > 0) %>%
+  filter(n_parallel > 0, n_parallel != 30) %>%
   group_by(Ne, Gen, sel_s, f0, N = n_parallel) %>%
   summarise(power = mean(parallel_in_all_tops), .groups = "drop") %>%
   mutate(panel = "B")

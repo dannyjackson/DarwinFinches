@@ -1,0 +1,31 @@
+# Independent a priori review
+
+Ratings concern potential host responses to Philornis downsi, not evidence that any particular GO process has evolved or changed expression. No genomic, transcriptomic, or gene-expression results from Galapagos birds were used. Each supplied term was considered separately; broad housekeeping functions received weak-link scores unless their meaning specified a stronger physiological connection. Developmental and reproductive processes were not automatically promoted simply because parasitized nestlings grow poorly.
+
+## Damage and compensatory physiology
+
+Fessl, Sinclair and Kleindorfer (2006), *The life-cycle of Philornis downsi ... and its impacts on nestling survival*, documents early larvae in nostrils and other tissues and older larvae feeding externally on blood. Tissue injury and anemia are central causes of mortality. Thus wound responses, erythrocyte production and physiological compensation for blood loss have particularly close links. Hemostasis, epithelial repair, extracellular matrix repair, vascular integrity and oxygen homeostasis are strong physiological predictions, rather than all being experimentally demonstrated defenses. Source: https://pubmed.ncbi.nlm.nih.gov/16899139/
+
+Dudaniec, Kleindorfer and Fessl (2006), *Effects ... on haemoglobin level and nestling survival in Darwin's Small Ground Finch*, found lower hemoglobin with increasing infestation and increased immature red cells as hemoglobin declined. This directly supports compensatory erythropoiesis; iron balance and hematopoietic progenitor differentiation are core supporting mechanisms. Source: https://doi.org/10.1111/j.1442-9993.2006.01553.x ; author-affiliated abstract: https://researchers.mq.edu.au/en/publications/effects-of-the-introduced-ectoparasite-philornis-downsi-on-haemog/
+
+## Resistance and immune responses
+
+Koop and colleagues (2013), *Experimental demonstration of a parasite-induced immune response in wild birds*, experimentally showed P. downsi-binding antibody increases in adult female medium ground finches. Higher maternal antibody levels tended to accompany lower fly abundance, but offspring were not rescued and males and nestlings lacked comparable responses. Adaptive immunity is directly implicated; B-cell activation, differentiation and receptor signaling and T-cell help are core predictions. Innate recognition, cytokines, inflammation and complement are plausible resistance mechanisms, with less direct evidence for their specific components. The paper discusses skin inflammation and defensive molecules as possible ways to impair ectoparasite feeding. Source: https://doi.org/10.1002/ece3.651
+
+## Tolerance, nutrition and behavior
+
+Knutie and colleagues (2016), *Galapagos mockingbirds tolerate introduced parasites that affect Darwin's finches*, showed tolerance in mockingbirds associated with increased nestling begging and parental provisioning. Finches lacked equivalent compensation; neither species showed a significant antibody response in that experiment. This prevents treating immune resistance as universal. Energy balance is tightly connected; nutrient metabolism and transport, growth, muscular activity and relevant sensory signaling are supporting processes, while generic neuronal development is much less specific. Source: https://doi.org/10.1890/15-0119.1 ; https://pubmed.ncbi.nlm.nih.gov/27220210/
+
+McNew and colleagues (2019), *Annual environmental variation influences host tolerance to parasites*, found mockingbird tolerance declined in low-rainfall years; provisioning and food availability appear important. Nutritional compensation depends on ecological circumstances and is not established for every host. Source: https://doi.org/10.1098/rspb.2019.0049 ; https://experts.arizona.edu/en/publications/annual-environmental-variation-influences-host-tolerance-to-paras/
+
+McNew and Clayton (2018), *Alien Invasion: Biology of Philornis Flies Highlighting Philornis downsi*, reviews resistance, tolerance and avoidance. Larval removal/preening is not widespread. Females may stand more and brood less in parasitized nests, potentially compromising nestling thermal protection. Leaf rubbing with guayabillo is proposed as self-medication, not a proven general defense. These observations support behavioral detection/avoidance and thermoregulation as plausible responses without implying that all behavior, learning or detoxification pathways are direct defenses. Source: https://doi.org/10.1146/annurev-ento-020117-043103
+
+*Behavior of the Avian Parasite Philornis downsi in and Near Host Nests* describes Galapagos flycatcher nestlings dislodging larvae through flapping/preening, plus scratching that did not necessarily remove larvae. This adds behavioral evidence from another passerine without establishing universal effectiveness. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC8813692/
+
+Galligan and Kleindorfer (2009), *Naris and beak malformation ... in Darwin's small ground finch*, establishes persistent tissue damage. This supports local epithelial/skin repair and structural processes more strongly than unrelated embryonic organogenesis. Source: https://doi.org/10.1111/j.1095-8312.2009.01309.x
+
+## Rating interpretation and special case
+
+Scores of 5 were reserved for terms directly describing documented responses, including immune/adaptive responses, inflammatory responses discussed as a host mechanism, wound response and compensatory erythrocyte differentiation. Scores of 4 identify core immune or repair components and strong anemia/energy-compensation predictions. Scores of 3 identify plausible support, including oxidative stress, metabolism, repair signaling and vascular remodeling. Specific antiviral, meiotic and embryonic programs generally lack a specific connection. P. downsi is a tissue/blood-feeding ectoparasite, not an intracellular or viral pathogen; those labels do not establish relevance.
+
+The input gives GO:0160240 without an informative name. The GO authority identifies it as RNA polymerase II transcription initiation surveillance, scored as a weakly related general transcription-quality-control process (2). The GO ID and supplied input were preserved. Source: https://amigo.geneontology.org/amigo/term/GO%3A0160240
