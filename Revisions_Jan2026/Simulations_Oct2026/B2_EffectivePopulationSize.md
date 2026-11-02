@@ -90,12 +90,6 @@ Output columns in `Ne_estimates.tsv`: `pop species timepoint n_chrom n_sites the
 | Medium ground finch (FOR) | 73111 (1483) | 73480 (1279) | 73295 (979) |
 | Small tree finch (PAR) | 50639 (1016) | 48416 (987) | 49528 (708) |
 
-For orientation only, the previous values divided by 5 are:
-- CRA ≈ 31,200 (pre) / 18,100 (post)
-- FOR ≈ 41,400 / 43,500
-- PAR ≈ 33,900 / 35,600
-
-The rerun will differ for CRA in particular, because crapre previously came from a different SAF set and denominator.
 
 ## 5. Text for the manuscript (update numbers after rerunning)
 

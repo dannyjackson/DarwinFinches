@@ -58,7 +58,7 @@ Check the log for:
 ```
 cd ${PROJDIR}
 mkdir -p output/logs
-D=1.00 0.90
+D=(1.00 0.90)
 GEN_TIMES=(5 10)
 SELS=(0.01 0.02 0.05 0.1 0.2 0.3 0.4 0.5)
 F0S=(0.05 0.1 0.2 0.4 0.6)
