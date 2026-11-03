@@ -171,3 +171,7 @@ Rscript ${SCRIPTDIR}/figure_power_composite_decline.R
 ## Generate multipanel plot of all analyses
 ```
 Rscript ${SCRIPTDIR}/multipanel_power_figure.R
+
+```
+# Parallel GSEA
+Rscript ${SCRIPTDIR}/plot_gsea_parallel_nsel.R 
