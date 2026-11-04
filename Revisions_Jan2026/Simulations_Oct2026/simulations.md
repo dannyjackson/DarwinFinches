@@ -174,29 +174,18 @@ Rscript ${SCRIPTDIR}/multipanel_power_figure.R
 
 ```
 # Parallel GSEA
-#!/usr/bin/env bash
-#SBATCH --job-name=gsea_power_parallel
-#SBATCH --output=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/output/logs/%x_%j.out
-#SBATCH --error=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/output/logs/%x_%j.err
-#SBATCH --time=24:00:00
-#SBATCH --cpus-per-task=4
-#SBATCH --account=mcnew
-#SBATCH --partition=standard
-#SBATCH --nodes=1
-#SBATCH --ntasks=2
-#SBATCH --mem=8G
 
 PROJDIR=/xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis/
 SCRIPTDIR=${PROJDIR}/DarwinFinches/Revisions_Jan2026/Simulations_Oct2026/
 cd $SCRIPTDIR 
 git pull
 cd $PROJDIR
-module load R
-Rscript ${SCRIPTDIR}/D1_RankPower.top5.parallel.R 
 
-
-
-cd /xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis
 
 ARR=$(sbatch --parsable ${SCRIPTDIR}/run_rankpower_parallel_array.sh)
 sbatch --dependency=afterok:$ARR ${SCRIPTDIR}/run_rankpower_parallel_merge.sh
+
+
+cd /xdisk/mcnew/finches/dannyjackson/simulations/gsea_power_analysis
+module load R
+Rscript ${SCRIPTDIR}/figure_power_composite.R      # or overwrite the one in Simulations_Oct2026

@@ -6,17 +6,19 @@
 # line up between the parts.
 #
 #   I   Comparison across approaches at one demography (default Ne = 25k, decline = 1)
-#         rows    = approach A-D
+#         rows    = approach A-D (the 2 x 2: outlier / gene set x one species / three species)
 #         columns = starting frequency f0
-#   II  Selected approaches (default D only) at the other Ne values
-#       (default 50k, 75k), same decline
-#         rows    = one sub-row per Ne within each approach
+#   II  The empirical GSEA pipeline (approach E) at the same demography
+#         rows    = one sub-row per Ne in Ne_II (default: Ne_main only; add 50k, 75k to
+#                   reproduce the old part II)
 #         columns = starting frequency f0
 #
-#   Approaches  A  outliers: one species           (N = selected windows in genome)
-#               B  outliers: three-species overlap (N = parallel genes in genome)
-#               C  GSEA: one species               (N = selected windows in 10-window pathway)
-#               D  GSEA: three species             (N = selected blood-coagulation genes)
+#   Approaches  A  outliers: one species              (N = selected windows in genome)
+#               B  outliers: three-species overlap    (N = parallel genes in genome)
+#               C  gene-set rank test: one species    (N = selected windows in 10-window set)
+#               D  gene-set rank test: three species  (N = selected windows in 10-window set,
+#                                                      same N in every species)
+#               E  empirical GSEA pipeline, three species (N = selected blood-coagulation genes)
 #
 #   tile    = x: number selected (N), y: selection coefficient s, fill: power
 #   outline = orange, one shade per power level (default > 0.80, > 0.90, > 0.95)
@@ -28,7 +30,8 @@
 #   A  output/fst_outlier_power_nsel.tsv                    outlier_power_nsel.R
 #   B  output/parallel_overlap.permutations.tsv             parallel_outlier_overlap.R
 #   C  output/fst_rank_by_selected_windows.nnull10000.tsv   D1_RankPower.top5.test.R
-#   D  gsea_empirical_power_nsel/summary_nsel.tsv           plot_gsea_parallel_nsel.R
+#   D  output/fst_rank_by_selected_windows.parallel3.nnull10000.tsv   D1_RankPower.top5.parallel.R
+#   E  gsea_empirical_power_nsel/summary_nsel.tsv           plot_gsea_parallel_nsel.R
 #
 # Run from the project directory (gsea_power_analysis):
 #   Rscript ${SCRIPTDIR}/figure_power_composite.R
@@ -48,18 +51,19 @@ suppressPackageStartupMessages({
 file_outlier <- "output/fst_outlier_power_nsel.tsv"
 file_overlap <- "output/parallel_overlap.permutations.tsv"
 file_gsea1   <- "output/fst_rank_by_selected_windows.nnull10000.tsv"
-file_gsea3   <- "gsea_empirical_power_nsel/summary_nsel.tsv"
+file_gsea3   <- "output/fst_rank_by_selected_windows.parallel3.nnull10000.tsv"
+file_gsea_emp <- "gsea_empirical_power_nsel/summary_nsel.tsv"
 out_dir      <- "output/figure_power_composite"
 
 decline_main <- 1                       # both parts
 Ne_main      <- "25k"                   # part I
-Ne_compare   <- c("50k", "75k")         # part II sub-rows (Ne_main is not repeated)
-approaches_II <- c("D")                 # approaches shown in part II, e.g. c("C", "D")
+Ne_II        <- c("25k")                # part II sub-rows; c("25k", "50k", "75k") for the Ne comparison
+approaches_II <- c("E")                 # approaches shown in part II
 
 # Headings next to the numerals (sentence case, no final period). NULL = numeral only.
 # Update the Ne in title_I if you change Ne_main.
 title_I  <- "Comparison of approaches (Ne = 25,000)"
-title_II <- "Effect of Ne on cross-species pathway enrichment"
+title_II <- "Empirical GSEA pipeline, three species (Ne = 25,000)"
 f0_values    <- NULL                    # columns in both parts; NULL = every f0 present
 Gen_values   <- NULL                    # one figure per Gen; NULL = every Gen present
 s_values     <- NULL                    # tile rows; NULL = every s present
@@ -124,23 +128,27 @@ C <- read.delim(file_gsea1) %>% prep("af") %>%
   transmute(panel = "C", Ne, Gen, sel_s, f0, N = X_selected,
             power = .data[[paste0("prop_top_", gsea_top, "pct")]])
 
-D_raw <- read.delim(file_gsea3)
-D <- D_raw %>% prep("f0") %>%
-  transmute(panel = "D", Ne, Gen, sel_s, f0, N = n_selected,
-            power = .data[[paste0("power_cross_top", gsea_top)]])
-n_term <- max(D_raw$n_selected)
+D <- read.delim(file_gsea3) %>% prep("af") %>%
+  transmute(panel = "D", Ne, Gen, sel_s, f0, N = X_selected,
+            power = .data[[paste0("prop_top_", gsea_top, "pct")]])
 
-dat <- bind_rows(A, B, C, D)
+E_raw <- read.delim(file_gsea_emp)
+E <- E_raw %>% prep("f0") %>%
+  transmute(panel = "E", Ne, Gen, sel_s, f0, N = n_selected,
+            power = .data[[paste0("power_cross_top", gsea_top)]])
+n_term <- max(E_raw$n_selected)
+
+dat <- bind_rows(A, B, C, D, E)
 if (!is.null(Gen_values)) dat <- dat %>% filter(Gen %in% Gen_values)
 if (!is.null(s_values))   dat <- dat %>% filter(round(sel_s, 6) %in% round(s_values, 6))
 
 if (!is.null(f0_values)) dat <- dat %>% filter(round(f0, 6) %in% round(f0_values, 6))
 
 dat_I  <- dat %>% filter(Ne == Ne_main)
-dat_II <- dat %>% filter(Ne %in% setdiff(Ne_compare, Ne_main), panel %in% approaches_II)
+dat_II <- dat %>% filter(Ne %in% Ne_II, panel %in% approaches_II)
 
 if (nrow(dat_I) == 0)  stop("Part I: no data for Ne = ", Ne_main, ", decline = ", decline_main)
-if (nrow(dat_II) == 0) stop("Part II: no data for Ne = ", paste(Ne_compare, collapse = ", "),
+if (nrow(dat_II) == 0) stop("Part II: no data for Ne = ", paste(Ne_II, collapse = ", "),
                             ", decline = ", decline_main)
 
 # Shared levels so both parts use the same tiles, columns and colours
@@ -177,7 +185,8 @@ specs <- list(
   A = list(title = "A  Outliers, one species",           xlab = "Selected windows (N)"),
   B = list(title = "B  Outliers, three species",         xlab = "Parallel genes (N)"),
   C = list(title = "C  Pathway enrichment, one species",  xlab = "Selected windows in pathway (N)"),
-  D = list(title = "D  Pathway enrichment, three species",
+  D = list(title = "D  Pathway enrichment, three species",  xlab = "Selected windows in pathway (N)"),
+  E = list(title = "E  Empirical GSEA pipeline, three species",
            xlab = sprintf("Selected genes in term (N, of %d)", n_term))
 )
 
@@ -274,7 +283,7 @@ for (g in sort(unique(c(dat_I$Gen, dat_II$Gen)))) {
   dII <- dat_II %>% filter(Gen == g)
 
   ks    <- c("A", "B", "C", "D")
-  ks_II <- intersect(ks, approaches_II)
+  ks_II <- intersect(c("A", "B", "C", "D", "E"), approaches_II)
   cells <- c(list(numeral("I", title_I)),
              lapply(ks, function(k) make_row(filter(dI, panel == k), k, k == ks[1], "I")),
              list(numeral("II", title_II)),
@@ -306,7 +315,9 @@ cat("  A: power = share of selected windows in the top 1% of 10,000 (null 0.01)\
 cat("  B: power = share of parallel genes in all three top-1% lists (null 0)\n")
 cat(sprintf("  C: power = P(10-window pathway ranks in top %s%%) (null %g)\n",
             gsea_top, as.numeric(gsea_top) / 100))
-cat(sprintf("  D: power = P(blood coagulation in top %s%% by mean NES) (null %g)\n",
+cat(sprintf("  D: power = P(10-window set selected in all three species ranks in top %s%% by mean score) (null %g)\n",
+            gsea_top, as.numeric(gsea_top) / 100))
+cat(sprintf("  E: power = P(blood coagulation in top %s%% by mean NES, empirical pipeline) (null %g)\n",
             gsea_top, as.numeric(gsea_top) / 100))
 if (length(power_levels) > 0)
   cat(sprintf("  Orange outlines: power > %s (light to dark)\n",
